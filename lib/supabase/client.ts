@@ -1,22 +1,16 @@
-// Browser-side Supabase client.
+// Browser-side Supabase client for use in Client Components.
 //
-// This client runs inside Client Components in the browser. It reads the
-// session out of cookies that are managed by `@supabase/ssr`, and is the
-// entry point used for all interactive auth flows: email + password sign in,
-// Google OAuth, password reset emails, sign out, etc.
+// Used for all interactive auth flows: email/password sign in, Google OAuth,
+// password reset, and sign out. Reads the session from cookies managed by
+// @supabase/ssr.
 //
-// We deliberately create a brand new client every time `createClient()` is
-// called instead of caching a singleton. `createBrowserClient` already wires
-// up its own internal storage backed by `document.cookie`, so the cost of
-// reinstantiation is small, and we avoid the React Fast Refresh / module
-// re-evaluation issues that come with module-scoped singletons.
+// A new client is created on every call rather than a module-level singleton
+// to avoid stale state issues with React Fast Refresh in development.
 import { createBrowserClient } from "@supabase/ssr";
 
 export function createClient() {
-  // Both env vars are public (NEXT_PUBLIC_*) and safe to ship to the browser.
-  // The non-null assertion is appropriate here: if either is missing the app
-  // is unbuildable, so we want a loud runtime failure rather than a silent
-  // fallback to an unauthenticated client.
+  // NEXT_PUBLIC_* vars are safe to expose to the browser.
+  // Non-null assertions are intentional — missing vars should fail loudly.
   return createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,

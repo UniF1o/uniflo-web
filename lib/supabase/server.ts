@@ -1,20 +1,14 @@
-// Server-side Supabase client.
+// Server-side Supabase client for use in Server Components, Route Handlers,
+// and Server Actions.
 //
-// Used inside Server Components, Route Handlers, and Server Actions. Unlike
-// the browser client, this one cannot rely on `document.cookie` — it has to
-// be handed the request cookies explicitly via Next.js' `cookies()` helper.
-//
-// Per the @supabase/ssr docs, we create a NEW client per server invocation
-// (never a shared module-level instance), because Server Components are
-// rendered concurrently for many users and a shared client would leak the
-// wrong session cookies between requests.
+// Cannot use document.cookie — reads cookies via Next.js' cookies() helper
+// instead. Always create a new client per request; never share one instance
+// across requests or concurrent renders will mix up session cookies.
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
 export async function createClient() {
-  // In Next.js 15+ `cookies()` is async — it returns a Promise that resolves
-  // to the request-scoped cookie store. Awaiting it here lets us pass a sync
-  // cookie API into Supabase below.
+  // cookies() is async in Next.js 15+ — await it to get the request-scoped store.
   const cookieStore = await cookies();
 
   return createServerClient(
@@ -22,28 +16,22 @@ export async function createClient() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        // `getAll` lets Supabase read the existing auth cookies it set on a
-        // previous response, so it can hydrate the current session.
+        // Reads existing auth cookies so Supabase can hydrate the session.
         getAll() {
           return cookieStore.getAll();
         },
-        // `setAll` writes refreshed auth cookies back to the response.
-        //
-        // When this client is used from a Server Component, Next.js does NOT
-        // allow cookie writes (the response headers are already locked in
-        // for the streamed render). That call throws, and we swallow it —
-        // the proxy.ts at the repo root is responsible for refreshing the
-        // session on every request, so missing a write here is harmless.
-        //
-        // When used from a Route Handler or Server Action, cookie writes DO
-        // succeed and refreshed tokens are persisted as expected.
+        // Writes refreshed auth tokens back to the response.
+        // Wrapped in try/catch because Server Components cannot write response
+        // headers — Next.js throws if you try. The proxy (proxy.ts) handles
+        // session refresh on every request, so missing the write here is safe.
+        // Route Handlers and Server Actions can write cookies without issue.
         setAll(cookiesToSet) {
           try {
             cookiesToSet.forEach(({ name, value, options }) =>
               cookieStore.set(name, value, options),
             );
           } catch {
-            // Called from a Server Component — see comment above.
+            // Intentionally swallowed — called from a Server Component.
           }
         },
       },
