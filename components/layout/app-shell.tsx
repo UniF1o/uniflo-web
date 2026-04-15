@@ -1,13 +1,9 @@
-// AppShell — client-side chrome for every authenticated route.
+// AppShell — client-side chrome (navbar + sidebar) for every signed-in page.
 //
-// The (app) server-component layout handles auth / redirect logic, then hands
-// control to this shell. We split them because:
-//   1. Server components can call `redirect()` and read cookies via the
-//      Supabase server client. Client components can't.
-//   2. Drawer state (sidebar open/closed on mobile) needs `useState`, which
-//      only works in client components.
-// Keeping the shell thin lets us reuse it if we ever need an alternate
-// protected layout (e.g. an onboarding wizard with the same chrome).
+// The (app) layout is a Server Component that handles auth and redirects.
+// This component is a Client Component so it can hold the mobile sidebar's
+// open/closed state via useState — something server components can't do.
+// The split keeps each side doing only what it's suited for.
 "use client";
 
 import { useState } from "react";
@@ -22,12 +18,15 @@ interface AppShellProps {
 }
 
 export function AppShell({ user, children }: AppShellProps) {
-  // Drawer state. Only meaningful on mobile — on md+ the sidebar is always
-  // visible regardless of this value.
+  // Controls the mobile sidebar drawer. On md+ the sidebar is always visible
+  // so this value is ignored at those breakpoints.
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  // Track the last pathname we observed. If it changes, the user navigated,
-  // so auto-close the drawer. Doing this as derived state (instead of in a
-  // useEffect) avoids the extra render that React 19 now warns about.
+
+  // Auto-close the drawer when the user navigates to a new route.
+  // We compare the current pathname to the last one we saw and call setState
+  // directly during render (derived state pattern) rather than in a useEffect.
+  // React 19 warns against setState inside effects because it causes an extra
+  // render cycle — this approach avoids that.
   const pathname = usePathname();
   const [lastPathname, setLastPathname] = useState(pathname);
   if (lastPathname !== pathname) {
@@ -36,26 +35,24 @@ export function AppShell({ user, children }: AppShellProps) {
   }
 
   return (
-    // The outer flex column keeps navbar at the top and the sidebar + main
-    // row filling the remaining viewport height.
+    // Flex column: navbar fixed to top, sidebar + main filling the remaining height.
     <div className="flex min-h-dvh flex-col">
       <Navbar
         user={user}
         onToggleSidebar={() => setIsSidebarOpen((open) => !open)}
       />
 
-      {/* The sidebar + main row. On mobile the sidebar floats as a drawer
-       * (position: fixed) and the main column spans the full width. On md+
-       * the sidebar becomes an in-flow column and the main area flexes into
-       * the remaining space. */}
+      {/* Sidebar + content row.
+       * Mobile: sidebar is a fixed drawer (off-screen by default).
+       * Desktop (md+): sidebar is an in-flow column; main flexes into the rest. */}
       <div className="flex flex-1">
         <Sidebar
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
         />
 
-        {/* `min-w-0` prevents long text/tables inside the main content from
-         * forcing the flex container to grow wider than the viewport. */}
+        {/* min-w-0 prevents flex children from growing wider than the viewport
+         * when page content is long (e.g. wide tables or code blocks). */}
         <main className="flex min-w-0 flex-1 flex-col">
           <div className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 md:px-8 md:py-10">
             {children}

@@ -1,19 +1,17 @@
-// Brand mark — the "Uniflo" wordmark rendered with the display serif.
+// BrandMark — the "Uniflo" wordmark in the display serif.
 //
-// Centralised so the visual brand treatment (font, tracking, accent dot) stays
-// consistent across the navbar, auth layout, and any future hero usage. Kept
-// deliberately tiny: no props, no variants. If we later add logomark sizes
-// or a monogram, extend this file rather than duplicating the markup.
+// Single source of truth for the brand treatment (font, tracking, accent dot)
+// so it looks identical in the navbar, auth layout, and landing page.
+// Accepts an optional href so the link target can be overridden if needed.
 import Link from "next/link";
 
 export function BrandMark({ href = "/" }: { href?: string }) {
   return (
     <Link
       href={href}
-      // Display serif + tight leading gives the brand an editorial feel
-      // rather than a generic tech-startup one. The terracotta dot at the
-      // end is the subtle distinguishing mark — a nod to the "full stop" of
-      // an application being finally submitted.
+      // Display serif + tight tracking gives the wordmark an editorial feel.
+      // The terracotta dot is a nod to the "full stop" of a submitted
+      // application — subtle brand detail, not decoration.
       className="group inline-flex items-baseline gap-1 font-display text-2xl leading-none tracking-tight text-foreground"
       aria-label="Uniflo home"
     >

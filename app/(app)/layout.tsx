@@ -1,13 +1,10 @@
-// (app) route-group layout — the protected area of the app.
+// (app) route-group layout — wraps every authenticated page.
 //
-// Route groups in the App Router are folders wrapped in parentheses. They
-// let us share a layout across a set of routes WITHOUT adding a URL
-// segment. So `/dashboard` lives at `app/(app)/dashboard/page.tsx` but its
-// URL stays `/dashboard`, not `/app/dashboard`.
+// Route groups (folders in parentheses) share a layout without adding a URL
+// segment. So app/(app)/dashboard/page.tsx is reachable at /dashboard.
 //
-// This layout does the auth check on the server and hands off rendering to
-// the client-side AppShell (which owns interactive chrome like the mobile
-// drawer).
+// This layout runs on the server: it validates the session and redirects to
+// /login if no user is found, before any child page renders.
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/layout/app-shell";
@@ -17,17 +14,15 @@ export default async function ProtectedLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Server Supabase client reads the session cookies that the proxy has
-  // already refreshed on this request.
+  // The proxy has already refreshed the session cookies for this request.
+  // getUser() validates the JWT — if invalid or missing, user is null.
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // No session → bounce to /login. `redirect()` throws, so execution stops
-  // here and no children render — the browser never sees unauthenticated
-  // chrome. `/login` is built in Task 3; until then this route sends the
-  // user to a 404, which is acceptable for a protected area.
+  // redirect() throws internally, so no code below this runs for guests.
+  // The browser never receives any authenticated UI without a valid session.
   if (!user) {
     redirect("/login");
   }

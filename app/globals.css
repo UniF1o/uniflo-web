@@ -1,52 +1,43 @@
 /*
  * Uniflo global styles — design token foundation for the entire app.
  *
- * Tailwind v4 uses CSS-first config via the `@theme` directive. Every token
- * declared inside `@theme` becomes a Tailwind utility automatically — e.g.
- * `--color-primary: ...` creates `bg-primary`, `text-primary`, etc.
+ * Tailwind v4 uses CSS-first config via `@theme`. Every custom property
+ * declared here becomes a Tailwind utility automatically:
+ *   --color-primary → bg-primary, text-primary, border-primary, etc.
  *
- * Aesthetic direction: "editorial-confident warmth". Warm paper background,
- * deep indigo brand, terracotta accent. Distinctive typography (Instrument
- * Serif for display, Geist for body) — intentionally avoiding the default
- * Inter/Arial look.
+ * Palette direction: warm cream background, deep indigo brand, terracotta
+ * accent. Typography: Instrument Serif (display) + Geist (body).
  */
 @import "tailwindcss";
 
 @theme {
-  /* Colors ----------------------------------------------------------------
-   * Dominant palette (cream + indigo) with a warm accent. Hex values chosen
-   * for WCAG AA contrast on the primary text/bg pair (foreground on bg is
-   * ~15:1, well above 4.5:1). */
-  --color-background: #faf7f2;         /* warm cream — paper */
-  --color-foreground: #121417;         /* near-black with a blue undertone */
-  --color-muted: #ede7db;              /* dusty stone for muted surfaces */
-  --color-muted-foreground: #5c5b57;   /* low-emphasis text on any surface */
-  --color-border: #e0d9cb;             /* subtle hairlines on cream bg */
-  --color-primary: #1b2540;            /* deep indigo night — brand color */
-  --color-primary-foreground: #faf7f2; /* readable text on primary */
-  --color-accent: #d97757;             /* terracotta — warm, distinctly SA */
-  --color-accent-foreground: #faf7f2;  /* readable text on accent */
-  --color-destructive: #b23a3a;        /* deep red for destructive actions */
-  --color-ring: #1b2540;               /* focus ring matches primary */
+  /* ── Colors ──────────────────────────────────────────────────────────── */
+  --color-background: #faf7f2;         /* warm cream — paper, not white */
+  --color-foreground: #121417;         /* near-black (~15:1 contrast on bg) */
+  --color-muted: #ede7db;              /* dusty stone — muted surfaces */
+  --color-muted-foreground: #5c5b57;   /* low-emphasis text */
+  --color-border: #e0d9cb;             /* hairline on cream */
+  --color-primary: #1b2540;            /* deep indigo — brand colour */
+  --color-primary-foreground: #faf7f2; /* text on primary bg */
+  --color-accent: #d97757;             /* terracotta — warm SA anchor */
+  --color-accent-foreground: #faf7f2;  /* text on accent bg */
+  --color-destructive: #b23a3a;        /* error / destructive actions */
+  --color-ring: #1b2540;               /* focus ring (matches primary) */
 
-  /* Typography ------------------------------------------------------------
-   * --font-display and --font-body are wired to the next/font CSS variables
-   * declared in app/layout.tsx. They give us `font-display` and `font-body`
-   * utilities in Tailwind. */
+  /* ── Typography ──────────────────────────────────────────────────────── *
+   * Wired to the CSS variables set by next/font in app/layout.tsx.
+   * Use font-display for headings, font-body for everything else.         */
   --font-display: var(--font-instrument-serif), ui-serif, Georgia, serif;
   --font-body: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
 
-  /* Radii ---------------------------------------------------------------- */
+  /* ── Radii ───────────────────────────────────────────────────────────── */
   --radius-sm: 0.25rem;
   --radius-md: 0.5rem;
   --radius-lg: 0.75rem;
   --radius-xl: 1rem;
 }
 
-/* Base element styling. Kept deliberately small — utility classes do the
- * heavy lifting per component. */
 html {
-  /* Smooth scroll for in-page anchor links (e.g. skip-to-content). */
   scroll-behavior: smooth;
 }
 
@@ -54,24 +45,21 @@ body {
   background-color: var(--color-background);
   color: var(--color-foreground);
   font-family: var(--font-body);
-  /* Prevents horizontal overflow when responsive containers are slightly
-   * wider than the viewport (e.g. mobile drawer transforms). */
+  /* Stops the mobile sidebar transform from creating a horizontal scrollbar. */
   overflow-x: hidden;
-  /* Improve legibility for body copy at normal sizes. */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Global focus ring — visible, on-brand, consistent across all interactive
- * elements. Using `:focus-visible` so the ring only shows on keyboard focus,
- * never on mouse clicks. */
+/* Show the focus ring on keyboard navigation only — not on mouse clicks.
+ * Colour matches the primary brand so it feels intentional, not browser-default. */
 :focus-visible {
   outline: 2px solid var(--color-ring);
   outline-offset: 2px;
   border-radius: var(--radius-sm);
 }
 
-/* Subtle text selection color that matches the accent. */
+/* Selection highlight uses the accent so selected text stays on-brand. */
 ::selection {
   background-color: var(--color-accent);
   color: var(--color-accent-foreground);

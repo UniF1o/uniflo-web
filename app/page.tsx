@@ -1,10 +1,8 @@
-// Public landing page at `/`. Rendered outside both route groups, so it has
-// no navbar/sidebar — just the brand mark, a short value prop, and CTAs
-// into the auth flow.
+// Public landing page at `/`. Lives outside both route groups — no navbar or
+// sidebar. Gives unauthenticated visitors the value proposition and two clear
+// paths: start an application (/signup) or sign back in (/login).
 //
-// This is a minimal Task 2 entry point. The marketing site will be expanded
-// later; for now it simply gives unauthenticated visitors a clean starting
-// point and an obvious way into /signup or /login.
+// This is a minimal placeholder. The full marketing site is post-MVP.
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { BrandMark } from "@/components/layout/brand-mark";
@@ -38,14 +36,13 @@ export default function Home() {
 
       <main className="flex flex-1 flex-col items-start justify-center gap-8 px-6 py-16 md:px-10 md:py-24">
         <div className="max-w-3xl space-y-6">
-          {/* Small eyebrow label gives the hero a grounded, editorial feel. */}
+          {/* Eyebrow label — small pill above the headline grounds the hero. */}
           <span className="inline-flex items-center gap-2 rounded-full border border-border bg-background/60 px-3 py-1 text-xs uppercase tracking-widest text-muted-foreground">
             <span className="h-1.5 w-1.5 rounded-full bg-accent" />
             For South African students
           </span>
 
-          {/* Display-serif headline. Tight leading + balanced wrap make this
-           * read as one continuous idea rather than three separate lines. */}
+          {/* Display headline — tight leading so the two lines read as one idea. */}
           <h1 className="font-display text-5xl leading-[1.05] tracking-tight text-foreground md:text-7xl">
             Apply to every university.
             <br />
@@ -59,9 +56,8 @@ export default function Home() {
           </p>
         </div>
 
-        {/* CTA row. Primary CTA is deeply saturated so it visually anchors
-         * the page; the secondary CTA is a subtle text link that respects
-         * the paper aesthetic. */}
+        {/* CTA row — primary button is dark/saturated to anchor the eye;
+         * secondary is a ghost link so it doesn't compete. */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <Link
             href="/signup"

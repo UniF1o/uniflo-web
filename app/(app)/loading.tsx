@@ -1,10 +1,8 @@
-// (app) loading UI — shown automatically by Next.js while a page inside the
-// (app) route group is being server-rendered.
+// (app) loading UI — shown while any page inside (app) is streaming from the server.
 //
-// Next looks for a `loading.tsx` sibling of a page and mounts it inside a
-// React Suspense boundary while the page's data fetches. Keeping this at
-// the (app) level means the navbar/sidebar chrome stays mounted during
-// navigation — only the main content area gets replaced with the skeleton.
+// Next.js automatically wraps this in a Suspense boundary. Because it lives
+// at the route-group level, the navbar and sidebar stay mounted during
+// navigation — only the main content area swaps out for this skeleton.
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function AppLoading() {
@@ -12,10 +10,8 @@ export default function AppLoading() {
     <div
       role="status"
       aria-live="polite"
-      // The skeleton mirrors the typical shape of a page inside the shell:
-      // a heading, a supporting paragraph, and a grid of content cards. It
-      // won't be pixel-identical to any real page, but it pre-allocates the
-      // vertical space so the page doesn't jump when it loads.
+      // Approximates a typical page shape (heading + card grid) to reduce
+      // layout shift when the real content arrives.
       className="flex flex-col gap-6"
     >
       {/* Visually hidden label so screen-reader users hear "Loading" while

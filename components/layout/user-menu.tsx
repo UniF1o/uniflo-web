@@ -1,9 +1,8 @@
-// UserMenu — avatar + dropdown for the signed-in user.
+// UserMenu — avatar button + dropdown for the signed-in user.
 //
-// Client component: manages the dropdown's open/closed state and fires the
-// sign-out call to Supabase. Invoked only from inside (app) layouts where a
-// user is guaranteed to exist (route protection in the layout has already
-// run), so the `user` prop is non-nullable.
+// Client component: owns the dropdown open/closed state and handles sign-out.
+// Only rendered inside (app) layouts where the auth gate has already run,
+// so the user prop is always present (non-nullable).
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -49,10 +48,9 @@ export function UserMenu({ user }: UserMenuProps) {
     };
   }, []);
 
-  // Sign out via the browser Supabase client. After sign-out completes we
-  // `router.refresh()` so the server-side layout re-runs its auth check and
-  // redirects the user to /login. (The proxy also picks up the cleared
-  // cookies on the next request.)
+  // Signs out via the browser Supabase client, then navigates to /login and
+  // calls router.refresh() so the server layout re-runs its auth check.
+  // The proxy also clears the session cookies on the next request.
   async function handleSignOut() {
     const supabase = createClient();
     await supabase.auth.signOut();

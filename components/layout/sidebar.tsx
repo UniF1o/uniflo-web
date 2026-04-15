@@ -1,16 +1,10 @@
-// Sidebar — primary app navigation.
+// Sidebar — primary navigation panel.
 //
-// Behaviour:
-//   Desktop (md+): fixed vertical column on the left of the viewport, always
-//                  visible. The main content area gets a matching left
-//                  padding in AppShell.
-//   Mobile:        hidden off-screen. Slides in from the left as a drawer
-//                  when the user taps the navbar hamburger. A semi-opaque
-//                  backdrop covers the rest of the screen.
+// Desktop (md+): sticky in-flow column, always visible.
+// Mobile: fixed drawer that slides in from the left when the user taps
+//         the hamburger. A translucent backdrop covers the rest of the screen.
 //
-// Nav item set is scoped to Phase 1 (Dashboard, Profile, Documents). New
-// sections should be appended to the NAV_ITEMS array — don't hard-code
-// additions elsewhere.
+// To add a new nav section, append an entry to NAV_ITEMS below.
 "use client";
 
 import Link from "next/link";
@@ -59,12 +53,9 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         )}
       />
 
-      {/* Sidebar panel itself.
-       *
-       * Mobile: absolute, slides in with a translate transform.
-       * Desktop (md+): sticky in-flow column. `md:translate-x-0` overrides
-       *                the mobile translate so the desktop view is unaffected
-       *                by the `isOpen` state. */}
+      {/* Sidebar panel.
+       * Mobile: slides in/out via CSS translate (controlled by isOpen).
+       * Desktop: md:translate-x-0 pins it in place regardless of isOpen. */}
       <aside
         aria-label="Primary navigation"
         className={cn(
@@ -94,8 +85,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         {/* Nav list. Using <nav> for semantics + keyboard a11y. */}
         <nav className="flex flex-col gap-1 p-3">
           {NAV_ITEMS.map((item) => {
-            // Active match: exact path OR a sub-route of it (e.g. /profile/edit
-            // should still highlight "Profile").
+            // Highlight the item if on its exact path or any sub-route
+            // (e.g. /profile/edit still highlights "Profile").
             const isActive =
               pathname === item.href || pathname.startsWith(`${item.href}/`);
             const Icon = item.icon;

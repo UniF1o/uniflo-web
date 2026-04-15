@@ -1,9 +1,8 @@
-// Navbar — top utility bar used inside the (app) layout.
+// Navbar — sticky top bar rendered inside every authenticated page.
 //
-// Client component so it can accept an `onToggleSidebar` callback that's
-// wired to AppShell's drawer state. Keeps the rendered HTML minimal: a
-// hamburger button on mobile (hidden on md+), the brand mark, and the user
-// menu on the right.
+// Client component so it can accept the onToggleSidebar callback from
+// AppShell. Contains three elements: hamburger (mobile only), brand mark,
+// and the user avatar menu.
 "use client";
 
 import { Menu } from "lucide-react";
@@ -21,13 +20,11 @@ interface NavbarProps {
 export function Navbar({ user, onToggleSidebar }: NavbarProps) {
   return (
     <header
-      // Sticky at the top so the brand and user menu follow the user as they
-      // scroll long forms. `backdrop-blur` + translucent bg gives the paper
-      // aesthetic a subtle depth cue.
+      // Sticky so the brand and user menu stay visible while the user scrolls.
+      // bg-background/80 + backdrop-blur gives a frosted-glass depth cue.
       className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur-md md:h-16 md:px-6"
     >
-      {/* Hamburger — only visible on mobile. Tapping calls the parent's
-       * toggle so the sidebar drawer slides in. */}
+      {/* Hamburger — mobile only (md:hidden). Opens the sidebar drawer. */}
       <button
         type="button"
         onClick={onToggleSidebar}

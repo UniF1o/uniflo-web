@@ -1,31 +1,27 @@
-// Root layout for the whole Uniflo web app.
+// Root layout — wraps the entire Uniflo app.
 //
-// Responsibilities:
-// - Load and expose the two project fonts (Instrument Serif + Geist Sans)
-//   as CSS custom properties so they can be used across every layout.
-// - Define site-wide <html> / <body> shell.
-// - Provide base SEO metadata. Individual pages/routes override titles and
-//   descriptions via their own `generateMetadata` or `metadata` exports.
+// Loads both project fonts via next/font (downloaded at build time, served
+// from our own origin — no runtime request to fonts.googleapis.com).
+// Each font is exposed as a CSS variable so Tailwind's @theme block can
+// wire it up as a utility class (font-body / font-display).
 //
-// next/font downloads the fonts at build time and self-hosts them — no
-// external network request at runtime. `variable: '--font-...'` exposes each
-// font as a CSS custom property that Tailwind picks up via @theme.
+// SEO: child routes export their own `metadata.title` as a short string
+// (e.g. "Dashboard") and the template here expands it to "Dashboard — Uniflo".
 import type { Metadata } from "next";
 import { Geist, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 
-// Body / UI font — Geist Sans. Chosen over Inter for distinctive character
-// while still feeling modern. `subsets: ['latin']` is enough for English and
-// SA's Latin-script languages (Zulu, Xhosa, Afrikaans, Sesotho, etc.).
+// Body / UI font. Chosen over Inter for a more distinctive character while
+// remaining legible at small sizes. Latin subset covers English and SA's
+// main Latin-script languages (Afrikaans, Zulu, Xhosa, Sesotho).
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
   display: "swap",
 });
 
-// Display font — Instrument Serif. Used for h1/h2 and the brand mark.
-// Instrument Serif only ships a 400 weight, which is all we need for
-// editorial-style headings.
+// Display font for headings and the brand mark. Instrument Serif ships one
+// weight (400) which is all we need for editorial-style titles.
 const instrumentSerif = Instrument_Serif({
   variable: "--font-instrument-serif",
   subsets: ["latin"],
@@ -35,14 +31,11 @@ const instrumentSerif = Instrument_Serif({
 
 export const metadata: Metadata = {
   title: {
-    // Child routes set `title: 'Page name'`; the root layout appends the
-    // brand template, so browser tabs always read "Page name — Uniflo".
     default: "Uniflo — Apply to SA universities, automated",
     template: "%s — Uniflo",
   },
   description:
     "Uniflo helps South African students apply to multiple universities in one go. Fill in your details once, review every application, and let us handle the rest.",
-  // Basic OpenGraph / icon metadata can be added here once assets exist.
 };
 
 export default function RootLayout({
@@ -53,10 +46,11 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      // Expose both font variables on <html> so any descendant can reference
-      // them via the Tailwind `font-body` / `font-display` utilities. `h-full`
-      // + body's `min-h-dvh` lets fixed-position overlays (mobile drawer,
-      // modals) size correctly on iOS Safari.
+      // Both font variables must be on <html> so every descendant can reach
+      // them. `h-full` works with `min-h-dvh` on body to let fixed overlays
+      // (mobile drawer, modals) size correctly on iOS Safari.
+      // `suppressHydrationWarning` silences the mismatch React logs when
+      // browser extensions inject attributes onto <html> after SSR.
       className={`${geistSans.variable} ${instrumentSerif.variable} h-full`}
       suppressHydrationWarning
     >
