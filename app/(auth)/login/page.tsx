@@ -45,8 +45,8 @@ function validate(email: string, password: string) {
   return errors;
 }
 
-// Separated from the page export so it can be wrapped in Suspense
-// (required by Next.js when useSearchParams is used in a client component).
+// Separated into its own component so it can be wrapped in Suspense below.
+// Next.js requires a Suspense boundary around any component that calls useSearchParams.
 function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -224,9 +224,8 @@ function LoginContent() {
   );
 }
 
-// Suspense wrapper required by Next.js when a client component calls
-// useSearchParams. The boundary prevents the whole page tree from being
-// treated as dynamic just because of the search-param read.
+// Suspense boundary required by Next.js for useSearchParams in client components.
+// Without it the entire page subtree would be forced into dynamic rendering.
 export default function LoginPage() {
   return (
     <Suspense fallback={null}>

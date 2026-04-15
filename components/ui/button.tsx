@@ -40,8 +40,8 @@ export function Button({
       )}
       {...props}
     >
-      {/* Spinner shown while loading. shrink-0 stops it from collapsing in
-       * narrow flex containers. */}
+      {/* Spinner rendered when loading=true. aria-hidden keeps it silent for
+       * screen readers — the disabled state already communicates "busy". */}
       {loading && (
         <svg
           aria-hidden

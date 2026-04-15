@@ -21,7 +21,8 @@ import type { AuthError } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-// Map raw Supabase auth errors to copy that makes sense to a student.
+
+// Maps raw Supabase error strings to copy that makes sense to a student.
 function getAuthErrorMessage(error: AuthError): string {
   const msg = error.message.toLowerCase();
   if (msg.includes("already registered") || msg.includes("already exists")) {
@@ -66,7 +67,6 @@ export default function SignUpPage() {
     e.preventDefault();
     setFormError(null);
 
-    // Validate before hitting the network.
     const errors = validate(email, password);
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
@@ -134,7 +134,6 @@ export default function SignUpPage() {
 
   return (
     <div className="space-y-8">
-      {/* Page heading */}
       <div className="space-y-1">
         <h1 className="font-display text-3xl tracking-tight text-foreground">
           Create your account
@@ -191,14 +190,12 @@ export default function SignUpPage() {
         </Button>
       </form>
 
-      {/* Divider */}
       <div className="relative flex items-center gap-4">
         <div className="h-px flex-1 bg-border" />
         <span className="text-xs text-muted-foreground">or</span>
         <div className="h-px flex-1 bg-border" />
       </div>
 
-      {/* Google OAuth */}
       <Button
         type="button"
         variant="ghost"
@@ -232,7 +229,6 @@ export default function SignUpPage() {
         Continue with Google
       </Button>
 
-      {/* Link to login for returning users */}
       <p className="text-center text-sm text-muted-foreground">
         Already have an account?{" "}
         <Link

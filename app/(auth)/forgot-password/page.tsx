@@ -1,15 +1,11 @@
-// Forgot password screen — sends a password reset email via Supabase.
+// Forgot password screen — triggers a Supabase password reset email.
 //
-// Calls supabase.auth.resetPasswordForEmail(). When Supabase receives this
-// request, it sends a reset link to the address if an account exists.
+// Security: the success message is identical whether the email has an account
+// or not. This prevents user enumeration — an attacker cannot discover which
+// addresses are registered by watching for different responses.
 //
-// Security note: we show the same success message regardless of whether the
-// email exists in our system. This prevents user enumeration — an attacker
-// cannot learn which email addresses have Uniflo accounts by submitting this
-// form and watching for different responses.
-//
-// The reset link in the email points to /auth/reset-password (built in a
-// later task) where the user enters their new password.
+// The reset link in the email points to /auth/reset-password where the user
+// sets their new password (built in a later task).
 "use client";
 
 import { useState } from "react";
@@ -45,8 +41,8 @@ export default function ForgotPasswordPage() {
 
     const supabase = createClient();
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      // Where the reset link in the email should land the user. The reset
-      // password page (which handles the new-password form) is built later.
+      // The reset link in the email lands here so the user can set a new
+      // password. This page is built in a later task.
       redirectTo: `${window.location.origin}/auth/reset-password`,
     });
 

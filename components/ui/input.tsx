@@ -25,8 +25,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         <input
           ref={ref}
           id={id}
-          // aria-describedby links the input to its error message so screen
-          // readers announce the error when the field is focused.
+          // Links the input to its error message so screen readers
+          // announce the error text when the field receives focus.
           aria-describedby={error ? `${id}-error` : undefined}
           aria-invalid={error ? true : undefined}
           className={cn(
@@ -41,8 +41,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           {...props}
         />
 
-        {/* Error message. role="alert" makes screen readers announce it
-         * immediately when it appears without the user having to re-focus. */}
+        {/* role="alert" causes screen readers to announce the error as soon
+         * as it appears, without requiring the user to re-focus the input. */}
         {error && (
           <p id={`${id}-error`} role="alert" className="text-xs text-destructive">
             {error}
