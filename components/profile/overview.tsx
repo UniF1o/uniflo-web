@@ -13,6 +13,10 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  GENDER_LABELS,
+  HOME_LANGUAGE_LABELS,
+} from "@/lib/constants/profile-enums";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -29,33 +33,6 @@ interface ProfileResponse {
   gender?: string;
   home_language?: string;
 }
-
-// ─── Constants ───────────────────────────────────────────────────────────────
-
-// Human-readable labels for the gender enum values sent to the backend.
-// Kept aligned with the options in components/profile/setup-form.tsx.
-const GENDER_LABELS: Record<string, string> = {
-  male: "Male",
-  female: "Female",
-  other: "Other",
-  prefer_not_to_say: "Prefer not to say",
-};
-
-// Human-readable labels for the home language enum values.
-// Kept aligned with components/profile/setup-form.tsx.
-const LANGUAGE_LABELS: Record<string, string> = {
-  zulu: "isiZulu",
-  xhosa: "isiXhosa",
-  afrikaans: "Afrikaans",
-  english: "English",
-  sepedi: "Sepedi",
-  tswana: "Setswana",
-  sesotho: "Sesotho",
-  tsonga: "Xitsonga",
-  swati: "siSwati",
-  venda: "Tshivenda",
-  ndebele: "isiNdebele",
-};
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -192,7 +169,7 @@ export function ProfileOverview() {
     {
       label: "Home language",
       value: profile.home_language
-        ? (LANGUAGE_LABELS[profile.home_language] ?? profile.home_language)
+        ? (HOME_LANGUAGE_LABELS[profile.home_language] ?? profile.home_language)
         : null,
     },
   ];

@@ -29,35 +29,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { cn } from "@/lib/utils/cn";
+import {
+  GENDER_OPTIONS,
+  HOME_LANGUAGE_OPTIONS,
+} from "@/lib/constants/profile-enums";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 const STEPS = ["Personal details", "Contact details", "Identity"] as const;
-
-// Gender options — values must match the backend enum exactly.
-// Confirm these with Partner B before going live.
-const GENDER_OPTIONS = [
-  { value: "male", label: "Male" },
-  { value: "female", label: "Female" },
-  { value: "other", label: "Other" },
-  { value: "prefer_not_to_say", label: "Prefer not to say" },
-];
-
-// All 11 South African official languages. Ordering and values must match the
-// backend enum — confirm with Partner B before going live.
-const HOME_LANGUAGE_OPTIONS = [
-  { value: "zulu", label: "isiZulu" },
-  { value: "xhosa", label: "isiXhosa" },
-  { value: "afrikaans", label: "Afrikaans" },
-  { value: "english", label: "English" },
-  { value: "sepedi", label: "Sepedi" },
-  { value: "tswana", label: "Setswana" },
-  { value: "sesotho", label: "Sesotho" },
-  { value: "tsonga", label: "Xitsonga" },
-  { value: "swati", label: "siSwati" },
-  { value: "venda", label: "Tshivenda" },
-  { value: "ndebele", label: "isiNdebele" },
-];
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
