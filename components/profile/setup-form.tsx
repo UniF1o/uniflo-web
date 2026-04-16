@@ -29,35 +29,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { cn } from "@/lib/utils/cn";
+import {
+  GENDER_OPTIONS,
+  HOME_LANGUAGE_OPTIONS,
+} from "@/lib/constants/profile-enums";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 const STEPS = ["Personal details", "Contact details", "Identity"] as const;
-
-// Gender options — values must match the backend enum exactly.
-// Confirm these with Partner B before going live.
-const GENDER_OPTIONS = [
-  { value: "male", label: "Male" },
-  { value: "female", label: "Female" },
-  { value: "other", label: "Other" },
-  { value: "prefer_not_to_say", label: "Prefer not to say" },
-];
-
-// All 11 South African official languages. Ordering and values must match the
-// backend enum — confirm with Partner B before going live.
-const HOME_LANGUAGE_OPTIONS = [
-  { value: "zulu", label: "isiZulu" },
-  { value: "xhosa", label: "isiXhosa" },
-  { value: "afrikaans", label: "Afrikaans" },
-  { value: "english", label: "English" },
-  { value: "sepedi", label: "Sepedi" },
-  { value: "tswana", label: "Setswana" },
-  { value: "sesotho", label: "Sesotho" },
-  { value: "tsonga", label: "Xitsonga" },
-  { value: "swati", label: "siSwati" },
-  { value: "venda", label: "Tshivenda" },
-  { value: "ndebele", label: "isiNdebele" },
-];
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -110,14 +89,16 @@ function validateStep2(fields: {
   const errors: Record<string, string> = {};
   if (!fields.phone.trim()) errors.phone = "Phone number is required.";
   if (!fields.address.trim()) errors.address = "Address is required.";
-  if (!fields.nationality.trim()) errors.nationality = "Nationality is required.";
+  if (!fields.nationality.trim())
+    errors.nationality = "Nationality is required.";
   return errors;
 }
 
 function validateStep3(fields: { gender: string; homeLanguage: string }) {
   const errors: Record<string, string> = {};
   if (!fields.gender) errors.gender = "Please select a gender.";
-  if (!fields.homeLanguage) errors.homeLanguage = "Please select a home language.";
+  if (!fields.homeLanguage)
+    errors.homeLanguage = "Please select a home language.";
   return errors;
 }
 
@@ -137,7 +118,7 @@ function StepIndicator({ current }: { current: number }) {
     <div className="flex items-center gap-2">
       {STEPS.map((title, i) => {
         const stepNum = i + 1;
-        const isDone = stepNum < current;   // step was completed
+        const isDone = stepNum < current; // step was completed
         const isActive = stepNum === current; // step currently visible
         return (
           <div key={stepNum} className="flex items-center gap-2">
@@ -146,8 +127,11 @@ function StepIndicator({ current }: { current: number }) {
               className={cn(
                 "flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-medium",
                 isDone && "bg-primary text-primary-foreground",
-                isActive && "bg-primary text-primary-foreground ring-2 ring-primary/30 ring-offset-2",
-                !isDone && !isActive && "border border-border text-muted-foreground",
+                isActive &&
+                  "bg-primary text-primary-foreground ring-2 ring-primary/30 ring-offset-2",
+                !isDone &&
+                  !isActive &&
+                  "border border-border text-muted-foreground",
               )}
             >
               {isDone ? <CheckCircle2 size={14} /> : stepNum}
@@ -156,7 +140,9 @@ function StepIndicator({ current }: { current: number }) {
             <span
               className={cn(
                 "hidden text-xs sm:inline",
-                isActive ? "font-medium text-foreground" : "text-muted-foreground",
+                isActive
+                  ? "font-medium text-foreground"
+                  : "text-muted-foreground",
               )}
             >
               {title}

@@ -12,17 +12,17 @@
 
 @theme {
   /* ── Colors ──────────────────────────────────────────────────────────── */
-  --color-background: #faf7f2;         /* warm cream — paper, not white */
-  --color-foreground: #121417;         /* near-black (~15:1 contrast on bg) */
-  --color-muted: #ede7db;              /* dusty stone — muted surfaces */
-  --color-muted-foreground: #5c5b57;   /* low-emphasis text */
-  --color-border: #e0d9cb;             /* hairline on cream */
-  --color-primary: #1b2540;            /* deep indigo — brand colour */
+  --color-background: #faf7f2; /* warm cream — paper, not white */
+  --color-foreground: #121417; /* near-black (~15:1 contrast on bg) */
+  --color-muted: #ede7db; /* dusty stone — muted surfaces */
+  --color-muted-foreground: #5c5b57; /* low-emphasis text */
+  --color-border: #e0d9cb; /* hairline on cream */
+  --color-primary: #1b2540; /* deep indigo — brand colour */
   --color-primary-foreground: #faf7f2; /* text on primary bg */
-  --color-accent: #d97757;             /* terracotta — warm SA anchor */
-  --color-accent-foreground: #faf7f2;  /* text on accent bg */
-  --color-destructive: #b23a3a;        /* error / destructive actions */
-  --color-ring: #1b2540;               /* focus ring (matches primary) */
+  --color-accent: #d97757; /* terracotta — warm SA anchor */
+  --color-accent-foreground: #faf7f2; /* text on accent bg */
+  --color-destructive: #b23a3a; /* error / destructive actions */
+  --color-ring: #1b2540; /* focus ring (matches primary) */
 
   /* ── Typography ──────────────────────────────────────────────────────── *
    * Wired to the CSS variables set by next/font in app/layout.tsx.

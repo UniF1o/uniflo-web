@@ -15,10 +15,7 @@ export function Skeleton({
       // `bg-muted` uses the warm-stone design token so skeletons feel like
       // part of the page rather than an alien grey block.
       // Consumers pass sizing classes via `className` (e.g. "h-4 w-32").
-      className={cn(
-        "animate-pulse rounded-[--radius-md] bg-muted",
-        className,
-      )}
+      className={cn("animate-pulse rounded-md bg-muted", className)}
       {...props}
     />
   );

@@ -37,10 +37,10 @@ import { cn } from "@/lib/utils/cn";
 // `mark` is a string so we can represent an empty or partially-typed value
 // without forcing "0" as a default. It is parsed to an integer on submit.
 type SubjectRow = {
-  id: string;          // Stable React key — generated once, never changes.
-  name: string;        // Value from NSC_SUBJECTS, "Other", or "" (not yet set).
-  customName: string;  // Free-text name — only relevant when name === "Other".
-  mark: string;        // Raw input value, e.g. "78" or "". Parsed on submit.
+  id: string; // Stable React key — generated once, never changes.
+  name: string; // Value from NSC_SUBJECTS, "Other", or "" (not yet set).
+  customName: string; // Free-text name — only relevant when name === "Other".
+  mark: string; // Raw input value, e.g. "78" or "". Parsed on submit.
 };
 
 // Payload shape for POST /academic-records.
@@ -105,7 +105,8 @@ function validate(
   subjects: SubjectRow[],
 ): Record<string, string> {
   const errors: Record<string, string> = {};
-  if (!institution.trim()) errors.institution = "School or institution name is required.";
+  if (!institution.trim())
+    errors.institution = "School or institution name is required.";
   if (!year) {
     errors.year = "Year is required.";
   } else {
@@ -504,11 +505,7 @@ export function AcademicRecordsForm() {
 
         {/* "Add subject" button — ghost variant so it doesn't compete with the
          * primary submit button below. */}
-        <Button
-          type="button"
-          variant="ghost"
-          onClick={addRow}
-        >
+        <Button type="button" variant="ghost" onClick={addRow}>
           <Plus size={16} aria-hidden />
           Add subject
         </Button>

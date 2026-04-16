@@ -1,36 +1,103 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# uniflo-web
 
-## Getting Started
+Frontend for **Uniflo** — a South African university application automation platform. Students fill in their details once and Uniflo automatically applies to multiple universities on their behalf. Students review and approve every application before anything is submitted.
 
-First, run the development server:
+This repo is owned by **Partner A (Frontend)**. The FastAPI backend lives separately in `uniflo-api`.
+
+For architecture, schema, and build-plan detail see `docs/` — notably `docs/architecture-designs.md`, `docs/build-action-plan.md`, and `docs/partner-a-phase-1-plan.md`.
+
+## Stack
+
+| Concern   | Tool                                               |
+| --------- | -------------------------------------------------- |
+| Framework | Next.js 16 (App Router) with TypeScript            |
+| Styling   | Tailwind CSS v4                                    |
+| Auth      | Supabase Auth (`@supabase/ssr` + `supabase-js`)    |
+| Storage   | Supabase Storage (document uploads)                |
+| API types | `openapi-typescript` (generated from `uniflo-api`) |
+| Linting   | ESLint + Prettier                                  |
+| Testing   | Vitest (+ jsdom)                                   |
+| Hosting   | Vercel                                             |
+| CI        | GitHub Actions — `.github/workflows/frontend.yml`  |
+
+## Getting started
+
+### 1. Install dependencies
+
+```bash
+npm install
+```
+
+### 2. Configure environment variables
+
+Copy the example file and fill in real values:
+
+```bash
+cp .env.example .env.local
+```
+
+You'll need:
+
+- `NEXT_PUBLIC_SUPABASE_URL` — from Supabase project settings
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` — from Supabase project settings
+- `NEXT_PUBLIC_API_URL` — base URL for the `uniflo-api` FastAPI backend
+
+Never commit `.env.local`. If you add a new variable, add it to `.env.example` with a short description at the same time.
+
+### 3. Run the dev server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open <http://localhost:3000>. The dev server hot-reloads on edit.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Command         | What it does                       |
+| --------------- | ---------------------------------- |
+| `npm run dev`   | Start the Next.js dev server       |
+| `npm run build` | Production build (runs in CI)      |
+| `npm run start` | Serve the production build locally |
+| `npm run lint`  | ESLint over the whole tree         |
+| `npm run test`  | Run Vitest suite once              |
 
-## Learn More
+## Project layout
 
-To learn more about Next.js, take a look at the following resources:
+```
+app/                     Next.js App Router entry points
+  (auth)/                Public auth screens (login, signup, forgot-password)
+  (app)/                 Protected post-login app shell (dashboard, profile, …)
+  auth/callback/         OAuth callback route handler
+components/              React components, organised by feature
+  auth/                  Sign-in / sign-up client forms
+  layout/                App shell — sidebar, navbar, user menu
+  profile/               Profile setup + overview
+  academic-records/      NSC subjects form
+  documents/             Document upload with progress
+  ui/                    Primitive UI (Button, Input, Select, Skeleton)
+lib/
+  supabase/              Browser + server + middleware Supabase clients
+  utils/                 Small utilities (cn, …)
+  constants/             Static tables (e.g. canonical NSC subjects)
+proxy.ts                 Next.js middleware (session refresh + route guards)
+tests/                   Vitest suites
+docs/                    Source-of-truth architecture & phase docs
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Git workflow
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Never commit to `main` directly.**
+- Work on `feature/*` branches cut from `main`.
+- PRs target `main`. Merge with **Squash and Merge** only.
+- CI must be green. Delete the branch after merge.
 
-## Deploy on Vercel
+Full detail in `docs/git-github-workflow.md`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Contributing conventions
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Auth is Supabase-managed — never roll custom auth or store credentials locally.
+- API types come from the `uniflo-api` OpenAPI spec — do not hand-write them.
+- Mobile-first. Test on real Android viewports, not just desktop.
+- `gender` and `home_language` on `student_profiles` are **mandatory** — they drive the Playwright automation in Phase 2.
+- The `subjects` JSON contract is locked. See `docs/partner-a-phase-1-plan.md` before changing the shape.
