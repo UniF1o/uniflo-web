@@ -81,7 +81,11 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
         </div>
 
         {error && (
-          <p id={`${id}-error`} role="alert" className="text-xs text-destructive">
+          <p
+            id={`${id}-error`}
+            role="alert"
+            className="text-xs text-destructive"
+          >
             {error}
           </p>
         )}

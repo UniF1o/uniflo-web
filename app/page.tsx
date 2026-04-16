@@ -50,9 +50,9 @@ export default function Home() {
           </h1>
 
           <p className="max-w-xl text-lg leading-relaxed text-muted-foreground md:text-xl">
-            Uniflo handles the paperwork so you can focus on choosing where
-            to study. Enter your details once, review every application, and
-            we submit on your behalf.
+            Uniflo handles the paperwork so you can focus on choosing where to
+            study. Enter your details once, review every application, and we
+            submit on your behalf.
           </p>
         </div>
 

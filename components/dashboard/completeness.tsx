@@ -98,7 +98,11 @@ function SectionItem({ label, description, href, status }: SectionItemProps) {
           aria-hidden
         />
       ) : (
-        <Circle size={18} className="shrink-0 text-muted-foreground" aria-hidden />
+        <Circle
+          size={18}
+          className="shrink-0 text-muted-foreground"
+          aria-hidden
+        />
       )}
 
       {/* Section label and dynamic description */}

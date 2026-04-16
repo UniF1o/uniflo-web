@@ -44,7 +44,11 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         {/* role="alert" causes screen readers to announce the error as soon
          * as it appears, without requiring the user to re-focus the input. */}
         {error && (
-          <p id={`${id}-error`} role="alert" className="text-xs text-destructive">
+          <p
+            id={`${id}-error`}
+            role="alert"
+            className="text-xs text-destructive"
+          >
             {error}
           </p>
         )}

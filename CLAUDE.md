@@ -1,9 +1,11 @@
 @AGENTS.md
+
 # Uniflo — uniflo-web Context for Claude Code
 
 This file gives Claude Code the context it needs to work effectively in this repository. Read it before touching any code.
 
 For full detail on architecture decisions, schema, and the build plan, refer to the three source-of-truth docs committed in `/docs`:
+
 - `docs/architecture-designs.md` — full stack rationale, schema, layer-by-layer breakdown
 - `docs/build-action-plan.md` — phased build plan, partner split, phase status, MVP scope
 - `docs/git-github-workflow.md` — branching strategy, PR process, commit conventions
@@ -26,18 +28,18 @@ This repo is owned by **Partner A (Frontend)**. The backend lives in a separate 
 
 ## Stack
 
-| Concern | Tool |
-|---------|------|
-| Framework | Next.js (App Router) with TypeScript |
-| Styling | Tailwind CSS |
-| Auth | Supabase Auth JS SDK (client side) |
-| Storage | Supabase Storage (document uploads) |
-| API types | `openapi-typescript` generated from `uniflo-api` OpenAPI spec |
-| Linting | ESLint + Prettier |
-| Testing | Vitest |
-| Error tracking | Sentry |
-| Hosting | Vercel (Hobby during dev, Pro before beta) |
-| CI/CD | GitHub Actions — `frontend.yml` |
+| Concern        | Tool                                                          |
+| -------------- | ------------------------------------------------------------- |
+| Framework      | Next.js (App Router) with TypeScript                          |
+| Styling        | Tailwind CSS                                                  |
+| Auth           | Supabase Auth JS SDK (client side)                            |
+| Storage        | Supabase Storage (document uploads)                           |
+| API types      | `openapi-typescript` generated from `uniflo-api` OpenAPI spec |
+| Linting        | ESLint + Prettier                                             |
+| Testing        | Vitest                                                        |
+| Error tracking | Sentry                                                        |
+| Hosting        | Vercel (Hobby during dev, Pro before beta)                    |
+| CI/CD          | GitHub Actions — `frontend.yml`                               |
 
 ---
 
@@ -88,6 +90,7 @@ application_jobs       — id, application_id, status, attempts,
 **`gender` and `home_language` are mandatory** on `student_profiles`. They are required by the Playwright automation layer to complete university portal forms — not optional display fields.
 
 **`subjects` JSON contract (locked — do not change without coordinating with Partner B):**
+
 ```json
 {
   "subjects": [
@@ -98,6 +101,7 @@ application_jobs       — id, application_id, status, attempts,
   ]
 }
 ```
+
 The subject name must come from the canonical NSC list (hardcoded TypeScript constant for MVP). Only `"Other"` entries carry a `custom_name`. Free-text keys are not permitted — the backend field mapping service cannot handle inconsistent keys.
 
 **`applications.status` enum:** `"pending"`, `"processing"`, `"submitted"`, `"failed"`.
@@ -117,6 +121,7 @@ Full detail in `docs/git-github-workflow.md`. Summary:
 - Delete the feature branch immediately after merging.
 
 **Commit message format:**
+
 ```
 feat: add multi-step profile form
 fix: handle empty subject list in academic records
@@ -128,6 +133,7 @@ chore: update openapi-generated types
 ## CI/CD
 
 `frontend.yml` runs on every push:
+
 1. ESLint
 2. Vitest
 3. Deploys to Vercel on merge to `main`
@@ -137,15 +143,17 @@ Nothing merges with a failing CI run.
 ---
 
 ## Rules
-  When writing code, write comments that explain how the code work so one can understand how the code works
-  Keep the comments consice and professional but easy enough that someone not proficient can understand before we actually push the branch out
-  After every feature branch is done, write documentation that explains everything you did, design decisions, changes in implementation and make it an md file
-  Make commits as you work on each feature branch so you can track your history
-  Review all your work when you are done to catch mistakes, revise work to be better or to just note stuff for your improvement
+
+When writing code, write comments that explain how the code work so one can understand how the code works
+Keep the comments consice and professional but easy enough that someone not proficient can understand before we actually push the branch out
+After every feature branch is done, write documentation that explains everything you did, design decisions, changes in implementation and make it an md file
+Make commits as you work on each feature branch so you can track your history
+Review all your work when you are done to catch mistakes, revise work to be better or to just note stuff for your improvement
 
 ## What Not to Build (MVP Scope)
 
 Do not implement any of the following — they are explicitly post-MVP:
+
 - Payments (PayFast)
 - SMS notifications
 - Supabase Realtime / real-time status updates

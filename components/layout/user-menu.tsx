@@ -106,9 +106,7 @@ export function UserMenu({ user }: UserMenuProps) {
       >
         <div className="border-b border-border px-4 py-3">
           <p className="truncate text-sm font-medium">{displayName}</p>
-          <p className="truncate text-xs text-muted-foreground">
-            {user.email}
-          </p>
+          <p className="truncate text-xs text-muted-foreground">{user.email}</p>
         </div>
         <nav className="py-1">
           <Link

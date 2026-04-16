@@ -1,0 +1,20 @@
+# Build and dependency output
+.next/
+node_modules/
+out/
+dist/
+coverage/
+
+# Lockfiles — controlled by the package manager, do not reformat
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Environment files
+.env*
+
+# Docs are authored by hand — keep formatting choices as the author wrote them
+docs/
+
+# Generated API types
+types/api.ts
