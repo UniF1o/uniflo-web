@@ -1,18 +1,24 @@
 // ProfileSetupForm — three-step form that collects a student's full profile.
 //
 // Steps:
-//   1. Personal details — name, date of birth, SA ID number
-//   2. Contact details  — phone, address, nationality
+//   1. Personal details — first name, last name, date of birth, SA ID number
+//   2. Contact details  — phone number, residential address, nationality
 //   3. Identity         — gender, home language
 //
-// After each step the accumulated data is sent to the backend via
-// POST /profile with the JWT in the Authorization header. This means
-// partial progress is saved to the API even if the student drops off
-// mid-flow, so they don't have to start over.
+// API saves:
+//   After each step the user clicks "Save and continue", which POSTs the
+//   accumulated data to the backend (POST /profile, Bearer JWT). The payload
+//   grows with each step so partial progress is persisted even if the student
+//   drops off mid-flow — they won't need to re-enter earlier steps on return.
 //
-// Types are hand-written until Partner B delivers the FastAPI OpenAPI spec.
-// When it's available, run `openapi-typescript` and replace ProfilePayload
-// with the generated type for the /profile endpoint request body.
+//   Assumption: the backend accepts partial data (upsert/PATCH semantics via
+//   POST). If the API changes to require all fields in one shot, switch to
+//   accumulating state client-side and POST only on the final step.
+//
+// Types:
+//   ProfilePayload is hand-written to match the student_profiles schema.
+//   When Partner B delivers the FastAPI OpenAPI spec, run `openapi-typescript`
+//   and replace it with the generated type for the /profile endpoint body.
 "use client";
 
 import { useState } from "react";
@@ -28,8 +34,8 @@ import { cn } from "@/lib/utils/cn";
 
 const STEPS = ["Personal details", "Contact details", "Identity"] as const;
 
-// Gender values — confirm these string values with Partner B before going live,
-// as the backend enum may differ from these labels.
+// Gender options — values must match the backend enum exactly.
+// Confirm these with Partner B before going live.
 const GENDER_OPTIONS = [
   { value: "male", label: "Male" },
   { value: "female", label: "Female" },
@@ -37,7 +43,8 @@ const GENDER_OPTIONS = [
   { value: "prefer_not_to_say", label: "Prefer not to say" },
 ];
 
-// All 11 South African official languages. Confirm ordering/values with Partner B.
+// All 11 South African official languages. Ordering and values must match the
+// backend enum — confirm with Partner B before going live.
 const HOME_LANGUAGE_OPTIONS = [
   { value: "zulu", label: "isiZulu" },
   { value: "xhosa", label: "isiXhosa" },
@@ -54,8 +61,8 @@ const HOME_LANGUAGE_OPTIONS = [
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-// Partial is intentional: each step sends only what's been collected so far.
-// The API must accept partial profile data (PATCH semantics via POST upsert).
+// All fields are optional because each step only sends what's been filled in.
+// The backend must handle partial updates (POST upsert, not a full replace).
 // Replace with the openapi-typescript generated type once the spec is available.
 interface ProfilePayload {
   first_name?: string;
@@ -70,6 +77,10 @@ interface ProfilePayload {
 }
 
 // ─── Validation ───────────────────────────────────────────────────────────────
+//
+// Each step has its own validator that returns a Record<fieldKey, errorMessage>.
+// An empty object means all fields are valid. Errors are displayed inline
+// beneath each field rather than in a single top-level banner.
 
 function validateStep1(fields: {
   firstName: string;
@@ -84,6 +95,8 @@ function validateStep1(fields: {
   if (!fields.idNumber) {
     errors.idNumber = "ID number is required.";
   } else if (!/^\d{13}$/.test(fields.idNumber)) {
+    // Only checks digit count for MVP. Full Luhn checksum validation is
+    // post-MVP — it adds complexity without meaningful UX benefit at this stage.
     errors.idNumber = "SA ID number must be exactly 13 digits.";
   }
   return errors;
@@ -109,17 +122,26 @@ function validateStep3(fields: { gender: string; homeLanguage: string }) {
 }
 
 // ─── Step indicator ───────────────────────────────────────────────────────────
+//
+// Renders numbered circles connected by thin horizontal lines. Each circle is
+// in one of three states:
+//   - Done (stepNum < current)   — filled primary + checkmark icon
+//   - Active (stepNum === current) — filled primary + focus ring
+//   - Upcoming (stepNum > current) — outlined + muted number
+//
+// Step labels are hidden below the `sm` breakpoint (< 640px) to prevent text
+// overflow on narrow phone screens — only the numbered circles show.
 
 function StepIndicator({ current }: { current: number }) {
   return (
     <div className="flex items-center gap-2">
       {STEPS.map((title, i) => {
         const stepNum = i + 1;
-        const isDone = stepNum < current;
-        const isActive = stepNum === current;
+        const isDone = stepNum < current;   // step was completed
+        const isActive = stepNum === current; // step currently visible
         return (
           <div key={stepNum} className="flex items-center gap-2">
-            {/* Step circle */}
+            {/* Circle — styling switches based on done/active/upcoming state. */}
             <div
               className={cn(
                 "flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-medium",
@@ -130,7 +152,7 @@ function StepIndicator({ current }: { current: number }) {
             >
               {isDone ? <CheckCircle2 size={14} /> : stepNum}
             </div>
-            {/* Label — hidden on small screens to avoid overflow */}
+            {/* Label — visible from sm (640px) upward only. */}
             <span
               className={cn(
                 "hidden text-xs sm:inline",
@@ -139,7 +161,8 @@ function StepIndicator({ current }: { current: number }) {
             >
               {title}
             </span>
-            {/* Connector line between steps */}
+            {/* Connector line — only rendered between steps (not after the last).
+             * Fills with primary colour once the left-hand step is done. */}
             {i < STEPS.length - 1 && (
               <div
                 className={cn(
@@ -159,28 +182,35 @@ function StepIndicator({ current }: { current: number }) {
 
 export function ProfileSetupForm() {
   const router = useRouter();
+
+  // `step` tracks which screen (1–3) is visible. All field state lives at the
+  // top level so data from earlier steps is preserved when navigating back.
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  // apiError holds network/server error text shown above the action buttons.
   const [apiError, setApiError] = useState<string | null>(null);
+  // fieldErrors maps field keys to inline error messages beneath each input.
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
-  // Step 1 fields
+  // Step 1: personal details
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
   const [idNumber, setIdNumber] = useState("");
 
-  // Step 2 fields
+  // Step 2: contact details
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [nationality, setNationality] = useState("");
 
-  // Step 3 fields
+  // Step 3: identity
   const [gender, setGender] = useState("");
   const [homeLanguage, setHomeLanguage] = useState("");
 
-  // Clears a single field error as the user starts typing — so errors vanish
-  // as soon as the user addresses them rather than on the next submission.
+  // Removes one field's error message the moment the user starts correcting it.
+  // The early-return (`if (!prev[key]) return prev`) avoids a re-render when
+  // the field has no error to clear — returning the same reference prevents
+  // React from scheduling an unnecessary update.
   function clearError(key: string) {
     setFieldErrors((prev) => {
       if (!prev[key]) return prev;
@@ -190,8 +220,10 @@ export function ProfileSetupForm() {
     });
   }
 
-  // Sends accumulated profile data to the backend.
-  // Returns true on success, false on any error (also sets apiError state).
+  // POSTs accumulated profile data to the backend.
+  // Retrieves the Supabase JWT from the active session and attaches it as a
+  // Bearer token. Returns true on success; sets apiError and returns false on
+  // any failure (missing session, missing env var, HTTP error, or network error).
   async function saveProfile(payload: ProfilePayload): Promise<boolean> {
     const supabase = createClient();
     const {
@@ -221,7 +253,9 @@ export function ProfileSetupForm() {
       });
 
       if (!res.ok) {
-        // FastAPI returns error details under `detail` for 422 responses.
+        // FastAPI validation errors (422) surface under a `detail` string key.
+        // For other error codes the body may differ, so we fall back to a
+        // generic message if `detail` isn't a plain string.
         const body = await res.json().catch(() => ({}));
         const message =
           typeof body.detail === "string"
@@ -241,11 +275,15 @@ export function ProfileSetupForm() {
     }
   }
 
+  // Validates the current step, then POSTs to the backend and advances.
+  // Called both from each <form>'s onSubmit (Enter key) and from the
+  // "Save and continue" button's onClick — the optional `e` param lets both
+  // code paths reuse the same handler.
   async function handleContinue(e?: React.FormEvent) {
     e?.preventDefault();
     setApiError(null);
 
-    // Validate the current step's fields before hitting the network.
+    // Run the validator for whichever step is active.
     const errors =
       step === 1
         ? validateStep1({ firstName, lastName, dateOfBirth, idNumber })
@@ -260,8 +298,10 @@ export function ProfileSetupForm() {
     setFieldErrors({});
     setLoading(true);
 
-    // Build the payload with every field collected so far. The API receives
-    // more complete data at each step — by step 3 it has the full profile.
+    // The payload grows with each step. Step 1 sends only personal details;
+    // step 2 spreads contact details on top; step 3 adds identity fields.
+    // `...(condition && { key: value })` spreads the object when condition is
+    // truthy and spreads nothing (false is ignored) when it isn't.
     const payload: ProfilePayload = {
       first_name: firstName,
       last_name: lastName,
@@ -279,7 +319,7 @@ export function ProfileSetupForm() {
     if (step < 3) {
       setStep((s) => s + 1);
     } else {
-      // Profile complete — move on to academic records (Task 5).
+      // All three steps done — move on to academic records (Task 5 / Phase 1).
       router.push("/academic-records");
     }
   }
@@ -301,8 +341,11 @@ export function ProfileSetupForm() {
         </p>
       </div>
 
-      {/* Each step is its own <form> so Enter-to-submit works naturally and
-       * the browser's built-in focus management moves to the first field. */}
+      {/* Each step's fields are wrapped in their own <form> so pressing Enter
+       * inside an input triggers handleContinue via onSubmit. The "Save and
+       * continue" button lives outside the form (in the nav block below) and
+       * uses onClick instead of type="submit", which would be a no-op outside
+       * a form element. Both paths call the same handleContinue handler. */}
       {/* ── Step 1: Personal details ─────────────────────────────────────── */}
       {step === 1 && (
         <form onSubmit={handleContinue} noValidate className="space-y-4">
@@ -358,7 +401,8 @@ export function ProfileSetupForm() {
               placeholder="0001010000000"
               value={idNumber}
               onChange={(e) => {
-                // Allow digits only — filter out any non-numeric input.
+                // Strip non-digit characters on every keystroke so the field
+                // only ever holds numbers. maxLength={13} caps further input.
                 setIdNumber(e.target.value.replace(/\D/g, ""));
                 clearError("idNumber");
               }}
@@ -454,14 +498,18 @@ export function ProfileSetupForm() {
         </form>
       )}
 
-      {/* API-level error — shown below the fields, above the action buttons. */}
+      {/* API-level error (session expired, network failure, server 4xx/5xx).
+       * role="alert" makes screen readers announce it when it appears.
+       * Shown below the fields and above the navigation buttons. */}
       {apiError && (
         <p role="alert" className="text-sm text-destructive">
           {apiError}
         </p>
       )}
 
-      {/* Navigation buttons */}
+      {/* Navigation — Back only appears on steps 2 and 3.
+       * Clicking Back clears any API error from the previous attempt so it
+       * doesn't linger when the user returns to that step. */}
       <div className="flex gap-3">
         {step > 1 && (
           <Button
@@ -476,6 +524,8 @@ export function ProfileSetupForm() {
             Back
           </Button>
         )}
+        {/* fullWidth expands the button to fill remaining space so it sits flush
+         * next to the Back button (or spans the full row on step 1). */}
         <Button
           type="button"
           fullWidth

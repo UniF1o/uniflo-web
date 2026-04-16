@@ -1,8 +1,15 @@
-// Select — labelled dropdown with an error message slot.
+// Select — labelled native dropdown with an error message slot.
 //
-// Wraps the native <select> so it matches the Input component's visual style:
-// same height, border, focus ring, and error state. appearance-none removes
-// the browser's default arrow; we render our own ChevronDown icon instead.
+// Wraps <select> so it matches Input's visual language: same height (h-10),
+// border, focus ring, and error state. We use a native <select> rather than a
+// custom combobox library because:
+//   - Keyboard navigation and screen-reader announcements are handled by the
+//     browser for free.
+//   - Mobile devices open their native picker (much better UX than a JS one).
+//   - We only need it for two static option lists (gender, home language).
+//
+// `appearance-none` strips the browser's default arrow glyph; we place our own
+// ChevronDown icon in the same spot so the visual style is consistent.
 import { forwardRef } from "react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
@@ -28,11 +35,15 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
           {label}
         </label>
 
-        {/* Wrapper gives us a positioning context for the chevron icon. */}
+        {/* position:relative on the wrapper lets us absolutely-position the
+         * chevron icon in the right-hand side of the select box. */}
         <div className="relative">
           <select
             ref={ref}
             id={id}
+            // aria-describedby links the <select> to its error message so
+            // screen readers announce the error text when the field is focused.
+            // aria-invalid flags the invalid state to assistive technology.
             aria-describedby={error ? `${id}-error` : undefined}
             aria-invalid={error ? true : undefined}
             className={cn(
@@ -58,8 +69,10 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             ))}
           </select>
 
-          {/* Chevron — pointer-events-none so it doesn't block the select's
-           * native click target. */}
+          {/* pointer-events-none ensures clicks pass through the icon to the
+           * underlying <select> — without it the icon would eat the click and
+           * the dropdown wouldn't open. aria-hidden hides it from screen
+           * readers since it's purely decorative. */}
           <ChevronDown
             size={16}
             aria-hidden
