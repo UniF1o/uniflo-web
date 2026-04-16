@@ -21,7 +21,8 @@ export default function DashboardPage() {
           Dashboard
         </h1>
         <p className="text-sm text-muted-foreground">
-          Complete all three sections below before you can apply to universities.
+          Complete all three sections below before you can apply to
+          universities.
         </p>
       </div>
 

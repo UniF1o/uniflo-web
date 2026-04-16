@@ -110,14 +110,16 @@ function validateStep2(fields: {
   const errors: Record<string, string> = {};
   if (!fields.phone.trim()) errors.phone = "Phone number is required.";
   if (!fields.address.trim()) errors.address = "Address is required.";
-  if (!fields.nationality.trim()) errors.nationality = "Nationality is required.";
+  if (!fields.nationality.trim())
+    errors.nationality = "Nationality is required.";
   return errors;
 }
 
 function validateStep3(fields: { gender: string; homeLanguage: string }) {
   const errors: Record<string, string> = {};
   if (!fields.gender) errors.gender = "Please select a gender.";
-  if (!fields.homeLanguage) errors.homeLanguage = "Please select a home language.";
+  if (!fields.homeLanguage)
+    errors.homeLanguage = "Please select a home language.";
   return errors;
 }
 
@@ -137,7 +139,7 @@ function StepIndicator({ current }: { current: number }) {
     <div className="flex items-center gap-2">
       {STEPS.map((title, i) => {
         const stepNum = i + 1;
-        const isDone = stepNum < current;   // step was completed
+        const isDone = stepNum < current; // step was completed
         const isActive = stepNum === current; // step currently visible
         return (
           <div key={stepNum} className="flex items-center gap-2">
@@ -146,8 +148,11 @@ function StepIndicator({ current }: { current: number }) {
               className={cn(
                 "flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-medium",
                 isDone && "bg-primary text-primary-foreground",
-                isActive && "bg-primary text-primary-foreground ring-2 ring-primary/30 ring-offset-2",
-                !isDone && !isActive && "border border-border text-muted-foreground",
+                isActive &&
+                  "bg-primary text-primary-foreground ring-2 ring-primary/30 ring-offset-2",
+                !isDone &&
+                  !isActive &&
+                  "border border-border text-muted-foreground",
               )}
             >
               {isDone ? <CheckCircle2 size={14} /> : stepNum}
@@ -156,7 +161,9 @@ function StepIndicator({ current }: { current: number }) {
             <span
               className={cn(
                 "hidden text-xs sm:inline",
-                isActive ? "font-medium text-foreground" : "text-muted-foreground",
+                isActive
+                  ? "font-medium text-foreground"
+                  : "text-muted-foreground",
               )}
             >
               {title}

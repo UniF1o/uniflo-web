@@ -26,7 +26,10 @@ export default function AuthLayout({
 
       {/* Footer — small, muted, gives the layout visual closure. */}
       <footer className="px-6 py-6 text-center text-xs text-muted-foreground">
-        <p>© {new Date().getFullYear()} Uniflo. Building futures, one application at a time.</p>
+        <p>
+          © {new Date().getFullYear()} Uniflo. Building futures, one application
+          at a time.
+        </p>
       </footer>
     </div>
   );

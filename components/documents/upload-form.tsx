@@ -41,10 +41,10 @@ type UploadStatus = "idle" | "uploading" | "uploaded" | "error";
 
 type ZoneState = {
   status: UploadStatus;
-  fileName: string | null;   // Original file name from the user's device
+  fileName: string | null; // Original file name from the user's device
   uploadedAt: string | null; // ISO timestamp returned by the backend on success
-  progress: number;          // 0–100, driven by XHR upload progress events
-  error: string | null;      // Validation or API error message, null when none
+  progress: number; // 0–100, driven by XHR upload progress events
+  error: string | null; // Validation or API error message, null when none
 };
 
 // Shape of each document record returned by GET /documents.
@@ -181,9 +181,7 @@ function uploadViaXhr(
     // Fires on network-level failure (offline, DNS failure, timeout, etc.).
     xhr.addEventListener("error", () => {
       reject(
-        new Error(
-          "Unable to connect. Check your connection and try again.",
-        ),
+        new Error("Unable to connect. Check your connection and try again."),
       );
     });
 
@@ -213,7 +211,11 @@ interface DocumentZoneCardProps {
   onFileSelect: (file: File) => void;
 }
 
-function DocumentZoneCard({ config, state, onFileSelect }: DocumentZoneCardProps) {
+function DocumentZoneCard({
+  config,
+  state,
+  onFileSelect,
+}: DocumentZoneCardProps) {
   // Ref lets us call .click() on the hidden input from the styled button.
   const inputRef = useRef<HTMLInputElement>(null);
   // Stable id used to link the zone's label to the trigger buttons via
@@ -238,7 +240,9 @@ function DocumentZoneCard({ config, state, onFileSelect }: DocumentZoneCardProps
         <p id={labelId} className="text-sm font-medium text-foreground">
           {config.label}
         </p>
-        <p className="text-xs text-muted-foreground mt-0.5">{config.description}</p>
+        <p className="text-xs text-muted-foreground mt-0.5">
+          {config.description}
+        </p>
       </div>
 
       {/* Hidden file input — accepts PDF and image types */}
