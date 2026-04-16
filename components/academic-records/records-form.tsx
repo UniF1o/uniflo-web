@@ -202,7 +202,9 @@ function SubjectRowEditor({
         />
       </div>
 
-      {/* Mark input — constrained to a narrow width since it only holds 0–3 digits. */}
+      {/* Mark input — constrained to a narrow width since it only holds 0–3 digits.
+       * step={1} restricts the browser's number spinner and native validation
+       * to integers only, preventing decimal entries like "78.5". */}
       <div className="w-32">
         <Input
           id={`subject-mark-${row.id}`}
@@ -211,6 +213,7 @@ function SubjectRowEditor({
           inputMode="numeric"
           min={0}
           max={100}
+          step={1}
           placeholder="0–100"
           value={row.mark}
           onChange={(e) => onChange({ mark: e.target.value })}
@@ -494,7 +497,6 @@ export function AcademicRecordsForm() {
           type="button"
           variant="ghost"
           onClick={addRow}
-          className="gap-2"
         >
           <Plus size={16} aria-hidden />
           Add subject
