@@ -85,8 +85,11 @@ export default function SignUpPage() {
     }
 
     if (data.session) {
-      // Email confirmation is disabled in Supabase — user is signed in immediately.
+      // Email confirmation is disabled — user is signed in immediately.
+      // router.refresh() invalidates Next.js's server cache so the (app)
+      // layout re-reads the newly written session cookie on the next request.
       router.push("/profile/setup");
+      router.refresh();
     } else {
       // Email confirmation is required — tell the user to check their inbox.
       setEmailSent(true);
