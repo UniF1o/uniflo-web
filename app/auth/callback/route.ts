@@ -7,13 +7,23 @@
 //
 // The optional `next` query param lets the OAuth initiator set the post-auth
 // destination — signup passes next=/profile/setup, login uses /dashboard.
+// `next` is strictly validated as a same-origin path to prevent open-redirect
+// attacks (e.g. next=//evil.com or next=@evil.com).
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+
+// Only accepts values that look like "/some/path". A single-slash prefix
+// followed by a non-slash and non-backslash character keeps an attacker from
+// smuggling in a different host via "//evil.com" or "/\evil.com".
+function safeNextPath(next: string | null): string {
+  if (next && /^\/[^/\\]/.test(next)) return next;
+  return "/dashboard";
+}
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/dashboard";
+  const next = safeNextPath(searchParams.get("next"));
 
   if (code) {
     const supabase = await createClient();
