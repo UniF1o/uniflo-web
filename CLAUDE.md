@@ -138,7 +138,6 @@ Nothing merges with a failing CI run.
 
 ## Rules
   When writing code, write comments that explain how the code work so one can understand how the code works
-  Keep comments very detailed before committing so i can proof read
   Keep the comments consice and professional but easy enough that someone not proficient can understand before we actually push the branch out
   After every feature branch is done, write documentation that explains everything you did, design decisions, changes in implementation and make it an md file
   Make commits as you work on each feature branch so you can track your history
