@@ -78,10 +78,10 @@ function newId(): string {
     : String(Date.now() + Math.random());
 }
 
-// Calculates the aggregate (simple average) from whatever marks have been entered.
-// Skips rows with empty, non-numeric, or out-of-range marks so the display
-// remains valid while the user is still filling in the form.
-// Returns null when no valid marks exist yet — used to hide the aggregate display.
+// Returns the simple average of all valid marks (0–100 integers), rounded to
+// one decimal place. Rows with empty or out-of-range marks are skipped so the
+// display stays correct while the form is partially filled.
+// Returns null when no valid marks exist yet — used to hide the aggregate stat.
 function calculateAggregate(subjects: SubjectRow[]): number | null {
   const valid = subjects
     .map((s) => parseInt(s.mark, 10))
@@ -93,9 +93,12 @@ function calculateAggregate(subjects: SubjectRow[]): number | null {
 }
 
 // ─── Validation ───────────────────────────────────────────────────────────────
+//
+// Each validator returns a Record<fieldKey, errorMessage>. An empty object
+// means the inputs are valid. Errors are shown inline beneath each field.
 
-// Validates institution name, year, and the presence of at least one subject row.
-// Returns a Record<fieldKey, errorMessage>; an empty object means no errors.
+// Validates the top-level fields: institution name, year range, and that at
+// least one subject row exists.
 function validate(
   institution: string,
   year: string,
@@ -116,8 +119,8 @@ function validate(
   return errors;
 }
 
-// Validates a single subject row. Returns errors keyed by field name:
-// "name", "customName", "mark". An empty return means the row is valid.
+// Validates one subject row. Errors are keyed by field name:
+// "name", "customName" (only required when name === "Other"), "mark".
 function validateSubject(row: SubjectRow): Record<string, string> {
   const errors: Record<string, string> = {};
   if (!row.name) {
@@ -259,8 +262,9 @@ export function AcademicRecordsForm() {
     { id: newId(), name: "", customName: "", mark: "" },
   ]);
 
-  // Removes one top-level field error the moment the user starts correcting it.
-  // Early-return avoids a re-render when the key has no error to clear.
+  // Removes one top-level field error (institution, year, subjects) the moment
+  // the user starts correcting it. Early-return skips a re-render when there
+  // is no error to clear for that key.
   function clearError(key: string) {
     setFieldErrors((prev) => {
       if (!prev[key]) return prev;
@@ -270,7 +274,8 @@ export function AcademicRecordsForm() {
     });
   }
 
-  // Removes one cell from rowErrors. Key format: "${rowId}.${field}".
+  // Removes one error entry from rowErrors. Keys follow the pattern
+  // "${rowId}.${field}" (e.g. "abc123.mark") to scope errors to their row.
   function clearRowError(rowId: string, field: string) {
     const key = `${rowId}.${field}`;
     setRowErrors((prev) => {
@@ -299,7 +304,8 @@ export function AcademicRecordsForm() {
 
   function removeRow(id: string) {
     setSubjects((prev) => prev.filter((row) => row.id !== id));
-    // Purge all errors belonging to the removed row.
+    // Remove all rowErrors entries for the deleted row. Keys are prefixed with
+    // the row's id (e.g. "abc123.mark"), so a startsWith check clears them all.
     setRowErrors((prev) => {
       const next = { ...prev };
       for (const key of Object.keys(next)) {
@@ -309,6 +315,9 @@ export function AcademicRecordsForm() {
     });
   }
 
+  // Validates all fields, builds the payload, and POSTs to the backend.
+  // Top-level fields (institution, year) and every subject row are validated
+  // together before any network request is made.
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setApiError(null);
@@ -408,7 +417,8 @@ export function AcademicRecordsForm() {
     }
   }
 
-  // Recalculate on every render so the display updates as the user types marks.
+  // Derived from subjects state — recalculates on every render so the header
+  // aggregate stat stays in sync as the user types or removes marks.
   const aggregate = calculateAggregate(subjects);
 
   return (
