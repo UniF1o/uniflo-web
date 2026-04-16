@@ -1,10 +1,13 @@
-// /dashboard — placeholder landing page for signed-in users.
+// Dashboard page — the first screen a signed-in student lands on.
 //
-// This page intentionally has almost no content. Task 7 fleshes it out with
-// a real profile-completeness indicator. For Task 2 it exists only so the
-// (app) route group has a reachable route and the shell chrome can be
-// exercised end-to-end on the Vercel preview.
+// Lives under (app) so the auth gate in the route-group layout has already
+// verified the session. This page is a thin server component: it sets the
+// title and renders the client-side completeness indicator.
+//
+// If the student has no profile yet, the completeness component redirects
+// them to /profile/setup automatically before any dashboard content shows.
 import type { Metadata } from "next";
+import { ProfileCompleteness } from "@/components/dashboard/completeness";
 
 export const metadata: Metadata = {
   title: "Dashboard",
@@ -12,14 +15,17 @@ export const metadata: Metadata = {
 
 export default function DashboardPage() {
   return (
-    <div className="space-y-4">
-      <h1 className="font-display text-4xl leading-tight tracking-tight md:text-5xl">
-        Welcome back.
-      </h1>
-      <p className="max-w-prose text-muted-foreground">
-        This is the dashboard shell. Your real dashboard — profile progress,
-        academic records, and document uploads — arrives in Task 7.
-      </p>
+    <div className="max-w-2xl space-y-8">
+      <div className="space-y-1">
+        <h1 className="font-display text-3xl tracking-tight text-foreground">
+          Dashboard
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          Complete all three sections below before you can apply to universities.
+        </p>
+      </div>
+
+      <ProfileCompleteness />
     </div>
   );
 }
