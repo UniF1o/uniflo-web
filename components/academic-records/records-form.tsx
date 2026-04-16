@@ -183,9 +183,10 @@ function SubjectRowEditor({
         </button>
       )}
 
-      {/* Subject name select — pr-8 on the select itself leaves space for the
-       * custom ChevronDown icon inside Select. The wrapper has some right
-       * padding so the chevron doesn't overlap the trash button on small screens. */}
+      {/* pr-7 on the wrapper shifts the Select's right edge away from the
+       * card's right edge, giving the absolutely-positioned trash button room
+       * so it doesn't sit on top of Select's ChevronDown icon. Only applied
+       * when the trash button is visible (removable). */}
       <div className={cn(removable && "pr-7")}>
         <Select
           id={`subject-name-${row.id}`}
@@ -221,8 +222,8 @@ function SubjectRowEditor({
         />
       </div>
 
-      {/* Custom name — only rendered when "Other" is selected. Animates into
-       * view naturally because it enters the DOM as a new flex child. */}
+      {/* Custom name — conditionally rendered when "Other" is selected.
+       * Mounts/unmounts with the subject name change via the controlled select. */}
       {row.name === "Other" && (
         <Input
           id={`subject-custom-${row.id}`}
