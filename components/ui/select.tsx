@@ -39,8 +39,6 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
               // Match Input's sizing and colour tokens exactly.
               "h-10 w-full appearance-none rounded-lg border border-border bg-background px-3 pr-9 text-sm text-foreground",
               "transition-colors focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20",
-              // Placeholder option reads as muted until a real value is chosen.
-              "invalid:text-muted-foreground",
               error &&
                 "border-destructive focus:border-destructive focus:ring-destructive/20",
               className,

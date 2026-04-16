@@ -241,7 +241,8 @@ export function ProfileSetupForm() {
     }
   }
 
-  async function handleContinue() {
+  async function handleContinue(e?: React.FormEvent) {
+    e?.preventDefault();
     setApiError(null);
 
     // Validate the current step's fields before hitting the network.
@@ -300,9 +301,11 @@ export function ProfileSetupForm() {
         </p>
       </div>
 
+      {/* Each step is its own <form> so Enter-to-submit works naturally and
+       * the browser's built-in focus management moves to the first field. */}
       {/* ── Step 1: Personal details ─────────────────────────────────────── */}
       {step === 1 && (
-        <div className="space-y-4">
+        <form onSubmit={handleContinue} noValidate className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <Input
               id="firstName"
@@ -365,12 +368,12 @@ export function ProfileSetupForm() {
               13-digit number on the front of your green ID book or smart card.
             </p>
           </div>
-        </div>
+        </form>
       )}
 
       {/* ── Step 2: Contact details ──────────────────────────────────────── */}
       {step === 2 && (
-        <div className="space-y-4">
+        <form onSubmit={handleContinue} noValidate className="space-y-4">
           <Input
             id="phone"
             label="Phone number"
@@ -412,12 +415,12 @@ export function ProfileSetupForm() {
             }}
             error={fieldErrors.nationality}
           />
-        </div>
+        </form>
       )}
 
       {/* ── Step 3: Identity ────────────────────────────────────────────── */}
       {step === 3 && (
-        <div className="space-y-4">
+        <form onSubmit={handleContinue} noValidate className="space-y-4">
           <Select
             id="gender"
             label="Gender"
@@ -448,7 +451,7 @@ export function ProfileSetupForm() {
               Used to complete university application forms on your behalf.
             </p>
           </div>
-        </div>
+        </form>
       )}
 
       {/* API-level error — shown below the fields, above the action buttons. */}
