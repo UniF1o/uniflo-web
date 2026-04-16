@@ -141,6 +141,7 @@ Nothing merges with a failing CI run.
   Keep the comments consice and professional but easy enough that someone not proficient can understand before we actually push the branch out
   After every feature branch is done, write documentation that explains everything you did, design decisions, changes in implementation and make it an md file
   Make commits as you work on each feature branch so you can track your history
+  Review all your work when you are done to catch mistakes, revise work to be better or to just note stuff for your improvement
 
 ## What Not to Build (MVP Scope)
 
