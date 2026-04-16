@@ -216,6 +216,10 @@ interface DocumentZoneCardProps {
 function DocumentZoneCard({ config, state, onFileSelect }: DocumentZoneCardProps) {
   // Ref lets us call .click() on the hidden input from the styled button.
   const inputRef = useRef<HTMLInputElement>(null);
+  // Stable id used to link the zone's label to the trigger buttons via
+  // aria-describedby so screen readers announce which document type the
+  // button belongs to (e.g. "Select file, South African ID document").
+  const labelId = `zone-label-${config.type}`;
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -228,9 +232,12 @@ function DocumentZoneCard({ config, state, onFileSelect }: DocumentZoneCardProps
 
   return (
     <div className="rounded-lg border border-border p-4 space-y-3">
-      {/* Zone label and description */}
+      {/* Zone label and description. The id on the <p> is referenced by
+       * aria-describedby on each trigger button below. */}
       <div>
-        <p className="text-sm font-medium text-foreground">{config.label}</p>
+        <p id={labelId} className="text-sm font-medium text-foreground">
+          {config.label}
+        </p>
         <p className="text-xs text-muted-foreground mt-0.5">{config.description}</p>
       </div>
 
@@ -242,7 +249,7 @@ function DocumentZoneCard({ config, state, onFileSelect }: DocumentZoneCardProps
         accept=".pdf,.jpg,.jpeg,.png"
         onChange={handleInputChange}
         // aria-hidden so screen readers don't navigate to the raw input —
-        // the visible button below is the accessible trigger.
+        // the visible buttons below are the accessible triggers.
         aria-hidden
       />
 
@@ -261,6 +268,7 @@ function DocumentZoneCard({ config, state, onFileSelect }: DocumentZoneCardProps
           <Button
             type="button"
             variant="ghost"
+            aria-describedby={labelId}
             onClick={() => inputRef.current?.click()}
           >
             <UploadCloud size={16} aria-hidden />
@@ -315,6 +323,7 @@ function DocumentZoneCard({ config, state, onFileSelect }: DocumentZoneCardProps
           <Button
             type="button"
             variant="ghost"
+            aria-describedby={labelId}
             onClick={() => inputRef.current?.click()}
           >
             Replace
@@ -336,6 +345,7 @@ function DocumentZoneCard({ config, state, onFileSelect }: DocumentZoneCardProps
           <Button
             type="button"
             variant="ghost"
+            aria-describedby={labelId}
             onClick={() => inputRef.current?.click()}
           >
             <UploadCloud size={16} aria-hidden />
@@ -379,7 +389,8 @@ export function DocumentsUploadForm() {
         const res = await fetch(`${apiUrl}/documents`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        // A non-OK response (e.g. 404) just means no documents yet — stay idle.
+        // Non-OK status (auth failure, server error, etc.) — stay idle.
+        // An empty upload list returns 200 with [], not 404.
         if (!res.ok) return;
 
         const docs = (await res.json()) as ExistingDocument[];
