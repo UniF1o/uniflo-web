@@ -259,26 +259,23 @@ export function ProfileCompleteness() {
         )}
       </p>
 
-      {/* One card per section */}
+      {/* One card per section — rendered from SECTIONS so label/href stay
+       * in one place. Documents gets a dynamic description based on partial
+       * progress; the other two sections use the static description from SECTIONS. */}
       <div className="space-y-3">
-        <SectionItem
-          label="Personal profile"
-          description="Your personal and contact details."
-          href="/profile/setup"
-          status={state.profile as Exclude<SectionStatus, "loading">}
-        />
-        <SectionItem
-          label="Academic records"
-          description="Your matric results and subject marks."
-          href="/academic-records"
-          status={state.academicRecords as Exclude<SectionStatus, "loading">}
-        />
-        <SectionItem
-          label="Documents"
-          description={documentsDescription}
-          href="/documents"
-          status={state.documents as Exclude<SectionStatus, "loading">}
-        />
+        {SECTIONS.map((section) => (
+          <SectionItem
+            key={section.key}
+            label={section.label}
+            description={
+              section.key === "documents"
+                ? documentsDescription
+                : section.description
+            }
+            href={section.href}
+            status={state[section.key] as Exclude<SectionStatus, "loading">}
+          />
+        ))}
       </div>
     </div>
   );
