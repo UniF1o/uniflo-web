@@ -10,7 +10,7 @@ For full detail on architecture decisions, schema, and the build plan, refer to 
 - `docs/build-action-plan.md` — phased build plan, partner split, phase status, MVP scope
 - `docs/git-github-workflow.md` — branching strategy, PR process, commit conventions
 
-Per-task write-ups for completed work live in `docs/phase-1/` — useful for recovering the reasoning behind a specific feature. `docs/phase-1/phase-0-1-review.md` is the cross-phase audit that closed out Phase 1.
+Per-task write-ups live in `docs/phase-1/` (all complete) and `docs/phase-2/` (in progress). `docs/phase-1/phase-0-1-review.md` is the cross-phase audit that closed out Phase 1. `docs/phase-2/task-1-openapi-types.md` covers the Task 1 type generation work.
 
 ---
 
@@ -26,24 +26,24 @@ This repo is owned by **Partner A (Frontend)**. The backend lives in a separate 
 
 **Phase 0 and Phase 1 are complete on the frontend side.** A student can sign up (email/password or Google OAuth), complete the multi-step profile setup, add academic records, upload documents, and see a dashboard with completeness plus a read-only `/profile` overview.
 
-**Phase 2 is next** — university browsing, selection, application flow, and status dashboard. See `docs/build-action-plan.md` for the task breakdown. Before starting Phase 2 work, coordinate with Partner B on the `/universities` and `/applications` API shape so `openapi-typescript` types are in place first.
+**Phase 2 is in progress.** Task 1 (`feature/openapi-types`) is complete — `openapi-typescript` is wired, `lib/api/schema.d.ts` covers the full Phase 1 + Phase 2 contract, and `lib/api/client.ts` is the shared fetch wrapper. Task 2 (`feature/universities-browse`) is next. See `docs/phase-2/partner-a-phase-2-plan.md` for the full task breakdown.
 
 ---
 
 ## Stack
 
-| Concern        | Tool                                                                                                                                            |
-| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| Framework      | Next.js 16 (App Router) with TypeScript, React 19                                                                                               |
-| Styling        | Tailwind CSS v4                                                                                                                                 |
-| Auth           | Supabase Auth via `@supabase/ssr` (SSR-aware) + `@supabase/supabase-js`                                                                         |
-| Storage        | Supabase Storage (document uploads)                                                                                                             |
-| API types      | `openapi-typescript` generated from `uniflo-api` OpenAPI spec (not yet wired — see `components/profile/overview.tsx` for the hand-written stub) |
-| Linting        | ESLint + Prettier (`format:check` gated in CI)                                                                                                  |
-| Testing        | Vitest (no `@testing-library/react` yet — added when component tests begin in Phase 2)                                                          |
-| Error tracking | Sentry (deferred to Phase 2)                                                                                                                    |
-| Hosting        | Vercel (Hobby during dev, Pro before beta)                                                                                                      |
-| CI/CD          | GitHub Actions — `.github/workflows/frontend.yml` runs lint, `format:check`, `tsc --noEmit`, Vitest                                             |
+| Concern        | Tool                                                                                                                                         |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Framework      | Next.js 16 (App Router) with TypeScript, React 19                                                                                            |
+| Styling        | Tailwind CSS v4                                                                                                                              |
+| Auth           | Supabase Auth via `@supabase/ssr` (SSR-aware) + `@supabase/supabase-js`                                                                      |
+| Storage        | Supabase Storage (document uploads)                                                                                                          |
+| API types      | `openapi-typescript` generated from `uniflo-api` OpenAPI spec — `lib/api/schema.d.ts` (committed), `lib/api/client.ts` (typed fetch wrapper) |
+| Linting        | ESLint + Prettier (`format:check` gated in CI)                                                                                               |
+| Testing        | Vitest (no `@testing-library/react` yet — added when component tests begin in Phase 2)                                                       |
+| Error tracking | Sentry (deferred to Phase 2)                                                                                                                 |
+| Hosting        | Vercel (Hobby during dev, Pro before beta)                                                                                                   |
+| CI/CD          | GitHub Actions — `.github/workflows/frontend.yml` runs lint, `format:check`, `tsc --noEmit`, Vitest                                          |
 
 ---
 
@@ -63,7 +63,7 @@ This repo is owned by **Partner A (Frontend)**. The backend lives in a separate 
 
 ## Database Schema (for reference — owned by uniflo-api)
 
-The frontend needs to know the shape of data it sends and receives. Phase 1 tables are live. Phase 2 tables are on the roadmap but not yet implemented on either side. Do not send fields the backend doesn't expect.
+The frontend needs to know the shape of data it sends and receives. All Phase 1 and Phase 2 types are defined in `lib/api/schema.d.ts`. Do not send fields the backend doesn't expect.
 
 ```
 users                  — id, email, role, created_at

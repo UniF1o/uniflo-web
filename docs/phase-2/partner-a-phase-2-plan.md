@@ -101,17 +101,17 @@ At the end of each task branch, drop a write-up in `docs/phase-2/` as `task-<n>-
 
 Before anything else, replace hand-written API types with generated ones. Every Phase 2 task depends on this being in place. It is a small task but gates all the others.
 
-- [ ] Add `openapi-typescript` as a devDependency
-- [ ] Add an npm script `types:api` that runs `openapi-typescript <spec-url> -o lib/api/schema.d.ts`, reading the URL from an env var (e.g. `OPENAPI_SPEC_URL`) with a sensible local default (`http://localhost:8000/openapi.json`)
-- [ ] Create `lib/api/client.ts` — a thin `fetch` wrapper that:
+- [x] Add `openapi-typescript` as a devDependency
+- [x] Add an npm script `types:api` that runs `openapi-typescript <spec-url> -o lib/api/schema.d.ts`, reading the URL from an env var (e.g. `OPENAPI_SPEC_URL`) with a sensible local default (`http://localhost:8000/openapi.json`)
+- [x] Create `lib/api/client.ts` — a thin `fetch` wrapper that:
   - Reads `NEXT_PUBLIC_API_URL` as the base URL
   - Takes the Supabase JWT from `supabase.auth.getSession()` at call time (not at module load — long-open pages must not send expired tokens)
   - Attaches `Authorization: Bearer <token>`
   - Throws on non-2xx with the body included, so callers can render meaningful errors
   - Is typed against the generated `paths` from `lib/api/schema.d.ts`
-- [ ] Replace the hand-written `ProfileResponse` in `components/profile/overview.tsx` with the generated type — confirm the overview still compiles and behaves identically
-- [ ] Check `lib/api/schema.d.ts` into git. It is generated but stable between spec changes, and checking it in means Partner A can read it without running the backend locally
-- [ ] Document the regeneration command in the README under a new "Working with the API" section
+- [x] Replace the hand-written `ProfileResponse` in `components/profile/overview.tsx` with the generated type — confirm the overview still compiles and behaves identically
+- [x] Check `lib/api/schema.d.ts` into git. It is generated but stable between spec changes, and checking it in means Partner A can read it without running the backend locally
+- [x] Document the regeneration command in the README under a new "Working with the API" section
 
 **Why:** Every Phase 2 fetch (`/universities`, `/applications`, `/application-jobs`) is typed end to end against Partner B's schema. Drift between frontend expectations and backend reality shows up as a TypeScript error at build time instead of a runtime 4xx.
 
