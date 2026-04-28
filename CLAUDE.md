@@ -10,6 +10,8 @@ For full detail on architecture decisions, schema, and the build plan, refer to 
 - `docs/build-action-plan.md` — phased build plan, partner split, phase status, MVP scope
 - `docs/git-github-workflow.md` — branching strategy, PR process, commit conventions
 
+Per-task write-ups for completed work live in `docs/phase-1/` — useful for recovering the reasoning behind a specific feature. `docs/phase-1/phase-0-1-review.md` is the cross-phase audit that closed out Phase 1.
+
 ---
 
 ## What This Repo Is
@@ -22,7 +24,9 @@ This repo is owned by **Partner A (Frontend)**. The backend lives in a separate 
 
 ## Current Phase
 
-**Phase 0 is complete.** Phase 1 is the active phase. Refer to `docs\partner-a-phase-1-plan.md` when prompted on tasks for the phase.
+**Phase 0 and Phase 1 are complete on the frontend side.** A student can sign up (email/password or Google OAuth), complete the multi-step profile setup, add academic records, upload documents, and see a dashboard with completeness plus a read-only `/profile` overview.
+
+**Phase 2 is next** — university browsing, selection, application flow, and status dashboard. See `docs/build-action-plan.md` for the task breakdown. Before starting Phase 2 work, coordinate with Partner B on the `/universities` and `/applications` API shape so `openapi-typescript` types are in place first.
 
 ---
 
@@ -30,16 +34,16 @@ This repo is owned by **Partner A (Frontend)**. The backend lives in a separate 
 
 | Concern        | Tool                                                          |
 | -------------- | ------------------------------------------------------------- |
-| Framework      | Next.js (App Router) with TypeScript                          |
-| Styling        | Tailwind CSS                                                  |
-| Auth           | Supabase Auth JS SDK (client side)                            |
+| Framework      | Next.js 16 (App Router) with TypeScript, React 19             |
+| Styling        | Tailwind CSS v4                                               |
+| Auth           | Supabase Auth via `@supabase/ssr` (SSR-aware) + `@supabase/supabase-js` |
 | Storage        | Supabase Storage (document uploads)                           |
-| API types      | `openapi-typescript` generated from `uniflo-api` OpenAPI spec |
-| Linting        | ESLint + Prettier                                             |
-| Testing        | Vitest                                                        |
-| Error tracking | Sentry                                                        |
+| API types      | `openapi-typescript` generated from `uniflo-api` OpenAPI spec (not yet wired — see `components/profile/overview.tsx` for the hand-written stub) |
+| Linting        | ESLint + Prettier (`format:check` gated in CI)                |
+| Testing        | Vitest (no `@testing-library/react` yet — added when component tests begin in Phase 2) |
+| Error tracking | Sentry (deferred to Phase 2)                                  |
 | Hosting        | Vercel (Hobby during dev, Pro before beta)                    |
-| CI/CD          | GitHub Actions — `frontend.yml`                               |
+| CI/CD          | GitHub Actions — `.github/workflows/frontend.yml` runs lint, `format:check`, `tsc --noEmit`, Vitest |
 
 ---
 
@@ -59,7 +63,7 @@ This repo is owned by **Partner A (Frontend)**. The backend lives in a separate 
 
 ## Database Schema (for reference — owned by uniflo-api)
 
-The frontend needs to know the shape of data it sends and receives. These are the Phase 1 and Phase 2 tables. Do not send fields the backend doesn't expect.
+The frontend needs to know the shape of data it sends and receives. Phase 1 tables are live. Phase 2 tables are on the roadmap but not yet implemented on either side. Do not send fields the backend doesn't expect.
 
 ```
 users                  — id, email, role, created_at
@@ -132,23 +136,23 @@ chore: update openapi-generated types
 
 ## CI/CD
 
-`frontend.yml` runs on every push:
+`.github/workflows/frontend.yml` runs on every push:
 
 1. ESLint
-2. Vitest
-3. Deploys to Vercel on merge to `main`
+2. Prettier — `format:check`
+3. TypeScript — `tsc --noEmit`
+4. Vitest
 
-Nothing merges with a failing CI run.
+Vercel builds a Preview deployment on every PR and deploys to production on merge to `main`. Nothing merges with a failing CI run.
 
 ---
 
 ## Rules
 
-When writing code, write comments that explain how the code work so one can understand how the code works
-Keep the comments consice and professional but easy enough that someone not proficient can understand before we actually push the branch out
-After every feature branch is done, write documentation that explains everything you did, design decisions, changes in implementation and make it an md file
-Make commits as you work on each feature branch so you can track your history
-Review all your work when you are done to catch mistakes, revise work to be better or to just note stuff for your improvement
+- **Comment for clarity, not narration.** Add a short comment when the *why* isn't obvious from the code — a hidden constraint, a subtle invariant, a non-obvious workaround. Don't restate what the code already says. Keep any comment you do write short, professional, and readable to someone who is not deeply proficient.
+- **Write a task/feature doc at the end of each feature branch.** Drop it in `docs/phase-<N>/` as `task-<n>-<slug>.md` or `<feature>.md`. Cover: what was built, design decisions, any deviation from the plan, and anything the next person should know. This is the pattern already established in `docs/phase-1/`.
+- **Commit as you go on a feature branch.** Small, focused commits — squash-merge collapses them into one clean commit on `main` anyway, so optimise for reviewability of history while the branch is alive.
+- **Review your own work before opening the PR.** Run `lint`, `format:check`, `tsc --noEmit`, `test`, and `build` locally. Exercise the feature in a browser (desktop + mobile viewport). Catch the stuff a reviewer shouldn't have to.
 
 ## What Not to Build (MVP Scope)
 

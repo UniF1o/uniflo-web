@@ -3,6 +3,18 @@
 ## Product Summary
 Uniflo is a South African university application automation platform. Students fill in their details once and Uniflo automatically applies to multiple universities on their behalf. The MVP has one job: a student signs up, fills in their profile, selects universities, and Uniflo submits those applications automatically.
 
+## Phase Status At a Glance
+
+| Phase | Status |
+|-------|--------|
+| Phase 0 — Foundation | ✅ Complete |
+| Phase 1 — Auth, profiles, documents | ✅ Frontend complete (backend tracked separately in `uniflo-api`) |
+| Phase 2 — Universities & application flow | ⏳ Next up |
+| Phase 3 — Automation layer | ⏳ Not started |
+| Phase 4 — Beta hardening & launch | ⏳ Not started |
+
+Per-task Phase 1 write-ups (design decisions, what changed during implementation) live in `docs/phase-1/`. The cross-phase audit is `docs/phase-1/phase-0-1-review.md`.
+
 ---
 
 ## MVP Scope
@@ -133,13 +145,15 @@ documents              — id, student_id, type, storage_url, uploaded_at
 Write models first, generate Alembic migration, run migration against Supabase PostgreSQL. Do not include Phase 2 tables in this migration.
 
 ### Partner A — Frontend
-- [ ] Build authentication screens — sign up, login, forgot password
-- [ ] Integrate Supabase Auth JS SDK on the client
-- [ ] Build basic app layout — navbar, sidebar, page shell
-- [ ] Build student profile setup flow — multi-step form covering all profile fields including gender and home language
-- [ ] Build academic records form — subject multi-select from canonical NSC list with mark input per subject, plus "Other" free text option
-- [ ] Build document upload UI — ID copy, matric results, transcripts
-- [ ] Handle upload progress and error states clearly
+- [x] Build authentication screens — sign up, login, forgot password
+- [x] Integrate Supabase Auth on the client (via `@supabase/ssr` + `@supabase/supabase-js`, server-aware so signed-in users are redirected away from `/login` and `/signup`)
+- [x] Build basic app layout — `(auth)` and `(app)` route groups, sidebar, user menu, responsive shell
+- [x] Build student profile setup flow — multi-step form covering all profile fields including gender and home language
+- [x] Build academic records form — subject multi-select from canonical NSC list with mark input per subject, plus "Other" free text option
+- [x] Build document upload UI — ID copy, matric results, transcripts
+- [x] Handle upload progress and error states clearly
+- [x] Dashboard shell with profile-completeness indicator (added during Phase 1 — not in original plan but needed as the post-auth landing page)
+- [x] Read-only `/profile` overview page (added during Phase 0/1 review — the sidebar and user menu linked to a 404)
 
 ### Partner B — Backend
 - [ ] Set up Supabase Auth JWT validation middleware in FastAPI
