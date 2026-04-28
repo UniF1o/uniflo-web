@@ -49,9 +49,10 @@ Keep names lowercase, hyphen-separated, and specific enough that the other partn
 
 ### Step 1 — Cut a feature branch from main
 
-Always make sure your local `main` is up to date before cutting a new branch.
+Always make sure your local `main` is up to date before cutting a new branch. This matters extra because we use **Squash and Merge** — after a PR merges, the commit that lands on `origin/main` is a brand-new commit, so your local `main` does not contain it by hash even if it contains the same code. Branching off a stale local `main` produces awkward rebases and phantom conflicts. Always `fetch` + rebase on (or reset to) `origin/main` first.
 
 ```bash
+git fetch origin
 git checkout main
 git pull origin main
 git checkout -b feature/your-feature-name
@@ -159,7 +160,8 @@ Stale branches cause confusion. Delete them immediately after merging. GitHub of
 ## Quick Reference
 
 ```bash
-# Start new feature
+# Start new feature (always fetch first — squash-merged PRs leave local main stale)
+git fetch origin
 git checkout main && git pull origin main
 git checkout -b feature/your-feature-name
 

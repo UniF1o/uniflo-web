@@ -16,21 +16,19 @@
 //     field in the API response is intentionally ignored on the frontend.
 //   — The JWT is sent in the Authorization header, never in query params.
 //
-// Types are hand-written until Partner B delivers the FastAPI OpenAPI spec.
-// When available, replace ExistingDocument with the generated type.
 "use client";
 
 import { useState, useEffect, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, UploadCloud, AlertCircle } from "lucide-react";
+import type { components } from "@/lib/api/schema";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 // The three document types the backend /documents endpoint accepts.
-// These strings map directly to the `type` field in the multipart payload.
 // Do not change without coordinating with Partner B.
-type DocumentType = "id_document" | "matric_results" | "transcripts";
+type DocumentType = components["schemas"]["Document"]["type"];
 
 // Tracks the state of a single upload zone throughout its lifecycle.
 //   idle      — no file chosen yet, or validation error shown before upload
@@ -47,15 +45,9 @@ type ZoneState = {
   error: string | null; // Validation or API error message, null when none
 };
 
-// Shape of each document record returned by GET /documents.
-// Replace with the openapi-typescript generated type when the spec is available.
-// The storage_url field is present in the API response but deliberately unused
-// on the frontend — see the security note at the top of this file.
-interface ExistingDocument {
-  id: string;
-  type: DocumentType;
-  uploaded_at: string;
-}
+// storage_url is present in the API response but deliberately unused on
+// the frontend — see the security note at the top of this file.
+type ExistingDocument = components["schemas"]["Document"];
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
