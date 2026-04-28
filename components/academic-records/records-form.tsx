@@ -17,8 +17,6 @@
 //   Do not change this structure without coordinating with Partner B — it is
 //   consumed directly by the backend field-mapping service.
 //
-// Types are hand-written until Partner B delivers the FastAPI OpenAPI spec.
-// When available, replace AcademicRecordsPayload with the generated type.
 "use client";
 
 import { useState } from "react";
@@ -30,6 +28,7 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { NSC_SUBJECTS } from "@/lib/constants/nsc-subjects";
 import { cn } from "@/lib/utils/cn";
+import type { components } from "@/lib/api/schema";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -43,20 +42,7 @@ type SubjectRow = {
   mark: string; // Raw input value, e.g. "78" or "". Parsed on submit.
 };
 
-// Payload shape for POST /academic-records.
-// Replace with the openapi-typescript generated type once the spec is available.
-// The locked subjects contract:
-//   Standard: { name: string, mark: number }
-//   Other:    { name: "Other", custom_name: string, mark: number }
-interface AcademicRecordsPayload {
-  institution: string;
-  year: number;
-  aggregate: number;
-  subjects: Array<
-    | { name: string; mark: number }
-    | { name: "Other"; custom_name: string; mark: number }
-  >;
-}
+type AcademicRecordsPayload = components["schemas"]["AcademicRecordCreate"];
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 

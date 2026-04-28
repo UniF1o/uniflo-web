@@ -32,18 +32,18 @@ This repo is owned by **Partner A (Frontend)**. The backend lives in a separate 
 
 ## Stack
 
-| Concern        | Tool                                                          |
-| -------------- | ------------------------------------------------------------- |
-| Framework      | Next.js 16 (App Router) with TypeScript, React 19             |
-| Styling        | Tailwind CSS v4                                               |
-| Auth           | Supabase Auth via `@supabase/ssr` (SSR-aware) + `@supabase/supabase-js` |
-| Storage        | Supabase Storage (document uploads)                           |
+| Concern        | Tool                                                                                                                                            |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Framework      | Next.js 16 (App Router) with TypeScript, React 19                                                                                               |
+| Styling        | Tailwind CSS v4                                                                                                                                 |
+| Auth           | Supabase Auth via `@supabase/ssr` (SSR-aware) + `@supabase/supabase-js`                                                                         |
+| Storage        | Supabase Storage (document uploads)                                                                                                             |
 | API types      | `openapi-typescript` generated from `uniflo-api` OpenAPI spec (not yet wired — see `components/profile/overview.tsx` for the hand-written stub) |
-| Linting        | ESLint + Prettier (`format:check` gated in CI)                |
-| Testing        | Vitest (no `@testing-library/react` yet — added when component tests begin in Phase 2) |
-| Error tracking | Sentry (deferred to Phase 2)                                  |
-| Hosting        | Vercel (Hobby during dev, Pro before beta)                    |
-| CI/CD          | GitHub Actions — `.github/workflows/frontend.yml` runs lint, `format:check`, `tsc --noEmit`, Vitest |
+| Linting        | ESLint + Prettier (`format:check` gated in CI)                                                                                                  |
+| Testing        | Vitest (no `@testing-library/react` yet — added when component tests begin in Phase 2)                                                          |
+| Error tracking | Sentry (deferred to Phase 2)                                                                                                                    |
+| Hosting        | Vercel (Hobby during dev, Pro before beta)                                                                                                      |
+| CI/CD          | GitHub Actions — `.github/workflows/frontend.yml` runs lint, `format:check`, `tsc --noEmit`, Vitest                                             |
 
 ---
 
@@ -149,7 +149,7 @@ Vercel builds a Preview deployment on every PR and deploys to production on merg
 
 ## Rules
 
-- **Comment for clarity, not narration.** Add a short comment when the *why* isn't obvious from the code — a hidden constraint, a subtle invariant, a non-obvious workaround. Don't restate what the code already says. Keep any comment you do write short, professional, and readable to someone who is not deeply proficient.
+- **Comment for clarity, not narration.** Add a short comment when the _why_ isn't obvious from the code — a hidden constraint, a subtle invariant, a non-obvious workaround. Don't restate what the code already says. Keep any comment you do write short, professional, and readable to someone who is not deeply proficient.
 - **Write a task/feature doc at the end of each feature branch.** Drop it in `docs/phase-<N>/` as `task-<n>-<slug>.md` or `<feature>.md`. Cover: what was built, design decisions, any deviation from the plan, and anything the next person should know. This is the pattern already established in `docs/phase-1/`.
 - **Commit as you go on a feature branch.** Small, focused commits — squash-merge collapses them into one clean commit on `main` anyway, so optimise for reviewability of history while the branch is alive.
 - **Review your own work before opening the PR.** Run `lint`, `format:check`, `tsc --noEmit`, `test`, and `build` locally. Exercise the feature in a browser (desktop + mobile viewport). Catch the stuff a reviewer shouldn't have to.

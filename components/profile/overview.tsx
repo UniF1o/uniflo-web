@@ -6,7 +6,6 @@
 // affordance rather than auto-redirecting — a transient error shouldn't boot
 // the student out of their own profile page.
 //
-// Types are hand-written until Partner B delivers the FastAPI OpenAPI spec.
 "use client";
 
 import { useState, useEffect } from "react";
@@ -17,22 +16,11 @@ import {
   GENDER_LABELS,
   HOME_LANGUAGE_LABELS,
 } from "@/lib/constants/profile-enums";
+import type { components } from "@/lib/api/schema";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-// Mirrors the student_profiles table fields returned by GET /profile.
-// All fields are optional to keep the overview resilient if the API drops one.
-interface ProfileResponse {
-  first_name?: string;
-  last_name?: string;
-  id_number?: string;
-  date_of_birth?: string;
-  phone?: string;
-  address?: string;
-  nationality?: string;
-  gender?: string;
-  home_language?: string;
-}
+type ProfileResponse = components["schemas"]["ProfileResponse"];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 

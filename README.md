@@ -4,7 +4,7 @@ Frontend for **Uniflo** — a South African university application automation pl
 
 This repo is owned by **Partner A (Frontend)**. The FastAPI backend lives separately in `uniflo-api`.
 
-For architecture, schema, and build-plan detail see `docs/` — notably `docs/architecture-designs.md`, `docs/build-action-plan.md`, and `docs/partner-a-phase-1-plan.md`.
+For architecture, schema, and build-plan detail see `docs/` — notably `docs/architecture-designs.md`, `docs/build-action-plan.md`, and `docs/phase-2/partner-a-phase-2-plan.md`.
 
 ## Stack
 
@@ -54,13 +54,60 @@ Open <http://localhost:3000>. The dev server hot-reloads on edit.
 
 ## Scripts
 
-| Command         | What it does                       |
-| --------------- | ---------------------------------- |
-| `npm run dev`   | Start the Next.js dev server       |
-| `npm run build` | Production build (runs in CI)      |
-| `npm run start` | Serve the production build locally |
-| `npm run lint`  | ESLint over the whole tree         |
-| `npm run test`  | Run Vitest suite once              |
+| Command             | What it does                                           |
+| ------------------- | ------------------------------------------------------ |
+| `npm run dev`       | Start the Next.js dev server                           |
+| `npm run build`     | Production build (runs in CI)                          |
+| `npm run start`     | Serve the production build locally                     |
+| `npm run lint`      | ESLint over the whole tree                             |
+| `npm run test`      | Run Vitest suite once                                  |
+| `npm run types:api` | Regenerate `lib/api/schema.d.ts` from the OpenAPI spec |
+
+## Working with the API
+
+All request/response types are generated from the `uniflo-api` FastAPI OpenAPI spec and committed to `lib/api/schema.d.ts`. Do not hand-write API types.
+
+### Regenerating types
+
+Make sure `uniflo-api` is running locally (default: `http://localhost:8000`), then:
+
+```bash
+npm run types:api
+```
+
+To regenerate against a non-local spec (e.g. staging):
+
+```bash
+OPENAPI_SPEC_URL=https://api.uniflo.co.za/openapi.json npm run types:api
+```
+
+Commit the updated `lib/api/schema.d.ts` so Partner A can read the types without running the backend.
+
+### Making API calls
+
+Import the typed client and reference component schemas directly:
+
+```ts
+import { apiClient, ApiError } from "@/lib/api/client";
+import type { components } from "@/lib/api/schema";
+
+type University = components["schemas"]["University"];
+
+try {
+  const { items } =
+    await apiClient.get<components["schemas"]["UniversityList"]>(
+      "/universities",
+    );
+} catch (err) {
+  if (err instanceof ApiError && err.status === 401) {
+    // handle auth error
+  }
+}
+```
+
+The client attaches the Supabase JWT automatically at call time — never pass tokens manually.
+
+---
 
 ## Project layout
 
@@ -100,4 +147,4 @@ Full detail in `docs/git-github-workflow.md`.
 - API types come from the `uniflo-api` OpenAPI spec — do not hand-write them.
 - Mobile-first. Test on real Android viewports, not just desktop.
 - `gender` and `home_language` on `student_profiles` are **mandatory** — they drive the Playwright automation in Phase 2.
-- The `subjects` JSON contract is locked. See `docs/partner-a-phase-1-plan.md` before changing the shape.
+- The `subjects` JSON contract is locked. See `lib/api/schema.d.ts` (`SubjectRecord`) and coordinate with Partner B before changing the shape.
