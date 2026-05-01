@@ -31,10 +31,15 @@ function daysUntil(dateStr: string): number {
 
 interface UniversityCardProps {
   university: University;
+  isSelected: boolean;
   onSelect: (university: University) => void;
 }
 
-export function UniversityCard({ university, onSelect }: UniversityCardProps) {
+export function UniversityCard({
+  university,
+  isSelected,
+  onSelect,
+}: UniversityCardProps) {
   const status = getStatus(university);
   const days = status === "upcoming" ? daysUntil(university.open_date) : 0;
 
@@ -55,7 +60,14 @@ export function UniversityCard({ university, onSelect }: UniversityCardProps) {
   );
 
   return (
-    <div className="flex flex-col gap-4 rounded-lg border border-border bg-background p-5">
+    <div
+      className={cn(
+        "flex flex-col gap-4 rounded-lg border bg-background p-5 transition-colors",
+        isSelected
+          ? "border-primary/40 ring-1 ring-primary/20"
+          : "border-border",
+      )}
+    >
       <div className="flex items-start justify-between gap-3">
         <h3 className="text-sm font-medium leading-snug text-foreground">
           {university.name}
@@ -69,12 +81,12 @@ export function UniversityCard({ university, onSelect }: UniversityCardProps) {
       </p>
 
       <Button
-        variant="ghost"
+        variant={isSelected ? "primary" : "ghost"}
         disabled={status === "closed"}
         onClick={() => onSelect(university)}
         className="mt-auto self-end px-4 py-1.5 text-xs"
       >
-        Select
+        {isSelected ? "Remove" : "Select"}
       </Button>
     </div>
   );

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { apiClient, ApiError } from "@/lib/api/client";
 import type { components } from "@/lib/api/schema";
+import { useSelection } from "@/lib/state/selection";
 import { UniversityCard } from "./university-card";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -26,6 +27,7 @@ interface UniversityListProps {
 }
 
 export function UniversityList({ initialUniversities }: UniversityListProps) {
+  const { add, remove, isSelected } = useSelection();
   const [query, setQuery] = useState("");
   const [universities, setUniversities] = useState(initialUniversities);
   const [searching, setSearching] = useState(false);
@@ -66,9 +68,13 @@ export function UniversityList({ initialUniversities }: UniversityListProps) {
     };
   }, []);
 
-  // Placeholder — wired to selection context in Task 3.
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  function handleSelect(_: University) {}
+  function handleSelect(university: University) {
+    if (isSelected(university.id)) {
+      remove(university.id);
+    } else {
+      add({ universityId: university.id, universityName: university.name });
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -113,7 +119,12 @@ export function UniversityList({ initialUniversities }: UniversityListProps) {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {universities.map((u) => (
-            <UniversityCard key={u.id} university={u} onSelect={handleSelect} />
+            <UniversityCard
+              key={u.id}
+              university={u}
+              isSelected={isSelected(u.id)}
+              onSelect={handleSelect}
+            />
           ))}
         </div>
       )}
