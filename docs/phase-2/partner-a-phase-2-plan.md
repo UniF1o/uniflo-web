@@ -150,15 +150,15 @@ Build the page where students discover which universities Uniflo supports. This 
 
 A student picks one or more universities from the browse page and carries that selection into the application form (Task 4). This task introduces the session-scoped selection state.
 
-- [ ] Create `lib/state/selection.ts` — a simple React Context provider that holds an array of `{ universityId, programme?, applicationYear? }` entries and exposes `add`, `remove`, `clear`, and `update` helpers
+- [x] Create `lib/state/selection.ts` — a simple React Context provider that holds an array of `{ universityId, programme?, applicationYear? }` entries and exposes `add`, `remove`, `clear`, and `update` helpers
   - Why Context over a store library (Zustand etc.): one screen-group, session-only, no persistence. Adding a store for one use-case is over-engineering; if Phase 3 needs broader cross-screen state we re-evaluate then
   - Why not URL state: the selection grows and shrinks and mobile deep-links aren't a requirement
-- [ ] Wire the provider into `app/(app)/layout.tsx` so the selection survives navigation between `/universities`, `/applications/new`, and the review screen
-- [ ] Update the `University` card's "Select" button (from Task 2) to toggle selection — visually reflect selected state (filled button, "Remove" label)
-- [ ] Build `components/universities/selection-bar.tsx` — a sticky bottom bar visible when the selection is non-empty, showing "N selected" and a "Continue" button that navigates to `/applications/new`
+- [x] Wire the provider into `app/(app)/layout.tsx` so the selection survives navigation between `/universities`, `/applications/new`, and the review screen
+- [x] Update the `University` card's "Select" button (from Task 2) to toggle selection — visually reflect selected state (filled button, "Remove" label)
+- [x] Build `components/universities/selection-bar.tsx` — a sticky bottom bar visible when the selection is non-empty, showing "N selected" and a "Continue" button that navigates to `/applications/new`
   - Sticky-bottom pattern is mobile-friendly. On desktop it can sit inline below the filters
-- [ ] On "Continue" with zero selections, the button is disabled (not hidden) so the student sees it's there waiting
-- [ ] Deep-link guard: if a student navigates directly to `/applications/new` with an empty selection, redirect them to `/universities` with a toast/inline message
+- [x] On "Continue" with zero selections, the button is disabled (not hidden) so the student sees it's there waiting
+- [x] Deep-link guard: if a student navigates directly to `/applications/new` with an empty selection, redirect them to `/universities` with a toast/inline message
 
 **Deliberate non-goals:** No persistence across sessions (see "A note on draft state" above). No cross-tab sync. No undo for removes — "Select" toggles back and forth cleanly enough.
 

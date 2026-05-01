@@ -8,6 +8,8 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/layout/app-shell";
+import { SelectionProvider } from "@/lib/state/selection";
+import { SelectionBar } from "@/components/universities/selection-bar";
 
 export default async function ProtectedLayout({
   children,
@@ -27,5 +29,10 @@ export default async function ProtectedLayout({
     redirect("/login");
   }
 
-  return <AppShell user={user}>{children}</AppShell>;
+  return (
+    <SelectionProvider>
+      <AppShell user={user}>{children}</AppShell>
+      <SelectionBar />
+    </SelectionProvider>
+  );
 }
