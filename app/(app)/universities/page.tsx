@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import type { components } from "@/lib/api/schema";
+import { SEED_UNIVERSITIES } from "@/lib/constants/seed-universities";
 import { UniversityList } from "@/components/universities/university-list";
 
 export const metadata: Metadata = {
@@ -30,9 +31,10 @@ export default async function UniversitiesPage() {
     data: { session },
   } = await supabase.auth.getSession();
 
-  const universities = session?.access_token
+  const fromApi = session?.access_token
     ? await fetchInitialUniversities(session.access_token)
     : [];
+  const universities = fromApi.length > 0 ? fromApi : SEED_UNIVERSITIES;
 
   return (
     <div className="max-w-5xl space-y-8">
