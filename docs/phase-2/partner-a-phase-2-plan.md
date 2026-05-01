@@ -126,18 +126,18 @@ Before anything else, replace hand-written API types with generated ones. Every 
 
 Build the page where students discover which universities Uniflo supports. This is the first screen in the Phase 2 flow — it lives at `/universities` and links from the sidebar and dashboard.
 
-- [ ] Create `app/(app)/universities/page.tsx` as a server component. Fetch the initial university list server-side using the server Supabase client + typed API client, so the list renders on first paint without a loading flash
-- [ ] Create `components/universities/university-list.tsx` — client component that receives the initial list as a prop, owns the search input state, and re-fetches on search input change (debounced ~300ms). The server fetch handles first paint; client-side handles interactivity
-- [ ] Create `components/universities/university-card.tsx` — presentational card showing:
+- [x] Create `app/(app)/universities/page.tsx` as a server component. Fetch the initial university list server-side using the server Supabase client + typed API client, so the list renders on first paint without a loading flash
+- [x] Create `components/universities/university-list.tsx` — client component that receives the initial list as a prop, owns the search input state, and re-fetches on search input change (debounced ~300ms). The server fetch handles first paint; client-side handles interactivity
+- [x] Create `components/universities/university-card.tsx` — presentational card showing:
   - Name
   - `open_date` – `close_date` range, formatted as "Applications open N April – 30 September" (use a single shared formatter)
   - A status pill: "Open now", "Opens N days", "Closed" — derive from `is_active`, `open_date`, `close_date`, and `new Date()` client-side
   - A "Select" button that adds the university to the selection (Task 3)
-- [ ] Handle empty states: no universities at all, no matches for the search query — distinct copy for each
-- [ ] Handle the loading state during debounced search — skeletons match the card shape, not a spinner
-- [ ] Handle the error state — a retry affordance, same pattern used by `components/profile/overview.tsx`
-- [ ] Add `/universities` to the sidebar (`components/layout/sidebar.tsx`). It is the new entry point for Phase 2
-- [ ] Mobile check: the card grid collapses to a single column on 375px viewports, the search input remains reachable above the fold
+- [x] Handle empty states: no universities at all, no matches for the search query — distinct copy for each
+- [x] Handle the loading state during debounced search — skeletons match the card shape, not a spinner
+- [x] Handle the error state — a retry affordance, same pattern used by `components/profile/overview.tsx`
+- [x] Add `/universities` to the sidebar (`components/layout/sidebar.tsx`). It is the new entry point for Phase 2
+- [x] Mobile check: the card grid collapses to a single column on 375px viewports, the search input remains reachable above the fold
 
 **Deliberate non-goals for this task:** No filters beyond free-text search. No sort options. No pagination UI (a `limit=50` on the query is enough for MVP — there are 3–5 seeded universities). Filtering by "accepting applications now" is implicit via the status pill but not a dedicated toggle.
 

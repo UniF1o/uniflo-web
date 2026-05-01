@@ -9,7 +9,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, UserCircle2, FileText, X } from "lucide-react";
+import {
+  LayoutDashboard,
+  UserCircle2,
+  FileText,
+  GraduationCap,
+  X,
+} from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
@@ -28,11 +34,11 @@ interface NavItem {
   icon: LucideIcon;
 }
 
-// Centralised nav definition. Add Phase 2 routes here when they ship.
 const NAV_ITEMS: readonly NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/profile", label: "Profile", icon: UserCircle2 },
   { href: "/documents", label: "Documents", icon: FileText },
+  { href: "/universities", label: "Universities", icon: GraduationCap },
 ] as const;
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {

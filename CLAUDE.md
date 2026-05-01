@@ -10,7 +10,7 @@ For full detail on architecture decisions, schema, and the build plan, refer to 
 - `docs/build-action-plan.md` — phased build plan, partner split, phase status, MVP scope
 - `docs/git-github-workflow.md` — branching strategy, PR process, commit conventions
 
-Per-task write-ups live in `docs/phase-1/` (all complete) and `docs/phase-2/` (in progress). `docs/phase-1/phase-0-1-review.md` is the cross-phase audit that closed out Phase 1. `docs/phase-2/task-1-openapi-types.md` covers the Task 1 type generation work.
+Per-task write-ups live in `docs/phase-1/` (all complete) and `docs/phase-2/` (in progress). `docs/phase-1/phase-0-1-review.md` is the cross-phase audit that closed out Phase 1. `docs/phase-2/task-1-openapi-types.md` covers the Task 1 type generation work. `docs/phase-2/task-2-universities-browse.md` covers the Task 2 university browse and search page.
 
 ---
 
@@ -26,7 +26,7 @@ This repo is owned by **Partner A (Frontend)**. The backend lives in a separate 
 
 **Phase 0 and Phase 1 are complete on the frontend side.** A student can sign up (email/password or Google OAuth), complete the multi-step profile setup, add academic records, upload documents, and see a dashboard with completeness plus a read-only `/profile` overview.
 
-**Phase 2 is in progress.** Task 1 (`feature/openapi-types`) is complete — `openapi-typescript` is wired, `lib/api/schema.d.ts` covers the full Phase 1 + Phase 2 contract, and `lib/api/client.ts` is the shared fetch wrapper. Task 2 (`feature/universities-browse`) is next. See `docs/phase-2/partner-a-phase-2-plan.md` for the full task breakdown.
+**Phase 2 is in progress.** Tasks 1 and 2 are complete. Task 1 (`feature/openapi-types`) — `openapi-typescript` is wired, `lib/api/schema.d.ts` covers the full contract, `lib/api/client.ts` is the shared fetch wrapper. Task 2 (`feature/universities-browse`) — `/universities` page with server-side initial fetch, debounced search, skeleton loading, and status pills. Task 3 (`feature/university-selection`) is next. See `docs/phase-2/partner-a-phase-2-plan.md` for the full task breakdown.
 
 ---
 
