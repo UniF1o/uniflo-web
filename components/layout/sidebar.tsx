@@ -65,8 +65,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       <aside
         aria-label="Primary navigation"
         className={cn(
-          "fixed inset-y-0 left-0 z-40 flex h-dvh w-64 flex-col border-r border-border bg-background transition-transform duration-200 ease-out",
-          "md:sticky md:top-0 md:translate-x-0",
+          "fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-border bg-background transition-transform duration-200 ease-out",
+          "md:sticky md:top-0 md:min-h-full md:translate-x-0",
           isOpen ? "translate-x-0" : "-translate-x-full",
         )}
       >

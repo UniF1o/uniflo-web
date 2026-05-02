@@ -171,16 +171,16 @@ A student picks one or more universities from the browse page and carries that s
 
 For each selected university, the student provides a programme name and an application year. This is where the selection becomes concrete. The page lives at `/applications/new`.
 
-- [ ] Create `app/(app)/applications/new/page.tsx` as a server component. Redirect to `/universities` if the selection is empty (guard duplicated from Task 3 because deep-links bypass the selection bar)
+- [x] Create `app/(app)/applications/new/page.tsx` as a server component. Redirect to `/universities` if the selection is empty (guard duplicated from Task 3 because deep-links bypass the selection bar)
   - Selection lives in client state, so the server component can't read it directly. Use a lightweight client wrapper that checks the context on mount and fires the redirect via `router.replace`
-- [ ] Create `components/applications/new-applications-form.tsx` — client component rendering one `<ApplicationFieldset>` per selected university
-- [ ] `<ApplicationFieldset>` — shows the university name (read-only), a `programme` text input, and an `applicationYear` number/select input
+- [x] Create `components/applications/new-applications-form.tsx` — client component rendering one `<ApplicationFieldset>` per selected university
+- [x] `<ApplicationFieldset>` — shows the university name (read-only), a `programme` text input, and an `applicationYear` number/select input
   - `programme` validation: required, 3–120 characters, no leading/trailing whitespace
   - `applicationYear` validation: integer, bounded by what Partner B accepts (see coordination section — lock the valid year range with Partner B, default to `[currentYear, currentYear + 1]` if ambiguous)
-- [ ] Errors clear on input change (same UX as the Phase 1 profile form)
-- [ ] A "Review" button at the bottom — disabled until every fieldset is valid. On click, writes the programme and year back into the selection context and navigates to `/applications/review`
-- [ ] A "Back to universities" link at the top for students who want to add or remove a university before filling in details
-- [ ] Handle a university being removed from the selection on this page (e.g. via the selection bar) — the corresponding fieldset unmounts cleanly with its state discarded
+- [x] Errors clear on input change (same UX as the Phase 1 profile form)
+- [x] A "Review" button at the bottom — disabled until every fieldset is valid. On click, writes the programme and year back into the selection context and navigates to `/applications/review`
+- [x] A "Back to universities" link at the top for students who want to add or remove a university before filling in details
+- [x] Handle a university being removed from the selection on this page (e.g. via the selection bar) — the corresponding fieldset unmounts cleanly with its state discarded
 
 **Squash commit:** `feat: add application form for programme and year per selection`
 

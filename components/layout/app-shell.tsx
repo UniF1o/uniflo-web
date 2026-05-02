@@ -45,7 +45,10 @@ export function AppShell({ user, children }: AppShellProps) {
       {/* Sidebar + content row.
        * Mobile: sidebar is a fixed drawer (off-screen by default).
        * Desktop (md+): sidebar is an in-flow column; main flexes into the rest. */}
-      <div className="flex flex-1">
+      {/* overflow-y-auto here (not on main) because main's height via
+       * align-items:stretch always equals the row height — it can never
+       * overflow itself. The row CAN scroll when its flex items grow taller. */}
+      <div className="flex flex-1 overflow-y-auto min-h-0">
         <Sidebar
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
@@ -53,8 +56,8 @@ export function AppShell({ user, children }: AppShellProps) {
 
         {/* min-w-0 prevents flex children from growing wider than the viewport
          * when page content is long (e.g. wide tables or code blocks). */}
-        <main className="flex min-w-0 flex-1 flex-col">
-          <div className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 md:px-8 md:py-10">
+        <main className="min-w-0 flex-1">
+          <div className="mx-auto w-full max-w-6xl px-4 pt-6 pb-24 md:px-8 md:pt-10">
             {children}
           </div>
         </main>
