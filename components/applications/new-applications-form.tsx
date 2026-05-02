@@ -116,7 +116,7 @@ export function NewApplicationsForm() {
   }
 
   return (
-    <div className="max-w-2xl space-y-8 pb-24">
+    <div className="max-w-2xl space-y-8">
       <Link
         href="/universities"
         className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
