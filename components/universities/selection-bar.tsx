@@ -16,11 +16,11 @@ export function SelectionBar() {
     <div
       aria-hidden={count === 0}
       className={cn(
-        "fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background transition-transform duration-200",
+        "fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background transition-transform duration-200 md:left-64",
         count > 0 ? "translate-y-0" : "pointer-events-none translate-y-full",
       )}
     >
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-8">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 md:px-8">
         <p className="text-sm text-muted-foreground">
           <span className="font-medium text-foreground">{count}</span>{" "}
           {count === 1 ? "university" : "universities"} selected
