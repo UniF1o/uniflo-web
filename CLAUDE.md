@@ -153,6 +153,7 @@ Vercel builds a Preview deployment on every PR and deploys to production on merg
 - **Write a task/feature doc at the end of each feature branch.** Drop it in `docs/phase-<N>/` as `task-<n>-<slug>.md` or `<feature>.md`. Cover: what was built, design decisions, any deviation from the plan, and anything the next person should know. This is the pattern already established in `docs/phase-1/`.
 - **Commit as you go on a feature branch.** Small, focused commits — squash-merge collapses them into one clean commit on `main` anyway, so optimise for reviewability of history while the branch is alive.
 - **Review your own work before opening the PR.** Run `lint`, `format:check`, `tsc --noEmit`, `test`, and `build` locally. Exercise the feature in a browser (desktop + mobile viewport). Catch the stuff a reviewer shouldn't have to.
+- **After every task, do a self-review before reporting done.** Re-read every file you created or modified. Run all CI checks (`lint`, `format:check`, `tsc --noEmit`, `test`, `build`) and fix any failures before committing. Check for logic bugs, edge cases, missing accessibility attributes, and anything that would fail in a real code review. Do not consider a task complete until this pass is clean.
 
 ## What Not to Build (MVP Scope)
 
