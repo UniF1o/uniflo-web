@@ -129,16 +129,13 @@ export function ReviewScreen({
 
   const profileComplete =
     !!profile &&
-    REQUIRED_PROFILE_FIELDS.every(
-      (f) => !!profile[f as keyof ProfileResponse],
-    );
+    REQUIRED_PROFILE_FIELDS.every((f) => !!profile[f as keyof ProfileResponse]);
 
   const recordsOk = academicRecords !== null && academicRecords.length > 0;
 
   const uploadedTypes = new Set(documents?.map((d) => d.type) ?? []);
   const docsOk =
-    documents !== null &&
-    REQUIRED_DOC_TYPES.every((t) => uploadedTypes.has(t));
+    documents !== null && REQUIRED_DOC_TYPES.every((t) => uploadedTypes.has(t));
 
   // ── Submit state ─────────────────────────────────────────────────────────────
 
@@ -197,9 +194,8 @@ export function ReviewScreen({
         {
           label: "Full name",
           value:
-            [profile.first_name, profile.last_name]
-              .filter(Boolean)
-              .join(" ") || null,
+            [profile.first_name, profile.last_name].filter(Boolean).join(" ") ||
+            null,
         },
         {
           label: "Date of birth",
@@ -389,7 +385,7 @@ export function ReviewScreen({
                     {entry.programme} · {entry.applicationYear}
                   </p>
                   {status === "error" && (
-                    <p className="text-xs text-destructive">
+                    <p role="alert" className="text-xs text-destructive">
                       {submitErrors[entry.universityId]}
                     </p>
                   )}
