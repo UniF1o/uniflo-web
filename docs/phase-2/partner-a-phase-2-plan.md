@@ -191,17 +191,17 @@ For each selected university, the student provides a programme name and an appli
 
 The review screen is the data-integrity safeguard that `docs/architecture-designs.md` calls out as non-negotiable. Nothing is submitted until the student explicitly approves here. It lives at `/applications/review`.
 
-- [ ] Create `app/(app)/applications/review/page.tsx` as a server component. Server-side, fetch the student's profile, academic records, and document list using the typed API client — this is what will be submitted alongside each application. Redirect to `/applications/new` if the selection is missing programme/year fields
-- [ ] Create `components/applications/review.tsx` — client component that renders:
+- [x] Create `app/(app)/applications/review/page.tsx` as a server component. Server-side, fetch the student's profile, academic records, and document list using the typed API client — this is what will be submitted alongside each application. Redirect to `/applications/new` if the selection is missing programme/year fields
+- [x] Create `components/applications/review-screen.tsx` — client component that renders:
   - **Profile section** — a read-only summary mirroring `components/profile/overview.tsx`. If any required field is missing, show a "Complete your profile" inline banner with a link to `/profile/setup`. Block the "Submit" button until fixed
   - **Academic records section** — subjects + marks + institution + year. Same completeness check and blocker pattern
   - **Documents section** — list of uploaded documents by type, with a check/cross per required slot. Same completeness check
   - **Applications list** — one row per selection showing university name, programme, application year, and an "Edit" link back to `/applications/new`
   - **Submit button** — disabled until every completeness check passes and the terms checkbox below is ticked
   - **Consent checkbox** — "I confirm the details above are correct and authorise Uniflo to submit applications on my behalf." Mandatory. POPIA-adjacent — see `docs/architecture-designs.md` section 13
-- [ ] On submit, POST each selection to `/applications` sequentially (not in parallel — sequential is simpler to report on and rate-limit-friendly). If one fails, stop and show the error with a retry affordance; earlier successes remain submitted
+- [x] On submit, POST each selection to `/applications` sequentially (not in parallel — sequential is simpler to report on and rate-limit-friendly). If one fails, stop and show the error with a retry affordance; earlier successes remain submitted
   - Partner B is the source of truth for deadlines. A 4xx from `POST /applications` with a deadline-related error code renders as a clear "Applications to X have closed" message per row
-- [ ] On all-success, clear the selection context and redirect to `/applications` (the dashboard from Task 6) with a success toast/inline banner
+- [x] On all-success, clear the selection context and redirect to `/applications` (the dashboard from Task 6) with a success toast/inline banner
 
 **Deliberate non-goals:** No edit-in-place on this screen — the "Edit" link sends them back to `/applications/new`. The review screen is read-only by design. Confidence scoring UI is Phase 3, not this task.
 
