@@ -214,21 +214,21 @@ The review screen is the data-integrity safeguard that `docs/architecture-design
 
 After submission, students need to see what happened to each application. The dashboard lives at `/applications` (the list) with optional detail at `/applications/[id]`.
 
-- [ ] Create `app/(app)/applications/page.tsx` as a server component. Server-side fetch `GET /applications` (see contract locked with Partner B — includes the latest job summary per row). Render the list immediately on first paint
-- [ ] Create `components/applications/application-list.tsx` — client component owning "refresh" behaviour (see below) and receiving the initial list as a prop
-- [ ] Create `components/applications/status-badge.tsx` — maps the four status strings to coloured pills:
+- [x] Create `app/(app)/applications/page.tsx` as a server component. Server-side fetch `GET /applications` (see contract locked with Partner B — includes the latest job summary per row). Render the list immediately on first paint
+- [x] Create `components/applications/application-list.tsx` — client component owning "refresh" behaviour (see below) and receiving the initial list as a prop
+- [x] Create `components/applications/status-badge.tsx` — maps the four status strings to coloured pills:
   - `pending` — neutral (grey). Label: "Queued"
   - `processing` — info (blue). Label: "Submitting…"
   - `submitted` — success (green). Label: "Submitted"
   - `failed` — destructive (red). Label: "Failed"
   - Derive colours from the existing design tokens. Do not hardcode hex values
-- [ ] Each row shows: university name, programme, application year, status badge, `updated_at` (relative time, e.g. "2 minutes ago"), and a "View" link to the detail page
-- [ ] **No Supabase Realtime.** `CLAUDE.md` is explicit that realtime is post-MVP. The dashboard refreshes on page load. Add a visible "Refresh" button that re-fetches the list — this is the manual equivalent and is the intended MVP behaviour
-- [ ] Create `app/(app)/applications/[id]/page.tsx` — server-side fetch `GET /applications/{id}`. Show the application fields plus the latest job record's `status`, `attempts`, `last_error` (if any). Screenshot URL is rendered if present but is a Phase 3 deliverable — guard the code path
-- [ ] Failed-state handling: when a row is `failed`, the detail page shows the `last_error` clearly and offers a "Retry" button that POSTs to an endpoint Partner B exposes (confirm the shape — likely `POST /applications/{id}/retry` or similar). If retry isn't wired in Phase 2, show a "Contact support" placeholder that Partner B can swap in Phase 3
-- [ ] Empty state: no applications yet — show an illustration or icon with a "Browse universities" CTA to `/universities`
-- [ ] Add `/applications` to the sidebar. The dashboard profile-completeness card (from Phase 1) gains a new line: "Applications: N submitted" pointing to this page
-- [ ] Mobile: rows become cards, badge + university name remain on one line at 375px
+- [x] Each row shows: university name, programme, application year, status badge, `updated_at` (relative time, e.g. "2 minutes ago"), and a "View" link to the detail page
+- [x] **No Supabase Realtime.** `CLAUDE.md` is explicit that realtime is post-MVP. The dashboard refreshes on page load. Add a visible "Refresh" button that re-fetches the list — this is the manual equivalent and is the intended MVP behaviour
+- [x] Create `app/(app)/applications/[id]/page.tsx` — server-side fetch `GET /applications/{id}`. Show the application fields plus the latest job record's `status`, `attempts`, `last_error` (if any). Screenshot URL is rendered if present but is a Phase 3 deliverable — guard the code path
+- [x] Failed-state handling: when a row is `failed`, the detail page shows the `last_error` clearly and offers a "Retry" button that POSTs to an endpoint Partner B exposes (confirm the shape — likely `POST /applications/{id}/retry` or similar). If retry isn't wired in Phase 2, show a "Contact support" placeholder that Partner B can swap in Phase 3
+- [x] Empty state: no applications yet — show an illustration or icon with a "Browse universities" CTA to `/universities`
+- [x] Add `/applications` to the sidebar. The dashboard profile-completeness card (from Phase 1) gains a new line: "Applications: N submitted" pointing to this page
+- [x] Mobile: rows become cards, badge + university name remain on one line at 375px
 
 **Squash commit:** `feat: add application status dashboard with list and detail views`
 
