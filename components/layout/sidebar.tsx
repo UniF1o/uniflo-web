@@ -14,6 +14,7 @@ import {
   UserCircle2,
   FileText,
   GraduationCap,
+  ClipboardList,
   X,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -39,6 +40,7 @@ const NAV_ITEMS: readonly NavItem[] = [
   { href: "/profile", label: "Profile", icon: UserCircle2 },
   { href: "/documents", label: "Documents", icon: FileText },
   { href: "/universities", label: "Universities", icon: GraduationCap },
+  { href: "/applications", label: "Applications", icon: ClipboardList },
 ] as const;
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
