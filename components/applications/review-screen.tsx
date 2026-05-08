@@ -11,13 +11,14 @@ import {
   GENDER_LABELS,
   HOME_LANGUAGE_LABELS,
 } from "@/lib/constants/profile-enums";
+import { formatDate } from "@/lib/utils/format";
+import { REQUIRED_DOC_TYPES, DOC_LABELS } from "@/lib/constants/documents";
 import type { components } from "@/lib/api/schema";
 
 type ProfileResponse = components["schemas"]["ProfileResponse"];
 type AcademicRecord = components["schemas"]["AcademicRecord"];
 type Document = components["schemas"]["Document"];
 
-// All fields the Playwright automation needs to fill out university portal forms.
 const REQUIRED_PROFILE_FIELDS = [
   "first_name",
   "last_name",
@@ -30,31 +31,12 @@ const REQUIRED_PROFILE_FIELDS = [
   "home_language",
 ] as const;
 
-const REQUIRED_DOC_TYPES = [
-  "id_document",
-  "matric_results",
-  "transcripts",
-] as const;
-
-const DOC_LABELS: Record<string, string> = {
-  id_document: "ID Document",
-  matric_results: "Matric Results",
-  transcripts: "Transcripts",
-};
-
 type SubmitStatus = "idle" | "submitting" | "success" | "error";
 
 export interface ReviewScreenProps {
   profile: ProfileResponse | null;
   academicRecords: AcademicRecord[] | null;
   documents: Document[] | null;
-}
-
-function formatDate(iso: string | null | undefined): string | null {
-  if (!iso) return null;
-  const d = new Date(iso);
-  if (isNaN(d.getTime())) return iso;
-  return new Intl.DateTimeFormat("en-ZA", { dateStyle: "long" }).format(d);
 }
 
 function ReviewSection({

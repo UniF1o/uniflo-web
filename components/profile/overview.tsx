@@ -16,6 +16,7 @@ import {
   GENDER_LABELS,
   HOME_LANGUAGE_LABELS,
 } from "@/lib/constants/profile-enums";
+import { formatDate } from "@/lib/utils/format";
 import type { components } from "@/lib/api/schema";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -23,14 +24,6 @@ import type { components } from "@/lib/api/schema";
 type ProfileResponse = components["schemas"]["ProfileResponse"];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
-
-// Turns a Supabase ISO date string (YYYY-MM-DD) into the SA locale format.
-// Returns the raw value if parsing fails so the user still sees something.
-function formatDate(iso: string): string {
-  const d = new Date(iso);
-  if (isNaN(d.getTime())) return iso;
-  return new Intl.DateTimeFormat("en-ZA", { dateStyle: "long" }).format(d);
-}
 
 // Masks a 13-digit SA ID number to show only the first 6 digits (date of
 // birth portion) — the remaining digits contain gender/citizenship/race info

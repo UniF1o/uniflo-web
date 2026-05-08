@@ -105,6 +105,7 @@ export function ApplicationList({
                 <Link
                   href={`/applications/${app.id}`}
                   className="text-xs font-medium text-primary hover:underline"
+                  aria-label={`View application for ${uniName}`}
                 >
                   View →
                 </Link>
