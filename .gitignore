@@ -36,6 +36,10 @@ yarn-error.log*
 # Claude Code session data
 .claude/
 
+# Playwright MCP verification artefacts (screenshots + snapshots)
+.playwright-mcp/
+redesign-*.png
+
 # vercel
 .vercel
 

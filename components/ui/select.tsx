@@ -1,6 +1,6 @@
 // Select — labelled native dropdown with an error message slot.
 //
-// Wraps <select> so it matches Input's visual language: same height (h-10),
+// Wraps <select> so it matches Input's visual language: same height,
 // border, focus ring, and error state. We use a native <select> rather than a
 // custom combobox library because:
 //   - Keyboard navigation and screen-reader announcements are handled by the
@@ -47,11 +47,12 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             aria-describedby={error ? `${id}-error` : undefined}
             aria-invalid={error ? true : undefined}
             className={cn(
-              // Match Input's sizing and colour tokens exactly.
-              "h-10 w-full appearance-none rounded-lg border border-border bg-background px-3 pr-9 text-sm text-foreground",
-              "transition-colors focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20",
+              // Matches Input's sizing and inset highlight for visual parity.
+              "h-11 w-full cursor-pointer appearance-none rounded-lg border border-border bg-background px-3.5 pr-9 text-sm text-foreground",
+              "shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_1px_0_rgba(13,26,61,0.04)]",
+              "transition-colors focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/25",
               error &&
-                "border-destructive focus:border-destructive focus:ring-destructive/20",
+                "border-destructive focus:border-destructive focus:ring-destructive/25",
               className,
             )}
             {...props}

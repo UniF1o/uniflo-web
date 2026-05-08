@@ -5,36 +5,54 @@
  * declared here becomes a Tailwind utility automatically:
  *   --color-primary → bg-primary, text-primary, border-primary, etc.
  *
- * Palette direction: warm cream background, deep indigo brand, terracotta
- * accent. Typography: Instrument Serif (display) + Geist (body).
+ * Identity: cobalt blue + sunset coral on cream paper. Editorial type
+ * (Instrument Serif display + Geist body) with Caveat for sparing
+ * handwritten accents. All colour tokens cleared WCAG AA on the
+ * surfaces they're used against.
  */
 @import "tailwindcss";
 
 @theme {
   /* ── Colors ──────────────────────────────────────────────────────────── */
-  --color-background: #faf7f2; /* warm cream — paper, not white */
-  --color-foreground: #121417; /* near-black (~15:1 contrast on bg) */
-  --color-muted: #ede7db; /* dusty stone — muted surfaces */
-  --color-muted-foreground: #5c5b57; /* low-emphasis text */
-  --color-border: #e0d9cb; /* hairline on cream */
-  --color-primary: #1b2540; /* deep indigo — brand colour */
-  --color-primary-foreground: #faf7f2; /* text on primary bg */
-  --color-accent: #d97757; /* terracotta — warm SA anchor */
-  --color-accent-foreground: #faf7f2; /* text on accent bg */
-  --color-destructive: #b23a3a; /* error / destructive actions */
-  --color-ring: #1b2540; /* focus ring (matches primary) */
+  --color-background: #fbf6ec; /* cream paper — warmer than office white */
+  --color-foreground: #0d1a3d; /* deep navy ink (~16:1 on background) */
+  --color-muted: #ede2cd; /* warm sand for muted surfaces */
+  --color-muted-foreground: #5a5b66; /* low-emphasis text */
+  --color-border: #d8d0bd; /* hairline border on cream */
+  --color-primary: #1f4ed8; /* cobalt — the brand colour */
+  --color-primary-foreground: #fbf6ec; /* cream on cobalt */
+  --color-accent: #ff6a47; /* sunset coral — CTAs, underlines, accents */
+  /* Navy-on-coral instead of cream-on-coral for AA contrast (cream-on-coral
+   * is ~2.2:1 — fails AA). Navy-on-coral lands at ~7.3:1 and reads richer. */
+  --color-accent-foreground: #0d1a3d;
+  --color-soft: #e3ebff; /* pale sky tint — badges, illustration washes */
+  --color-success: #25664a; /* darkened from #2f7a55 to clear AA on cream */
+  --color-warning: #8a5d10; /* darkened from #c98a1d to clear AA on cream */
+  --color-destructive: #b03825; /* darkened from #c8412f to clear AA */
+  --color-ring: #1f4ed8; /* focus ring matches primary */
 
   /* ── Typography ──────────────────────────────────────────────────────── *
    * Wired to the CSS variables set by next/font in app/layout.tsx.
-   * Use font-display for headings, font-body for everything else.         */
+   * Display = editorial serif. Body = clean sans. Script = sparing accent. */
   --font-display: var(--font-instrument-serif), ui-serif, Georgia, serif;
   --font-body: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-script: var(--font-caveat), "Comic Sans MS", cursive;
 
   /* ── Radii ───────────────────────────────────────────────────────────── */
   --radius-sm: 0.25rem;
   --radius-md: 0.5rem;
   --radius-lg: 0.75rem;
   --radius-xl: 1rem;
+  --radius-2xl: 1.5rem; /* hero cards, feature surfaces */
+
+  /* ── Shadows ─────────────────────────────────────────────────────────── *
+   * `--shadow-soft` is the default lift for layered cards.
+   * `--shadow-pop` is reserved for the coral accent button so it broadcasts
+   * its importance without us needing to size it up.                      */
+  --shadow-soft: 0 8px 24px -12px rgba(13, 26, 61, 0.18);
+  --shadow-pop: 0 12px 36px -10px rgba(255, 106, 71, 0.4);
+  --shadow-paper:
+    0 1px 0 rgba(13, 26, 61, 0.04), 0 1px 2px rgba(13, 26, 61, 0.06);
 }
 
 html {
@@ -63,4 +81,17 @@ body {
 ::selection {
   background-color: var(--color-accent);
   color: var(--color-accent-foreground);
+}
+
+/* Respect users who request less motion. Suppress non-essential transforms
+ * but keep colour/opacity changes so feedback isn't lost. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
