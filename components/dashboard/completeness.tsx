@@ -20,6 +20,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { CheckCircle2, Circle, ArrowRight } from "lucide-react";
+import { REQUIRED_DOC_TYPES } from "@/lib/constants/documents";
 import { Skeleton } from "@/components/ui/skeleton";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -39,14 +40,6 @@ type CompletenessState = {
 };
 
 // ─── Constants ───────────────────────────────────────────────────────────────
-
-// The three document types that must all be present for the documents section
-// to be considered complete. Matches the DocumentType enum in upload-form.tsx.
-const REQUIRED_DOCUMENT_TYPES = [
-  "id_document",
-  "matric_results",
-  "transcripts",
-] as const;
 
 // Static config for each section card — label, description, and where to send
 // the student if the section is incomplete.
@@ -199,7 +192,7 @@ export function ProfileCompleteness() {
       let documentsUploaded = 0;
       if (docsRes.status === "fulfilled" && docsRes.value.ok) {
         const docs = (await docsRes.value.json()) as Array<{ type: string }>;
-        documentsUploaded = REQUIRED_DOCUMENT_TYPES.filter((type) =>
+        documentsUploaded = REQUIRED_DOC_TYPES.filter((type) =>
           docs.some((d) => d.type === type),
         ).length;
       }
@@ -208,7 +201,7 @@ export function ProfileCompleteness() {
         profile: profileComplete ? "complete" : "incomplete",
         academicRecords: recordsComplete ? "complete" : "incomplete",
         documents:
-          documentsUploaded === REQUIRED_DOCUMENT_TYPES.length
+          documentsUploaded === REQUIRED_DOC_TYPES.length
             ? "complete"
             : "incomplete",
         documentsUploaded,

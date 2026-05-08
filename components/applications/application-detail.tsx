@@ -6,18 +6,12 @@ import { ChevronLeft } from "lucide-react";
 import { apiClient, ApiError } from "@/lib/api/client";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "./status-badge";
+import { formatDate } from "@/lib/utils/format";
 import type { components } from "@/lib/api/schema";
 
 type ApplicationWithJob = components["schemas"]["ApplicationWithJob"];
 type ApplicationStatus = components["schemas"]["ApplicationStatus"];
 type Application = components["schemas"]["Application"];
-
-function formatDate(iso: string | null | undefined): string {
-  if (!iso) return "—";
-  const d = new Date(iso);
-  if (isNaN(d.getTime())) return iso;
-  return new Intl.DateTimeFormat("en-ZA", { dateStyle: "long" }).format(d);
-}
 
 function DetailRow({
   label,
@@ -104,10 +98,10 @@ export function ApplicationDetail({
           <DetailRow label="Programme">{application.programme}</DetailRow>
           <DetailRow label="Year">{application.application_year}</DetailRow>
           <DetailRow label="Submitted">
-            {formatDate(application.submitted_at)}
+            {formatDate(application.submitted_at) ?? "—"}
           </DetailRow>
           <DetailRow label="Created">
-            {formatDate(application.created_at)}
+            {formatDate(application.created_at) ?? "—"}
           </DetailRow>
         </dl>
       </div>

@@ -85,6 +85,7 @@ export function UniversityCard({
         disabled={status === "closed"}
         onClick={() => onSelect(university)}
         className="mt-auto self-end px-4 py-1.5 text-xs"
+        aria-label={`${isSelected ? "Remove" : "Select"} ${university.name}`}
       >
         {isSelected ? "Remove" : "Select"}
       </Button>

@@ -239,14 +239,14 @@ After submission, students need to see what happened to each application. The da
 
 A dedicated polish branch at the end of Phase 2, mirroring the `feature/phase-0-1-review` pass that closed Phase 1. Use it for:
 
-- [ ] End-to-end click-through on the Vercel preview: universities → selection → form → review → submit → dashboard → detail. Capture bugs as they surface, fix them in small commits
-- [ ] Consolidate any duplicated constants (status-label maps, date formatters) into `lib/constants/` or `lib/utils/`
-- [ ] Update the Phase 1 dashboard (`app/(app)/dashboard/page.tsx`) to surface the latest application statuses alongside profile completeness — one card per data domain
-- [ ] Make sure every Phase 2 screen has proper `<title>` metadata (server components) — search engines should not see generic titles
-- [ ] Mobile sweep: every new screen tested at 375px and 390px viewports on real devices if available, browser DevTools otherwise. Sidebar collapses, forms fit, sticky selection bar doesn't clip content
-- [ ] Accessibility sweep: every new form field has a label, every interactive icon has an `aria-label`, the status badges expose the status text to screen readers not just colour
-- [ ] Write the cross-task review doc `docs/phase-2/phase-2-review.md` summarising what shipped in Phase 2, open risks, and what unblocks Phase 3
-- [ ] Confirm `npm run lint`, `npm run format:check`, `npx tsc --noEmit`, `npm run test`, and `npm run build` are all green locally
+- [x] End-to-end click-through on the Vercel preview: universities → selection → form → review → submit → dashboard → detail. Capture bugs as they surface, fix them in small commits
+- [x] Consolidate any duplicated constants (status-label maps, date formatters) into `lib/constants/` or `lib/utils/`
+- [x] Update the Phase 1 dashboard (`app/(app)/dashboard/page.tsx`) to surface the latest application statuses alongside profile completeness — one card per data domain
+- [x] Make sure every Phase 2 screen has proper `<title>` metadata (server components) — search engines should not see generic titles
+- [x] Mobile sweep: every new screen tested at 375px and 390px viewports on real devices if available, browser DevTools otherwise. Sidebar collapses, forms fit, sticky selection bar doesn't clip content
+- [x] Accessibility sweep: every new form field has a label, every interactive icon has an `aria-label`, the status badges expose the status text to screen readers not just colour
+- [x] Write the cross-task review doc `docs/phase-2/phase-2-review.md` summarising what shipped in Phase 2, open risks, and what unblocks Phase 3
+- [x] Confirm `npm run lint`, `npm run format:check`, `npx tsc --noEmit`, `npm run test`, and `npm run build` are all green locally
 
 **Squash commit:** `chore: phase 2 polish, error paths, and dashboard integration`
 

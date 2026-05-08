@@ -1,10 +1,9 @@
+import { cache } from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ApplicationDetail } from "@/components/applications/application-detail";
 import type { components } from "@/lib/api/schema";
-
-export const metadata: Metadata = { title: "Application" };
 
 type ApplicationWithJob = components["schemas"]["ApplicationWithJob"];
 type University = components["schemas"]["University"];
@@ -44,6 +43,33 @@ async function fetchUniversity(
   }
 }
 
+// React.cache deduplicates calls within a single request so generateMetadata
+// and the page component share one network round-trip for the application fetch.
+const getApplicationById = cache(
+  async (id: string): Promise<ApplicationWithJob | "not_found" | null> => {
+    const supabase = await createClient();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    const token = session?.access_token ?? null;
+    if (!token) return null;
+    return fetchApplication(token, id);
+  },
+);
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const application = await getApplicationById(id);
+  if (!application || application === "not_found") {
+    return { title: "Application" };
+  }
+  return { title: `${application.programme} — Application` };
+}
+
 export default async function ApplicationPage({
   params,
 }: {
@@ -51,15 +77,7 @@ export default async function ApplicationPage({
 }) {
   const { id } = await params;
 
-  const supabase = await createClient();
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  const token = session?.access_token ?? null;
-
-  if (!token) notFound();
-
-  const application = await fetchApplication(token, id);
+  const application = await getApplicationById(id);
 
   if (application === "not_found") notFound();
 
@@ -73,7 +91,15 @@ export default async function ApplicationPage({
     );
   }
 
-  const university = await fetchUniversity(token, application.university_id);
+  const supabase = await createClient();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  const token = session?.access_token ?? null;
+
+  const university = token
+    ? await fetchUniversity(token, application.university_id)
+    : null;
   const universityName = university?.name ?? application.university_id;
 
   return (
