@@ -45,16 +45,27 @@ export function Stat({
   ...props
 }: StatProps) {
   const ref = useRef<HTMLSpanElement>(null);
-  const parsed = parseNumeric(value);
   // Initial state is the final value so SSR + no-JS render sensibly. The
   // observer will swap to "0" + tween up only when JS + motion are enabled.
   const [display, setDisplay] = useState(value);
 
+  // Effect deps are the stable primitives `countUp` + `value` (a string).
+  // Earlier this depended on `parsed` (a fresh object every render), which
+  // caused the effect to re-run on every state update — restarting the
+  // observer mid-tween and stacking competing rAF loops, producing a
+  // visible flicker as multiple tweens fought to write the display value.
+  // The `cancelled` flag also pulls the rug out from any in-flight rAF
+  // loop on unmount or value change so a stale tick can't overwrite a
+  // newer setDisplay call.
   useEffect(() => {
     const el = ref.current;
-    if (!el || !parsed || !countUp) return;
+    if (!el || !countUp) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
+    const parsed = parseNumeric(value);
+    if (!parsed) return;
+
+    let cancelled = false;
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) return;
@@ -65,6 +76,7 @@ export function Stat({
         // Cubic ease-out so the count slows toward the target rather than
         // ticking at constant speed.
         const tick = (t: number) => {
+          if (cancelled) return;
           const p = Math.min(1, (t - start) / dur);
           const eased = 1 - Math.pow(1 - p, 3);
           const n = Math.round(eased * parsed.target);
@@ -79,8 +91,11 @@ export function Stat({
     );
 
     observer.observe(el);
-    return () => observer.disconnect();
-  }, [countUp, parsed]);
+    return () => {
+      cancelled = true;
+      observer.disconnect();
+    };
+  }, [countUp, value]);
 
   return (
     <div

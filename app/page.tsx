@@ -128,12 +128,15 @@ export default function Home() {
                 className="relative inline-block translate-y-5 opacity-0 [animation:fade-up_0.7s_cubic-bezier(0.22,1,0.36,1)_forwards] motion-reduce:translate-y-0 motion-reduce:opacity-100 motion-reduce:animate-none"
               >
                 <span className="text-primary">go.</span>
-                {/* Hand-script accent floating above the headline word —
-                 * tilts away from the reading line so it feels like a
-                 * margin note rather than copy. Wiggles gently. */}
+                {/* Hand-script accent sitting to the right of "go." like a
+                 * margin note jotted next to the headline. left-full pins
+                 * its left edge to the right edge of "go.", top-[0.05em]
+                 * lines it up near the cap-height. Transform origin is the
+                 * lower-left corner so the wiggle pivots from where it
+                 * meets "go." rather than spinning in place. */}
                 <span
                   aria-hidden
-                  className="absolute -right-4 -top-6 hidden origin-bottom-right font-script text-2xl text-primary/80 [animation:wiggle_3.2s_ease-in-out_infinite] [animation-delay:2.2s] [transform:rotate(-8deg)] motion-reduce:animate-none md:block"
+                  className="absolute left-full top-[0.05em] ml-3 hidden origin-bottom-left whitespace-nowrap font-script text-2xl text-primary/80 [animation:wiggle_3.2s_ease-in-out_infinite] [animation-delay:2.2s] [transform:rotate(-8deg)] motion-reduce:animate-none md:inline-block"
                 >
                   you got this
                 </span>
