@@ -1,8 +1,12 @@
 // Public landing page at `/`. Lives outside both route groups — no navbar
 // or sidebar. The marketing site for unauthenticated visitors.
 //
-// Structure: sticky header → hero → social-proof bar → universities grid →
+// Structure: sticky header → hero → social-proof bar → universities marquee →
 // testimonials → FAQ → closing CTA → footer with social links.
+//
+// Each major section is wrapped in <Reveal> so it fades up as it scrolls
+// into view. The marquee runs on a CSS keyframe (see globals.css) and
+// pauses on hover.
 import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { BrandMark } from "@/components/layout/brand-mark";
@@ -16,7 +20,13 @@ import { TestimonialCard } from "@/components/marketing/testimonial-card";
 import { FAQItem } from "@/components/marketing/faq-item";
 import { DashboardMockup } from "@/components/marketing/dashboard-mockup";
 import { SocialLinks } from "@/components/marketing/social-links";
-import { SA_UNIVERSITIES } from "@/lib/constants/universities";
+import { Marquee } from "@/components/marketing/marquee";
+import { Reveal } from "@/components/marketing/reveal";
+import { UniversityLogo } from "@/components/marketing/university-logo";
+import {
+  FEATURED_UNIVERSITIES,
+  SA_UNIVERSITIES,
+} from "@/lib/constants/universities";
 
 // Footer sitemap. Hrefs that don't exist yet point to placeholders so the
 // footer renders the full structure now and we can wire pages up later.
@@ -34,8 +44,8 @@ export default function Home() {
 
   return (
     <div className="relative flex min-h-dvh flex-col overflow-hidden">
-      {/* Atmospheric washes — coral bloom top-right, cobalt haze on the
-       * lower right so wide viewports never read as blank cream. */}
+      {/* Atmospheric washes — burnt-sienna bloom top-right, cobalt haze on
+       * the lower right so wide viewports never read as blank cream. */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[80vh] bg-[radial-gradient(ellipse_70%_60%_at_85%_5%,_var(--color-accent)_0%,_transparent_55%)] opacity-25"
@@ -66,10 +76,10 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-6xl px-6 md:px-10">
+      <main className="w-full">
         {/* ── Hero ───────────────────────────────────────────────────── */}
-        <section className="grid grid-cols-1 items-center gap-12 py-16 md:py-24 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
-          <div className="flex flex-col items-start gap-6">
+        <section className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 px-6 py-16 md:px-10 md:py-24 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
+          <Reveal from="left" className="flex flex-col items-start gap-6">
             <Badge tone="info" dot>
               For South African matrics
             </Badge>
@@ -113,116 +123,128 @@ export default function Home() {
               <Sparkles size={14} aria-hidden className="text-accent" />
               No card needed. Free to start.
             </p>
-          </div>
+          </Reveal>
 
           {/* Hero illustration — stacks below the copy on mobile/tablet. */}
-          <div className="flex items-center justify-center lg:justify-end">
+          <Reveal
+            from="right"
+            delayMs={100}
+            className="flex items-center justify-center lg:justify-end"
+          >
             <DashboardMockup />
-          </div>
+          </Reveal>
         </section>
 
         {/* ── Social-proof bar ───────────────────────────────────────── */}
-        <section className="border-y border-border py-10 md:py-14">
-          <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-[1fr_auto_1fr_auto_1fr]">
-            <Stat
-              value={`${SA_UNIVERSITIES.length}`}
-              label="universities covered"
-              note="and counting"
-            />
-            <DashedPath
-              variant="horizontal"
-              className="hidden h-6 w-full text-muted-foreground/60 md:block"
-            />
-            <Stat value="40+" label="hours saved per applicant" />
-            <DashedPath
-              variant="horizontal"
-              className="hidden h-6 w-full text-muted-foreground/60 md:block"
-            />
-            <Stat value="100%" label="review before we submit" />
-          </div>
-        </section>
+        <Reveal>
+          <section className="mx-auto max-w-6xl border-y border-border px-6 py-10 md:px-10 md:py-14">
+            <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-[1fr_auto_1fr_auto_1fr]">
+              <Stat
+                value={`${SA_UNIVERSITIES.length}`}
+                label="universities covered"
+                note="and counting"
+              />
+              <DashedPath
+                variant="horizontal"
+                className="hidden h-6 w-full text-muted-foreground/60 md:block"
+              />
+              <Stat value="40+" label="hours saved per applicant" />
+              <DashedPath
+                variant="horizontal"
+                className="hidden h-6 w-full text-muted-foreground/60 md:block"
+              />
+              <Stat value="100%" label="review before we submit" />
+            </div>
+          </section>
+        </Reveal>
 
-        {/* ── Supported universities ─────────────────────────────────── */}
-        <section className="py-20 md:py-28">
-          <SectionHeading
-            eyebrow="Coverage"
-            title="Every public SA university, in one place."
-            accentText="one place"
-            description="From UCT to UniZulu, Uniflo handles applications across the country. Pick the universities that fit your dream — we'll handle the paperwork for each one."
-          />
+        {/* ── Featured universities marquee ──────────────────────────── *
+         * The full list of supported universities is many; here we surface
+         * the most recognisable handful as a moving banner. The marquee
+         * pauses on hover so a curious user can read a card. */}
+        <section className="py-16 md:py-24">
+          <Reveal>
+            <div className="mx-auto max-w-6xl px-6 md:px-10">
+              <SectionHeading
+                eyebrow="Top universities"
+                title="The big six, all in one place."
+                accentText="big six"
+                description="A handful of the most-requested South African universities — and the marquee keeps moving so does our coverage. Hover any card to pause the scroll."
+              />
+            </div>
+          </Reveal>
 
-          <ul className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 md:gap-4 lg:grid-cols-4">
-            {SA_UNIVERSITIES.map((u) => (
-              <li key={u.shortName}>
-                <Card
-                  variant="paper"
-                  className="flex h-full flex-col gap-1 p-4 transition-colors hover:border-foreground/25 hover:bg-soft/40"
-                >
-                  <span className="text-xs font-semibold uppercase tracking-wider text-accent">
-                    {u.shortName}
-                  </span>
-                  <span className="text-sm font-medium text-foreground">
-                    {u.name}
-                  </span>
-                  <span className="text-xs text-muted-foreground">
-                    {u.city}
-                  </span>
-                </Card>
-              </li>
-            ))}
-          </ul>
+          <Reveal delayMs={120} className="mt-10">
+            {/* Full-bleed: the marquee escapes the inner container so the
+             * track has room to scroll edge-to-edge on desktop. */}
+            <Marquee speed="medium">
+              {FEATURED_UNIVERSITIES.map((u) => (
+                <UniversityLogo key={u.shortName} university={u} />
+              ))}
+            </Marquee>
+          </Reveal>
         </section>
 
         {/* ── Testimonials ───────────────────────────────────────────── */}
-        <section className="relative py-20 md:py-28">
+        <section className="relative mx-auto max-w-6xl px-6 py-20 md:px-10 md:py-28">
           <DotCluster
             aria-hidden
             className="absolute right-4 top-12 hidden h-10 w-16 text-accent/70 md:block"
           />
 
-          <SectionHeading
-            eyebrow="From the class of 2025"
-            title="Matrics who actually got in."
-            accentText="got in"
-            description="Real students who used Uniflo to land at the universities they wanted. Names changed where requested."
-          />
+          <Reveal>
+            <SectionHeading
+              eyebrow="From the class of 2025"
+              title="Matrics who actually got in."
+              accentText="got in"
+              description="Real students who used Uniflo to land at the universities they wanted. Names changed where requested."
+            />
+          </Reveal>
 
           <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-3 md:gap-6">
-            <TestimonialCard
-              badge="Accepted to UCT"
-              initials="LM"
-              name="Lesedi M."
-              role="Matric, 2025"
-              quote="I almost gave up halfway through filling forms for the third time. Uniflo did the boring part. I just had to read and tick. UCT confirmed two weeks later."
-            />
-            <TestimonialCard
-              badge="Bursary + Wits"
-              initials="TS"
-              name="Thandi S."
-              role="Now at Wits"
-              quote="My mom couldn't believe how quick it was. Three universities applied to in one evening, and I got to check every form before it went out."
-            />
-            <TestimonialCard
-              badge="Accepted at NMU"
-              initials="JV"
-              name="Jaco V."
-              role="Matric, 2025"
-              quote="Honestly the review screen was the best part. Felt like having a proper adult double-check my work. Made everything less scary."
-            />
+            <Reveal delayMs={0}>
+              <TestimonialCard
+                badge="Accepted to UCT"
+                initials="LM"
+                name="Lesedi M."
+                role="Matric, 2025"
+                quote="I almost gave up halfway through filling forms for the third time. Uniflo did the boring part. I just had to read and tick. UCT confirmed two weeks later."
+              />
+            </Reveal>
+            <Reveal delayMs={120}>
+              <TestimonialCard
+                badge="Bursary + Wits"
+                initials="TS"
+                name="Thandi S."
+                role="Now at Wits"
+                quote="My mom couldn't believe how quick it was. Three universities applied to in one evening, and I got to check every form before it went out."
+              />
+            </Reveal>
+            <Reveal delayMs={240}>
+              <TestimonialCard
+                badge="Accepted at NMU"
+                initials="JV"
+                name="Jaco V."
+                role="Matric, 2025"
+                quote="Honestly the review screen was the best part. Felt like having a proper adult double-check my work. Made everything less scary."
+              />
+            </Reveal>
           </div>
         </section>
 
         {/* ── FAQ ────────────────────────────────────────────────────── */}
-        <section className="py-20 md:py-28">
+        <section className="mx-auto max-w-6xl px-6 py-20 md:px-10 md:py-28">
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_1.4fr]">
-            <SectionHeading
-              eyebrow="Common questions"
-              title="The stuff your matric WhatsApp group keeps asking."
-              accentText="WhatsApp group"
-              description="If you don't see your question here, message us — we'll add it."
-            />
+            <Reveal>
+              <SectionHeading
+                eyebrow="Common questions"
+                title="The stuff your matric WhatsApp group keeps asking."
+                accentText="WhatsApp group"
+                description="If you don't see your question here, message us — we'll add it."
+              />
+            </Reveal>
 
-            <div className="lg:pt-2">
+            <Reveal delayMs={120} className="lg:pt-2">
               <FAQItem
                 defaultOpen
                 question="Does Uniflo pay my application fees?"
@@ -282,44 +304,46 @@ export default function Home() {
                   </>
                 }
               />
-            </div>
+            </Reveal>
           </div>
         </section>
 
         {/* ── Closing CTA ────────────────────────────────────────────── */}
-        <section className="py-16 md:py-24">
-          <Card
-            variant="feature"
-            className="relative overflow-hidden p-8 md:p-12"
-          >
-            <DotCluster
-              aria-hidden
-              className="absolute right-8 top-8 h-10 w-16 text-accent/70"
-            />
-            <div className="flex flex-col items-start gap-6 md:max-w-2xl">
-              <span className="font-script text-2xl text-accent">
-                ready when you are
-              </span>
-              <h2 className="font-display text-4xl leading-[1.05] tracking-tight text-foreground md:text-6xl">
-                Start your applications. It takes about 20 minutes.
-              </h2>
-              <p className="text-base text-muted-foreground md:text-lg">
-                Sign up free, build your profile once, and watch a single
-                dashboard handle every university you choose.
-              </p>
-              <div className="flex flex-col gap-3 sm:flex-row">
-                <Link href="/signup" className="contents">
-                  <Button variant="accent">
-                    Start free
-                    <ArrowRight size={16} aria-hidden />
-                  </Button>
-                </Link>
-                <Link href="/login" className="contents">
-                  <Button variant="secondary">Sign in</Button>
-                </Link>
+        <section className="mx-auto max-w-6xl px-6 py-16 md:px-10 md:py-24">
+          <Reveal>
+            <Card
+              variant="feature"
+              className="relative overflow-hidden p-8 md:p-12"
+            >
+              <DotCluster
+                aria-hidden
+                className="absolute right-8 top-8 h-10 w-16 text-accent/70"
+              />
+              <div className="flex flex-col items-start gap-6 md:max-w-2xl">
+                <span className="font-script text-2xl text-accent">
+                  ready when you are
+                </span>
+                <h2 className="font-display text-4xl leading-[1.05] tracking-tight text-foreground md:text-6xl">
+                  Start your applications. It takes about 20 minutes.
+                </h2>
+                <p className="text-base text-muted-foreground md:text-lg">
+                  Sign up free, build your profile once, and watch a single
+                  dashboard handle every university you choose.
+                </p>
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <Link href="/signup" className="contents">
+                    <Button variant="accent">
+                      Start free
+                      <ArrowRight size={16} aria-hidden />
+                    </Button>
+                  </Link>
+                  <Link href="/login" className="contents">
+                    <Button variant="secondary">Sign in</Button>
+                  </Link>
+                </div>
               </div>
-            </div>
-          </Card>
+            </Card>
+          </Reveal>
         </section>
       </main>
 

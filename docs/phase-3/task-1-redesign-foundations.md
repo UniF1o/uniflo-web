@@ -163,6 +163,54 @@ feedback intact.
     `--color-background: #fbf6ec`, `--color-success: #25664a`,
     `--color-soft: #e3ebff`, `--font-script: "Caveat"…`.
 
+## Iteration 1.5 — accent depth + marquee + scroll reveals
+
+After the first commit landed, the user pushed back on two things:
+
+1. The bright sunset coral (`#ff6a47`) felt too light against the cream
+   background — they wanted something **darker for stronger contrast**.
+2. The 26-uni grid was too much; they wanted **the top 6 with logos** plus
+   **transitions and animations** as the user scrolls.
+
+What changed in this commit:
+
+- **Accent darkened** from `#ff6a47` to `#b8421f` (deep burnt sienna).
+  Cream-on-burnt-sienna passes AA at ~5.2:1, so `accent-foreground` reverts
+  to `#fbf6ec` — cleaner than the navy-on-coral fix the previous version
+  needed. `--shadow-pop` rgba updated to match the new accent.
+- **Featured universities + brand-coloured logo chip.** New
+  `FEATURED_UNIVERSITIES` constant in `lib/constants/universities.ts`
+  carrying brand colour + display mark for UCT, Wits, Stellenbosch, UP,
+  UKZN, and UJ. New `components/marketing/university-logo.tsx` renders
+  each as an elevated card with a coloured disc. (Real official SVG
+  logos are trademarked; the disc treatment is a respectful placeholder
+  until you supply assets.)
+- **`Marquee` component** at `components/marketing/marquee.tsx` — a
+  CSS-driven right-to-left infinite track. Children are duplicated so
+  `transform: translateX(-50%)` lands invisibly at the seam. Edge fade
+  masks, pause on hover, respects `prefers-reduced-motion`. The
+  keyframe lives in `globals.css`.
+- **`Reveal` component** at `components/marketing/reveal.tsx` — fades a
+  section up (or in from the side) when it scrolls into view via
+  `IntersectionObserver`. State lives on a `data-reveal` attribute (not
+  React state) so it stays out of the render cycle and avoids the
+  `react-hooks/set-state-in-effect` lint rule. Sections already in the
+  initial viewport (the hero) skip the animation so there's no
+  flash-of-hidden. Reduced motion → render visible immediately.
+- **Landing page wired up.** Replaced the 26-card grid with a `Marquee`
+  of the six featured logos. Wrapped the hero, social-proof, marquee
+  intro, testimonials (cascaded with 0/120/240 ms delays), FAQ, and
+  closing CTA in `Reveal`. Hero copy slides in from the left, dashboard
+  mockup slides in from the right with a 100 ms delay so the pair feels
+  intentional.
+
+Verified: lint, format, tsc, vitest, build clean. Playwright at 1440×900,
+1440 mid-scroll, and 375 hero/marquee — burnt sienna applied across all
+the right places (CTAs, headline accent, "you got this" handwriting,
+sparkle, squiggles, brand sprout, "and counting" caption). Marquee
+animating mid-frame visible (UCT entering, Wits leaving). Reveal data
+attributes flip from `hidden` → `shown` as sections come into view.
+
 ## What the next iteration must do
 
 - Auth screens (`/login`, `/signup`, `/forgot-password`) — apply motifs and

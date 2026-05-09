@@ -21,10 +21,9 @@
   --color-border: #d8d0bd; /* hairline border on cream */
   --color-primary: #1f4ed8; /* cobalt — the brand colour */
   --color-primary-foreground: #fbf6ec; /* cream on cobalt */
-  --color-accent: #ff6a47; /* sunset coral — CTAs, underlines, accents */
-  /* Navy-on-coral instead of cream-on-coral for AA contrast (cream-on-coral
-   * is ~2.2:1 — fails AA). Navy-on-coral lands at ~7.3:1 and reads richer. */
-  --color-accent-foreground: #0d1a3d;
+  --color-accent: #b8421f; /* deep burnt sienna — heavier than coral for
+                            * stronger contrast against the cream surface */
+  --color-accent-foreground: #fbf6ec; /* cream-on-burnt-sienna ~5.2:1 — AA */
   --color-soft: #e3ebff; /* pale sky tint — badges, illustration washes */
   --color-success: #25664a; /* darkened from #2f7a55 to clear AA on cream */
   --color-warning: #8a5d10; /* darkened from #c98a1d to clear AA on cream */
@@ -50,9 +49,21 @@
    * `--shadow-pop` is reserved for the coral accent button so it broadcasts
    * its importance without us needing to size it up.                      */
   --shadow-soft: 0 8px 24px -12px rgba(13, 26, 61, 0.18);
-  --shadow-pop: 0 12px 36px -10px rgba(255, 106, 71, 0.4);
+  --shadow-pop: 0 12px 36px -10px rgba(184, 66, 31, 0.45);
   --shadow-paper:
     0 1px 0 rgba(13, 26, 61, 0.04), 0 1px 2px rgba(13, 26, 61, 0.06);
+}
+
+/* Right-to-left marquee track. The component duplicates its children so
+ * translating by -50% lands the seam invisibly back at the start. Speed is
+ * set per-instance via the `--marquee-duration` custom property. */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 html {

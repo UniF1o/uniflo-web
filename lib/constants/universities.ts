@@ -11,6 +11,62 @@ export interface MarketingUniversity {
   shortName: string;
 }
 
+// Featured universities surfaced on the landing-page marquee. Each carries a
+// brand colour so we can render a recognisable wordmark chip without
+// shipping copyrighted SVG logos. Replace `brandColor` mappings here when
+// official assets are sourced.
+export interface FeaturedUniversity extends MarketingUniversity {
+  brandColor: string;
+  // The label shown inside the colored disc — usually the shortName, but
+  // some unis read better with a bespoke 2–4 character mark.
+  mark: string;
+}
+
+export const FEATURED_UNIVERSITIES: FeaturedUniversity[] = [
+  {
+    shortName: "UCT",
+    mark: "UCT",
+    name: "University of Cape Town",
+    city: "Cape Town",
+    brandColor: "#7c1b14",
+  },
+  {
+    shortName: "Wits",
+    mark: "Wits",
+    name: "University of the Witwatersrand",
+    city: "Johannesburg",
+    brandColor: "#0a3a5e",
+  },
+  {
+    shortName: "Stellenbosch",
+    mark: "SU",
+    name: "Stellenbosch University",
+    city: "Stellenbosch",
+    brandColor: "#7e1124",
+  },
+  {
+    shortName: "UP",
+    mark: "UP",
+    name: "University of Pretoria",
+    city: "Pretoria",
+    brandColor: "#a41e22",
+  },
+  {
+    shortName: "UKZN",
+    mark: "UKZN",
+    name: "University of KwaZulu-Natal",
+    city: "Durban",
+    brandColor: "#90262c",
+  },
+  {
+    shortName: "UJ",
+    mark: "UJ",
+    name: "University of Johannesburg",
+    city: "Johannesburg",
+    brandColor: "#d35400",
+  },
+];
+
 export const SA_UNIVERSITIES: MarketingUniversity[] = [
   { shortName: "UCT", name: "University of Cape Town", city: "Cape Town" },
   {
