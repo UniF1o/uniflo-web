@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { RefreshCw } from "lucide-react";
+import { ArrowRight, RefreshCw } from "lucide-react";
 import { apiClient } from "@/lib/api/client";
+import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { StatusBadge } from "./status-badge";
 import { cn } from "@/lib/utils/cn";
 import type { components } from "@/lib/api/schema";
@@ -73,47 +75,58 @@ export function ApplicationList({
       </div>
 
       {refreshError && (
-        <p role="alert" className="text-sm text-destructive">
-          Could not refresh. Please try again.
-        </p>
+        <Alert tone="destructive">Could not refresh. Please try again.</Alert>
       )}
 
-      <div className="divide-y divide-border rounded-lg border border-border">
+      {/* Each application is its own elevated row card. Row cards lift on
+       * hover so the "View" affordance is felt. Using a list of cards
+       * (rather than a single divided list) means each row gets its own
+       * shadow + radius and reads more clearly on mobile. */}
+      <ul className="flex flex-col gap-3">
         {items.map((app) => {
           const uniName =
             universityNames[app.university_id] ?? app.university_id;
           return (
-            <div
-              key={app.id}
-              className="flex flex-col gap-2 px-5 py-4 sm:flex-row sm:items-center sm:gap-4"
-            >
-              <div className="min-w-0 flex-1 space-y-0.5">
-                <div className="flex flex-wrap items-center gap-2">
-                  <p className="text-sm font-medium text-foreground">
-                    {uniName}
-                  </p>
-                  <StatusBadge status={app.status} />
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  {app.programme} · {app.application_year}
-                </p>
-              </div>
-              <div className="flex shrink-0 items-center gap-4">
-                <span className="text-xs text-muted-foreground">
-                  {formatRelativeTime(app.updated_at)}
-                </span>
-                <Link
-                  href={`/applications/${app.id}`}
-                  className="text-xs font-medium text-primary hover:underline"
-                  aria-label={`View application for ${uniName}`}
+            <li key={app.id}>
+              <Link
+                href={`/applications/${app.id}`}
+                aria-label={`View application for ${uniName}`}
+                className="block focus:outline-none"
+              >
+                <Card
+                  variant="paper"
+                  className="group flex flex-col gap-2 px-5 py-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-foreground/20 hover:shadow-[var(--shadow-soft)] sm:flex-row sm:items-center sm:gap-4"
                 >
-                  View →
-                </Link>
-              </div>
-            </div>
+                  <div className="min-w-0 flex-1 space-y-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="text-sm font-medium text-foreground">
+                        {uniName}
+                      </p>
+                      <StatusBadge status={app.status} />
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {app.programme} · {app.application_year}
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-4">
+                    <span className="text-xs text-muted-foreground">
+                      {formatRelativeTime(app.updated_at)}
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-xs font-medium text-primary">
+                      View
+                      <ArrowRight
+                        size={12}
+                        aria-hidden
+                        className="transition-transform duration-200 group-hover:translate-x-0.5"
+                      />
+                    </span>
+                  </div>
+                </Card>
+              </Link>
+            </li>
           );
         })}
-      </div>
+      </ul>
     </div>
   );
 }
