@@ -22,6 +22,7 @@ import { DashboardMockup } from "@/components/marketing/dashboard-mockup";
 import { SocialLinks } from "@/components/marketing/social-links";
 import { Marquee } from "@/components/marketing/marquee";
 import { Reveal } from "@/components/marketing/reveal";
+import { ScrollShadowHeader } from "@/components/marketing/scroll-shadow-header";
 import { UniversityLogo } from "@/components/marketing/university-logo";
 import {
   FEATURED_UNIVERSITIES,
@@ -45,19 +46,22 @@ export default function Home() {
   return (
     <div className="relative flex min-h-dvh flex-col overflow-hidden">
       {/* Atmospheric washes — pale sky bloom top-right and a deeper cobalt
-       * haze lower down. Replaces the warm coral wash now that the brand is
-       * fully blue-led; the soft tint keeps the corner from reading flat. */}
+       * haze lower down. Both drift slowly via wash-drift so the corner is
+       * never static. Reduced-motion stops the drift but keeps the colour. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[80vh] bg-[radial-gradient(ellipse_70%_60%_at_85%_5%,_var(--color-soft)_0%,_transparent_60%)]"
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[80vh] bg-[radial-gradient(ellipse_70%_60%_at_85%_5%,_var(--color-soft)_0%,_transparent_60%)] [animation:wash-drift_28s_ease-in-out_infinite] motion-reduce:animate-none"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[120vh] bg-[radial-gradient(ellipse_55%_50%_at_92%_50%,_var(--color-primary)_0%,_transparent_65%)] opacity-[0.08]"
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[120vh] bg-[radial-gradient(ellipse_55%_50%_at_92%_50%,_var(--color-primary)_0%,_transparent_65%)] opacity-[0.08] [animation:wash-drift_40s_ease-in-out_infinite_reverse] motion-reduce:animate-none"
       />
 
-      {/* ── Sticky header ────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-40 border-b border-transparent bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      {/* ── Sticky header ────────────────────────────────────────────── *
+       * ScrollShadowHeader toggles a `data-scrolled` attribute as the user
+       * scrolls past 8px so the bar gains a hairline border + shadow once
+       * any content has moved underneath it. */}
+      <ScrollShadowHeader className="sticky top-0 z-40 border-b border-transparent bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-6 md:px-10">
           <BrandMark />
           <div className="flex-1" />
@@ -75,26 +79,61 @@ export default function Home() {
             <ArrowRight size={14} className="shrink-0" />
           </Link>
         </div>
-      </header>
+      </ScrollShadowHeader>
 
       <main className="w-full">
         {/* ── Hero ───────────────────────────────────────────────────── */}
         <section className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 px-6 py-16 md:px-10 md:py-24 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
           <Reveal from="left" className="flex flex-col items-start gap-6">
-            <Badge tone="info" dot>
+            <Badge tone="info" dot pulse>
               For South African matrics
             </Badge>
 
+            {/* Each word fades up on its own with a small stagger so the
+             * headline reads in beat rather than landing flat on first paint.
+             * The trailing space between spans is preserved with the explicit
+             * {" "} so the words wrap correctly. Reduced-motion strips the
+             * stagger and shows the line at full opacity. */}
             <h1 className="font-display text-5xl leading-[0.98] tracking-tight text-foreground md:text-7xl">
-              Apply to every university.{" "}
-              <span className="relative inline-block">
-                <span className="text-primary">In one go.</span>
+              {[
+                { text: "Apply", delay: "0.05s" },
+                { text: "to", delay: "0.13s" },
+                { text: "every", delay: "0.21s" },
+                { text: "university.", delay: "0.29s" },
+              ].map((w, i, arr) => (
+                <span
+                  key={i}
+                  style={{ animationDelay: w.delay }}
+                  className="inline-block translate-y-5 opacity-0 [animation:fade-up_0.7s_cubic-bezier(0.22,1,0.36,1)_forwards] motion-reduce:translate-y-0 motion-reduce:opacity-100 motion-reduce:animate-none"
+                >
+                  {w.text}
+                  {i < arr.length - 1 ? " " : ""}
+                </span>
+              ))}
+              <br />
+              {[
+                { text: "In", delay: "0.42s" },
+                { text: "one", delay: "0.5s" },
+              ].map((w) => (
+                <span
+                  key={w.text}
+                  style={{ animationDelay: w.delay }}
+                  className="inline-block translate-y-5 text-primary opacity-0 [animation:fade-up_0.7s_cubic-bezier(0.22,1,0.36,1)_forwards] motion-reduce:translate-y-0 motion-reduce:opacity-100 motion-reduce:animate-none"
+                >
+                  {w.text}&nbsp;
+                </span>
+              ))}
+              <span
+                style={{ animationDelay: "0.58s" }}
+                className="relative inline-block translate-y-5 opacity-0 [animation:fade-up_0.7s_cubic-bezier(0.22,1,0.36,1)_forwards] motion-reduce:translate-y-0 motion-reduce:opacity-100 motion-reduce:animate-none"
+              >
+                <span className="text-primary">go.</span>
                 {/* Hand-script accent floating above the headline word —
                  * tilts away from the reading line so it feels like a
-                 * margin note rather than copy. */}
+                 * margin note rather than copy. Wiggles gently. */}
                 <span
                   aria-hidden
-                  className="absolute -right-4 -top-6 hidden font-script text-2xl text-primary/80 [transform:rotate(-8deg)] md:block"
+                  className="absolute -right-4 -top-6 hidden origin-bottom-right font-script text-2xl text-primary/80 [animation:wiggle_3.2s_ease-in-out_infinite] [animation-delay:2.2s] [transform:rotate(-8deg)] motion-reduce:animate-none md:block"
                 >
                   you got this
                 </span>
@@ -119,9 +158,15 @@ export default function Home() {
               </Link>
             </div>
 
-            {/* Tiny trust line under the CTAs — concrete, scannable. */}
+            {/* Tiny trust line under the CTAs — concrete, scannable. The
+             * sparkle twinkles to draw a moment of attention without competing
+             * with the hero CTA. */}
             <p className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Sparkles size={14} aria-hidden className="text-primary" />
+              <Sparkles
+                size={14}
+                aria-hidden
+                className="text-primary [animation:twinkle_2.2s_ease-in-out_infinite] motion-reduce:animate-none"
+              />
               No card needed. Free to start.
             </p>
           </Reveal>
@@ -318,7 +363,9 @@ export default function Home() {
             >
               <DotCluster
                 aria-hidden
-                className="absolute right-8 top-8 h-10 w-16 text-primary/70"
+                // Tiny up-and-down bob so the closing CTA has a "still alive"
+                // signal even after the rest of the section has settled.
+                className="absolute right-8 top-8 h-10 w-16 text-primary/70 [animation:bob_4s_ease-in-out_infinite] motion-reduce:animate-none"
               />
               <div className="flex flex-col items-start gap-6 md:max-w-2xl">
                 <span className="font-script text-2xl text-primary">
@@ -403,7 +450,7 @@ export default function Home() {
             <p>© {year} Uniflo. Apply smarter.</p>
             <span className="inline-flex items-center gap-2">
               Made for SA matrics
-              <Sprout className="h-4 w-4 text-primary" />
+              <Sprout className="h-4 w-4 origin-bottom text-primary [animation:sway_6s_ease-in-out_infinite] motion-reduce:animate-none" />
             </span>
           </div>
         </div>

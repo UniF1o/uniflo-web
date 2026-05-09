@@ -41,10 +41,12 @@ export function Button({
         variant === "primary" &&
           "bg-primary text-primary-foreground shadow-[var(--shadow-soft)] hover:-translate-y-0.5 hover:bg-primary/95 active:translate-y-0",
 
-        // accent — coral with shadow-pop. Tiny rotate on hover signals
-        // hand-applied/playful intent without becoming distracting.
+        // accent — navy CTA with shadow-pop. Tiny rotate on hover signals
+        // hand-applied/playful intent. A diagonal shimmer sweep runs every
+        // few seconds via the ::after pseudo so the button reads "alive"
+        // even when idle. motion-reduce strips the shimmer.
         variant === "accent" &&
-          "bg-accent text-accent-foreground shadow-[var(--shadow-pop)] hover:-translate-y-0.5 hover:[transform:translateY(-2px)_rotate(-0.5deg)] active:[transform:translateY(0)_rotate(0)]",
+          "relative overflow-hidden bg-accent text-accent-foreground shadow-[var(--shadow-pop)] hover:-translate-y-0.5 hover:[transform:translateY(-2px)_rotate(-0.5deg)] active:[transform:translateY(0)_rotate(0)] after:pointer-events-none after:absolute after:inset-0 after:bg-[linear-gradient(120deg,transparent_35%,rgba(255,255,255,0.35)_50%,transparent_65%)] after:[animation:shimmer_4.5s_ease-in-out_infinite] after:[animation-delay:1.2s] motion-reduce:after:hidden",
 
         // secondary — cream-on-navy outline. Reads as "another good option".
         variant === "secondary" &&

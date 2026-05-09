@@ -10,6 +10,10 @@ interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   // Optional dot prefix rendered before the label. The dot uses the same tone
   // colour at full saturation, while the surrounding pill is tinted softer.
   dot?: boolean;
+  // When true and `dot` is also true, the dot emits a soft concentric ping —
+  // signals "this is a live, ongoing thing" (eg. the hero "for matrics" badge,
+  // or a processing application). Reduced-motion strips the ping animation.
+  pulse?: boolean;
 }
 
 // Tonal pairs: a subtly tinted background, a saturated foreground.
@@ -46,6 +50,7 @@ const toneClasses: Record<BadgeTone, { bg: string; fg: string; dot: string }> =
 export function Badge({
   tone = "neutral",
   dot = false,
+  pulse = false,
   className,
   children,
   ...props
@@ -62,7 +67,17 @@ export function Badge({
       {...props}
     >
       {dot && (
-        <span aria-hidden className={cn("h-1.5 w-1.5 rounded-full", t.dot)} />
+        <span
+          aria-hidden
+          // The wrapper holds the solid dot; the ::after pseudo (added via the
+          // pulse class below) renders the expanding ping ring on top.
+          className={cn(
+            "relative h-1.5 w-1.5 rounded-full",
+            t.dot,
+            pulse &&
+              "after:absolute after:inset-0 after:rounded-[inherit] after:bg-[currentColor] after:[animation:ping_2.4s_cubic-bezier(0,0,0.2,1)_infinite] after:motion-reduce:hidden",
+          )}
+        />
       )}
       {children}
     </span>

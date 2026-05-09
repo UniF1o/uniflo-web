@@ -59,6 +59,12 @@
     0 1px 0 rgba(20, 24, 43, 0.04), 0 1px 2px rgba(20, 24, 43, 0.06);
 }
 
+/* ──────────────────────────────────────────────────────────────────────────
+ * Animation primitives used across the landing page.
+ * Reduced-motion is enforced globally below — these only run when the user
+ * has motion enabled (or hasn't expressed a preference).
+ * ────────────────────────────────────────────────────────────────────── */
+
 /* Right-to-left marquee track. The component duplicates its children so
  * translating by -50% lands the seam invisibly back at the start. Speed is
  * set per-instance via the `--marquee-duration` custom property. */
@@ -68,6 +74,195 @@
   }
   to {
     transform: translateX(-50%);
+  }
+}
+
+/* Fade up + slide on entrance — used for hero word stagger. */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Concentric pulse ring used by the active info badge dot. */
+@keyframes ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  75% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+/* The brand sprout swings gently. Used in the BrandMark wordmark and footer. */
+@keyframes sway {
+  0%,
+  100% {
+    transform: rotate(-6deg);
+  }
+  50% {
+    transform: rotate(8deg);
+  }
+}
+
+/* The handwritten "you got this" wiggles like a margin note. */
+@keyframes wiggle {
+  0%,
+  100% {
+    transform: rotate(-8deg);
+  }
+  50% {
+    transform: rotate(-2deg) translateY(-2px);
+  }
+}
+
+/* Sparkle icon next to the trust line twinkles. */
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scale(0.85) rotate(45deg);
+  }
+}
+
+/* Hero dashboard mockup floats while keeping the slight base rotation. */
+@keyframes float-mockup {
+  0%,
+  100% {
+    transform: translateY(0) rotate(1.2deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(1.6deg);
+  }
+}
+
+/* Atmospheric washes drift slowly so the hero corner feels alive. */
+@keyframes wash-drift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(2%, 1.2%, 0) scale(1.04);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+/* Submitted sticker stamps in with a tiny overshoot. */
+@keyframes stamp-in {
+  0% {
+    opacity: 0;
+    transform: rotate(-22deg) scale(2.1);
+  }
+  60% {
+    opacity: 1;
+    transform: rotate(14deg) scale(0.92);
+  }
+  80% {
+    transform: rotate(10deg) scale(1.04);
+  }
+  100% {
+    opacity: 1;
+    transform: rotate(12deg) scale(1);
+  }
+}
+
+/* Diagonal shimmer sweep over the accent CTA. */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-110%) skewX(-20deg);
+  }
+  100% {
+    transform: translateX(220%) skewX(-20deg);
+  }
+}
+
+/* Closing CTA dot cluster bobs up and down. */
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+/* Mock progress bar fills on load. */
+@keyframes progress-fill {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 60%;
+  }
+}
+
+/* Current row in the dashboard mockup gets a soft pulse. */
+@keyframes row-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(31, 78, 216, 0);
+    border-color: var(--color-border);
+  }
+  50% {
+    box-shadow: 0 0 0 3px rgba(31, 78, 216, 0.12);
+    border-color: rgba(31, 78, 216, 0.5);
+  }
+}
+
+/* Section squiggle draws itself in via stroke-dashoffset transition once
+ * the heading scrolls into view. The wrapper toggles the `.in-view` class;
+ * the SVG path inside reads `stroke="currentColor"` from <Squiggle>. */
+.section-squiggle path {
+  stroke-dasharray: 360;
+  stroke-dashoffset: 360;
+  transition: stroke-dashoffset 1.4s cubic-bezier(0.65, 0, 0.35, 1);
+  transition-delay: 0.2s;
+}
+.section-squiggle.in-view path {
+  stroke-dashoffset: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .section-squiggle path {
+    stroke-dashoffset: 0;
+    transition: none;
+  }
+}
+
+/* Walking caret that moves down the dashboard rows.
+ * Step distance (56px) ≈ row height + gap; 3 stops = 0, 56px, 112px. */
+@keyframes caret-step {
+  0%,
+  30% {
+    transform: translateY(0);
+  }
+  33%,
+  63% {
+    transform: translateY(56px);
+  }
+  66%,
+  96% {
+    transform: translateY(112px);
+  }
+  100% {
+    transform: translateY(0);
   }
 }
 

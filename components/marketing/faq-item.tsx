@@ -2,6 +2,14 @@
 // element so the disclosure works without JavaScript and announces correctly
 // to screen readers. The chevron rotates when the item is open via a CSS
 // rule on the details[open] selector.
+//
+// When opened, the item auto-closes any sibling FAQItems inside the same
+// parent — so the FAQ behaves as a single-open accordion. The behaviour is
+// scoped to the closest parent rather than the document so multiple FAQ
+// groups on a page (unlikely but possible) don't fight.
+"use client";
+
+import { useEffect, useRef } from "react";
 import { ChevronDown } from "lucide-react";
 
 interface FAQItemProps {
@@ -14,8 +22,31 @@ interface FAQItemProps {
 }
 
 export function FAQItem({ question, answer, defaultOpen }: FAQItemProps) {
+  const ref = useRef<HTMLDetailsElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const onToggle = () => {
+      if (!el.open) return;
+      // Find sibling <details> nodes and force them closed. Walking the
+      // parent's children keeps the scope tight — we don't accidentally
+      // close FAQs in another section.
+      const parent = el.parentElement;
+      if (!parent) return;
+      Array.from(
+        parent.querySelectorAll<HTMLDetailsElement>("details"),
+      ).forEach((other) => {
+        if (other !== el && other.open) other.open = false;
+      });
+    };
+    el.addEventListener("toggle", onToggle);
+    return () => el.removeEventListener("toggle", onToggle);
+  }, []);
+
   return (
     <details
+      ref={ref}
       open={defaultOpen}
       className="group border-b border-border py-5 last:border-b-0 [&[open]>summary>svg]:rotate-180"
     >

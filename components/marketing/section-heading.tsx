@@ -4,10 +4,19 @@
 // one accented word.
 //
 // Pass `accentText` to highlight a single word (or short phrase) in the
-// coral accent colour with a hand-drawn squiggle underneath. The headline
-// before/after the accent is rendered as plain text.
+// cobalt primary colour with a hand-drawn squiggle underneath. The squiggle
+// "draws" itself in via stroke-dashoffset once the heading scrolls into
+// view (stroke-dasharray rule lives in globals.css under .section-squiggle).
+"use client";
+
+import { useEffect, useLayoutEffect, useRef } from "react";
 import { Squiggle } from "@/components/ui/motifs";
 import { cn } from "@/lib/utils/cn";
+
+// Avoid the SSR warning for useLayoutEffect by falling back to useEffect
+// on the server. The hook only runs on the client either way.
+const useIsoLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 interface SectionHeadingProps {
   eyebrow?: string;
@@ -35,6 +44,44 @@ export function SectionHeading({
   const parts =
     accentText && title.includes(accentText) ? title.split(accentText) : null;
 
+  // Drives the squiggle stroke-dashoffset transition. The wrapper around
+  // the squiggle gets `.in-view` once the squiggle has scrolled past the
+  // top half of the viewport, which triggers the CSS transition defined in
+  // globals.css. State is mutated directly on the DOM (classList) rather
+  // than via React state to keep the reveal mechanic out of the render
+  // cycle (and out of the react-hooks/set-state-in-effect lint rule).
+  // Reduced motion bypasses the observer entirely — the global rule in
+  // globals.css forces stroke-dashoffset to 0 in that case.
+  const squiggleRef = useRef<HTMLSpanElement>(null);
+
+  useIsoLayoutEffect(() => {
+    if (!parts) return;
+    const el = squiggleRef.current;
+    if (!el) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      el.classList.add("in-view");
+      return;
+    }
+    // If the squiggle is already on screen at mount (e.g. above the fold
+    // hero), draw it immediately so it doesn't sit empty.
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight - 48) {
+      el.classList.add("in-view");
+      return;
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.classList.add("in-view");
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.4 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [parts]);
+
   return (
     <div
       className={cn(
@@ -54,9 +101,16 @@ export function SectionHeading({
             {parts[0]}
             <span className="relative inline-block">
               <span className="text-primary">{accentText}</span>
-              {/* Squiggle sits below the baseline so it reads as an
-               * underline scribble, not a strikethrough. */}
-              <Squiggle className="pointer-events-none absolute -bottom-2 left-0 h-3 w-full text-primary" />
+              {/* The squiggle wrapper carries the `section-squiggle` class
+               * — globals.css applies the dasharray + transition to its
+               * inner <path>. Toggling `in-view` triggers the draw. */}
+              <span
+                ref={squiggleRef}
+                aria-hidden
+                className="section-squiggle pointer-events-none absolute -bottom-2 left-0 block h-3 w-full text-primary"
+              >
+                <Squiggle className="h-full w-full" />
+              </span>
             </span>
             {parts.slice(1).join(accentText)}
           </>

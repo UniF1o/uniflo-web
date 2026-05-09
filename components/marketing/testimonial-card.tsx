@@ -25,7 +25,15 @@ export function TestimonialCard({
   badge,
 }: TestimonialCardProps) {
   return (
-    <Card variant="elevated" className="flex h-full flex-col gap-5 p-6">
+    // 3D tilt on hover — subtle rotate around X + Y axes plus a lift. The
+    // perspective lives on the parent so the rotation has depth; without
+    // it, rotateX/rotateY look like flat skews. motion-reduce keeps the
+    // hover state visible (border + shadow change still apply via Card's
+    // elevated variant) but suppresses the transform.
+    <Card
+      variant="elevated"
+      className="group/testimonial flex h-full flex-col gap-5 p-6 [perspective:800px] [transform-style:preserve-3d] transition-[transform,box-shadow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1.5 hover:[transform:translateY(-6px)_rotateX(2deg)_rotateY(-2deg)] hover:shadow-[0_24px_48px_-20px_rgba(20,24,43,0.20)] motion-reduce:hover:transform-none"
+    >
       {badge && (
         <Badge tone="success" dot>
           {badge}
