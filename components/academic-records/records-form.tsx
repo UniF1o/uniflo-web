@@ -23,6 +23,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Trash2, Plus } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
@@ -498,12 +499,8 @@ export function AcademicRecordsForm() {
       </div>
 
       {/* API-level error — session expired, network failure, server 4xx/5xx.
-       * role="alert" triggers a screen reader announcement on appearance. */}
-      {apiError && (
-        <p role="alert" className="text-sm text-destructive">
-          {apiError}
-        </p>
-      )}
+       * Alert handles the role="alert" announcement and tonal styling. */}
+      {apiError && <Alert tone="destructive">{apiError}</Alert>}
 
       <Button type="submit" fullWidth loading={loading}>
         Save records
