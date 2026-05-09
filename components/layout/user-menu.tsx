@@ -74,10 +74,12 @@ export function UserMenu({ user }: UserMenuProps) {
         onClick={() => setIsOpen((o) => !o)}
         aria-haspopup="menu"
         aria-expanded={isOpen}
-        className="flex items-center gap-2 rounded-full py-1 pl-1 pr-3 text-sm transition-colors hover:bg-muted"
+        className="flex cursor-pointer items-center gap-2 rounded-full py-1 pl-1 pr-3 text-sm transition-colors hover:bg-muted"
       >
-        {/* Avatar circle — terracotta background + cream initials. */}
-        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-accent font-display text-sm text-accent-foreground">
+        {/* Avatar circle — navy bg + cream initials, matching the brand
+         * accent role. The shadow gives it a tiny lift so it reads as a
+         * "thing" rather than a flat circle. */}
+        <span className="flex h-9 w-9 items-center justify-center rounded-full bg-accent font-display text-sm text-accent-foreground shadow-[var(--shadow-paper)]">
           {initials || <UserIcon size={14} />}
         </span>
         <span className="hidden max-w-[140px] truncate sm:inline">
@@ -98,33 +100,35 @@ export function UserMenu({ user }: UserMenuProps) {
         role="menu"
         aria-hidden={!isOpen}
         className={cn(
-          "absolute right-0 top-full z-50 mt-2 w-56 origin-top-right overflow-hidden rounded-lg border border-border bg-background shadow-lg transition-all duration-150",
+          "absolute right-0 top-full z-50 mt-2 w-60 origin-top-right overflow-hidden rounded-xl border border-border bg-background shadow-[var(--shadow-soft)] transition-all duration-150",
           isOpen
             ? "pointer-events-auto scale-100 opacity-100"
             : "pointer-events-none scale-95 opacity-0",
         )}
       >
-        <div className="border-b border-border px-4 py-3">
-          <p className="truncate text-sm font-medium">{displayName}</p>
+        <div className="border-b border-border bg-muted/40 px-4 py-3">
+          <p className="truncate text-sm font-medium text-foreground">
+            {displayName}
+          </p>
           <p className="truncate text-xs text-muted-foreground">{user.email}</p>
         </div>
-        <nav className="py-1">
+        <nav className="py-1.5">
           <Link
             href="/profile"
             role="menuitem"
-            className="flex items-center gap-2 px-4 py-2 text-sm transition-colors hover:bg-muted"
+            className="flex items-center gap-2.5 px-4 py-2 text-sm text-foreground transition-colors hover:bg-muted hover:text-primary"
             onClick={() => setIsOpen(false)}
           >
-            <UserIcon size={14} />
+            <UserIcon size={14} aria-hidden />
             Profile
           </Link>
           <button
             type="button"
             role="menuitem"
             onClick={handleSignOut}
-            className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-destructive transition-colors hover:bg-muted"
+            className="flex w-full cursor-pointer items-center gap-2.5 px-4 py-2 text-left text-sm text-destructive transition-colors hover:bg-destructive/10"
           >
-            <LogOut size={14} />
+            <LogOut size={14} aria-hidden />
             Sign out
           </button>
         </nav>
