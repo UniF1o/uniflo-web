@@ -1,8 +1,11 @@
 "use client";
 
+import { Check } from "lucide-react";
 import type { components } from "@/lib/api/schema";
-import { cn } from "@/lib/utils/cn";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { cn } from "@/lib/utils/cn";
 
 type University = components["schemas"]["University"];
 
@@ -50,29 +53,37 @@ export function UniversityCard({
         ? `Opens in ${days} day${days === 1 ? "" : "s"}`
         : "Closed";
 
-  const statusClass = cn(
-    "rounded-full px-2.5 py-0.5 text-xs font-medium",
-    status === "open" &&
-      "bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20",
-    status === "upcoming" &&
-      "bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-600/20",
-    status === "closed" && "bg-muted text-muted-foreground",
-  );
+  // Map status → Badge tone so colours come from tokens, not Tailwind defaults.
+  const statusTone =
+    status === "open"
+      ? "success"
+      : status === "upcoming"
+        ? "warning"
+        : "neutral";
+
+  const isClosed = status === "closed";
 
   return (
-    <div
+    <Card
+      variant="paper"
       className={cn(
-        "flex flex-col gap-4 rounded-lg border bg-background p-5 transition-colors",
+        "flex flex-col gap-4 p-5 transition-all duration-200",
+        // Selected: tinted soft sky surface + cobalt ring; the ring keeps
+        // the card visibly distinct from neighbours in the grid.
         isSelected
-          ? "border-primary/40 ring-1 ring-primary/20"
-          : "border-border",
+          ? "border-primary/50 bg-soft/60 ring-2 ring-primary/30"
+          : "hover:-translate-y-0.5 hover:border-foreground/20 hover:shadow-[var(--shadow-soft)]",
+        // Closed cards are dimmed to clarify they're not selectable.
+        isClosed && "opacity-60",
       )}
     >
       <div className="flex items-start justify-between gap-3">
         <h3 className="text-sm font-medium leading-snug text-foreground">
           {university.name}
         </h3>
-        <span className={statusClass}>{statusLabel}</span>
+        <Badge tone={statusTone} dot={status === "open"}>
+          {statusLabel}
+        </Badge>
       </div>
 
       <p className="text-xs text-muted-foreground">
@@ -81,14 +92,15 @@ export function UniversityCard({
       </p>
 
       <Button
-        variant={isSelected ? "primary" : "ghost"}
-        disabled={status === "closed"}
+        variant={isSelected ? "primary" : "secondary"}
+        disabled={isClosed}
         onClick={() => onSelect(university)}
         className="mt-auto self-end px-4 py-1.5 text-xs"
         aria-label={`${isSelected ? "Remove" : "Select"} ${university.name}`}
       >
-        {isSelected ? "Remove" : "Select"}
+        {isSelected && <Check size={12} aria-hidden strokeWidth={3} />}
+        {isSelected ? "Selected" : "Select"}
       </Button>
-    </div>
+    </Card>
   );
 }

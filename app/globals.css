@@ -5,36 +5,265 @@
  * declared here becomes a Tailwind utility automatically:
  *   --color-primary → bg-primary, text-primary, border-primary, etc.
  *
- * Palette direction: warm cream background, deep indigo brand, terracotta
- * accent. Typography: Instrument Serif (display) + Geist (body).
+ * Identity: cobalt blue + sunset coral on cream paper. Editorial type
+ * (Instrument Serif display + Geist body) with Caveat for sparing
+ * handwritten accents. All colour tokens cleared WCAG AA on the
+ * surfaces they're used against.
  */
 @import "tailwindcss";
 
 @theme {
   /* ── Colors ──────────────────────────────────────────────────────────── */
-  --color-background: #faf7f2; /* warm cream — paper, not white */
-  --color-foreground: #121417; /* near-black (~15:1 contrast on bg) */
-  --color-muted: #ede7db; /* dusty stone — muted surfaces */
-  --color-muted-foreground: #5c5b57; /* low-emphasis text */
-  --color-border: #e0d9cb; /* hairline on cream */
-  --color-primary: #1b2540; /* deep indigo — brand colour */
-  --color-primary-foreground: #faf7f2; /* text on primary bg */
-  --color-accent: #d97757; /* terracotta — warm SA anchor */
-  --color-accent-foreground: #faf7f2; /* text on accent bg */
-  --color-destructive: #b23a3a; /* error / destructive actions */
-  --color-ring: #1b2540; /* focus ring (matches primary) */
+  --color-background: #fbf6ec; /* cream paper — warmer than office white */
+  --color-foreground: #14182b; /* charcoal-blue ink, kept clearly distinct
+                                * from the navy accent below (~15:1 on bg) */
+  --color-muted: #ede2cd; /* warm sand for muted surfaces */
+  --color-muted-foreground: #4f5163; /* low-emphasis text */
+  --color-border: #d8d0bd; /* hairline border on cream */
+  --color-primary: #1f4ed8; /* cobalt — the brand colour, used for active
+                             * states, links, focus rings */
+  --color-primary-foreground: #fbf6ec; /* cream on cobalt */
+  --color-accent: #0a2540; /* deep navy — the weighted accent.
+                            * Cream-on-navy clears AA at ~14:1, so CTAs read
+                            * confident without losing the warmth of cream. */
+  --color-accent-foreground: #fbf6ec;
+  --color-soft: #e3ebff; /* pale sky tint — badges, illustration washes */
+  --color-success: #25664a; /* darkened from #2f7a55 to clear AA on cream */
+  --color-warning: #8a5d10; /* darkened from #c98a1d to clear AA on cream */
+  --color-destructive: #b03825; /* darkened from #c8412f to clear AA */
+  --color-ring: #1f4ed8; /* focus ring matches primary */
 
   /* ── Typography ──────────────────────────────────────────────────────── *
    * Wired to the CSS variables set by next/font in app/layout.tsx.
-   * Use font-display for headings, font-body for everything else.         */
+   * Display = editorial serif. Body = clean sans. Script = sparing accent. */
   --font-display: var(--font-instrument-serif), ui-serif, Georgia, serif;
   --font-body: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-script: var(--font-caveat), "Comic Sans MS", cursive;
 
   /* ── Radii ───────────────────────────────────────────────────────────── */
   --radius-sm: 0.25rem;
   --radius-md: 0.5rem;
   --radius-lg: 0.75rem;
   --radius-xl: 1rem;
+  --radius-2xl: 1.5rem; /* hero cards, feature surfaces */
+
+  /* ── Shadows ─────────────────────────────────────────────────────────── *
+   * `--shadow-soft` is the default lift for layered cards.
+   * `--shadow-pop` is reserved for the coral accent button so it broadcasts
+   * its importance without us needing to size it up.                      */
+  --shadow-soft: 0 8px 24px -12px rgba(20, 24, 43, 0.18);
+  /* Cobalt halo behind the accent CTA — the primary illuminating from
+   * underneath the navy button. Ties primary and accent together visually. */
+  --shadow-pop: 0 12px 38px -10px rgba(31, 78, 216, 0.4);
+  --shadow-paper:
+    0 1px 0 rgba(20, 24, 43, 0.04), 0 1px 2px rgba(20, 24, 43, 0.06);
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+ * Animation primitives used across the landing page.
+ * Reduced-motion is enforced globally below — these only run when the user
+ * has motion enabled (or hasn't expressed a preference).
+ * ────────────────────────────────────────────────────────────────────── */
+
+/* Right-to-left marquee track. The component duplicates its children so
+ * translating by -50% lands the seam invisibly back at the start. Speed is
+ * set per-instance via the `--marquee-duration` custom property. */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Fade up + slide on entrance — used for hero word stagger. */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Concentric pulse ring used by the active info badge dot. */
+@keyframes ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  75% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+/* The brand sprout swings gently. Used in the BrandMark wordmark and footer. */
+@keyframes sway {
+  0%,
+  100% {
+    transform: rotate(-6deg);
+  }
+  50% {
+    transform: rotate(8deg);
+  }
+}
+
+/* The handwritten "you got this" wiggles like a margin note. */
+@keyframes wiggle {
+  0%,
+  100% {
+    transform: rotate(-8deg);
+  }
+  50% {
+    transform: rotate(-2deg) translateY(-2px);
+  }
+}
+
+/* Sparkle icon next to the trust line twinkles. */
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scale(0.85) rotate(45deg);
+  }
+}
+
+/* Hero dashboard mockup floats while keeping the slight base rotation. */
+@keyframes float-mockup {
+  0%,
+  100% {
+    transform: translateY(0) rotate(1.2deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(1.6deg);
+  }
+}
+
+/* Atmospheric washes drift slowly so the hero corner feels alive. */
+@keyframes wash-drift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(2%, 1.2%, 0) scale(1.04);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+/* Submitted sticker stamps in with a tiny overshoot. */
+@keyframes stamp-in {
+  0% {
+    opacity: 0;
+    transform: rotate(-22deg) scale(2.1);
+  }
+  60% {
+    opacity: 1;
+    transform: rotate(14deg) scale(0.92);
+  }
+  80% {
+    transform: rotate(10deg) scale(1.04);
+  }
+  100% {
+    opacity: 1;
+    transform: rotate(12deg) scale(1);
+  }
+}
+
+/* Diagonal shimmer sweep over the accent CTA. */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-110%) skewX(-20deg);
+  }
+  100% {
+    transform: translateX(220%) skewX(-20deg);
+  }
+}
+
+/* Closing CTA dot cluster bobs up and down. */
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+/* Mock progress bar fills on load. */
+@keyframes progress-fill {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 60%;
+  }
+}
+
+/* Current row in the dashboard mockup gets a soft pulse. */
+@keyframes row-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(31, 78, 216, 0);
+    border-color: var(--color-border);
+  }
+  50% {
+    box-shadow: 0 0 0 3px rgba(31, 78, 216, 0.12);
+    border-color: rgba(31, 78, 216, 0.5);
+  }
+}
+
+/* Section squiggle draws itself in via stroke-dashoffset transition once
+ * the heading scrolls into view. The wrapper toggles the `.in-view` class;
+ * the SVG path inside reads `stroke="currentColor"` from <Squiggle>. */
+.section-squiggle path {
+  stroke-dasharray: 360;
+  stroke-dashoffset: 360;
+  transition: stroke-dashoffset 1.4s cubic-bezier(0.65, 0, 0.35, 1);
+  transition-delay: 0.2s;
+}
+.section-squiggle.in-view path {
+  stroke-dashoffset: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .section-squiggle path {
+    stroke-dashoffset: 0;
+    transition: none;
+  }
+}
+
+/* Walking caret that moves down the dashboard rows.
+ * Step distance (56px) ≈ row height + gap; 3 stops = 0, 56px, 112px. */
+@keyframes caret-step {
+  0%,
+  30% {
+    transform: translateY(0);
+  }
+  33%,
+  63% {
+    transform: translateY(56px);
+  }
+  66%,
+  96% {
+    transform: translateY(112px);
+  }
+  100% {
+    transform: translateY(0);
+  }
 }
 
 html {
@@ -63,4 +292,17 @@ body {
 ::selection {
   background-color: var(--color-accent);
   color: var(--color-accent-foreground);
+}
+
+/* Respect users who request less motion. Suppress non-essential transforms
+ * but keep colour/opacity changes so feedback isn't lost. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

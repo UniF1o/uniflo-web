@@ -11,24 +11,27 @@
 // non-OK responses (auth failures, server errors) are treated as incomplete
 // rather than triggering a redirect, so a transient API error doesn't boot
 // the student out of the dashboard unexpectedly.
-//
-// Types are hand-written until Partner B delivers the FastAPI OpenAPI spec.
 "use client";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { CheckCircle2, Circle, ArrowRight } from "lucide-react";
+import {
+  ArrowRight,
+  CheckCircle2,
+  FileText,
+  GraduationCap,
+  UserCircle2,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { REQUIRED_DOC_TYPES } from "@/lib/constants/documents";
+import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils/cn";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-// Lifecycle states for each completeness section.
-//   loading    — API call in flight, skeleton shown in place of this section
-//   complete   — backend confirmed the section has data
-//   incomplete — section has no data or the API returned a non-2xx response
 type SectionStatus = "loading" | "complete" | "incomplete";
 
 type CompletenessState = {
@@ -39,93 +42,184 @@ type CompletenessState = {
   documentsUploaded: number;
 };
 
-// ─── Constants ───────────────────────────────────────────────────────────────
+// ─── Section config ──────────────────────────────────────────────────────────
 
-// Static config for each section card — label, description, and where to send
-// the student if the section is incomplete.
-const SECTIONS = [
+interface SectionConfig {
+  key: keyof Omit<CompletenessState, "documentsUploaded">;
+  label: string;
+  description: string;
+  href: string;
+  icon: LucideIcon;
+}
+
+const SECTIONS: readonly SectionConfig[] = [
   {
-    key: "profile" as const,
+    key: "profile",
     label: "Personal profile",
     description: "Your personal and contact details.",
     href: "/profile/setup",
+    icon: UserCircle2,
   },
   {
-    key: "academicRecords" as const,
+    key: "academicRecords",
     label: "Academic records",
     description: "Your matric results and subject marks.",
     href: "/academic-records",
+    icon: GraduationCap,
   },
   {
-    key: "documents" as const,
+    key: "documents",
     label: "Documents",
     description: "Your ID document, matric certificate, and transcripts.",
     href: "/documents",
+    icon: FileText,
   },
-];
+] as const;
 
-// ─── SectionItem ──────────────────────────────────────────────────────────────
-//
-// Renders one row in the completeness checklist. Shows a green checkmark when
-// complete, a muted circle when incomplete, and a "Complete" link on the right
-// so the student can jump directly to the section they still need to finish.
+// ─── Completeness ring ───────────────────────────────────────────────────────
+// SVG ring showing X/N sections complete. The stroke-dashoffset transition
+// animates the progress when the data finishes loading.
 
-interface SectionItemProps {
-  label: string;
-  // Description text — can vary for documents to show partial progress.
-  description: string;
-  href: string;
-  status: Exclude<SectionStatus, "loading">;
-}
-
-function SectionItem({ label, description, href, status }: SectionItemProps) {
-  const isComplete = status === "complete";
+function CompletenessRing({
+  complete,
+  total,
+}: {
+  complete: number;
+  total: number;
+}) {
+  // Geometry: 64-radius circle in a 144×144 viewBox. The dasharray equals
+  // the circumference so we can express progress as a percentage of it.
+  const radius = 64;
+  const circumference = 2 * Math.PI * radius;
+  const percent = total === 0 ? 0 : complete / total;
+  const offset = circumference * (1 - percent);
 
   return (
-    <div className="flex items-center gap-3 rounded-lg border border-border p-4">
-      {/* Status icon — green checkmark when done, muted circle when not */}
-      {isComplete ? (
-        <CheckCircle2
-          size={18}
-          className="shrink-0 text-green-600"
-          aria-hidden
+    <div className="relative h-36 w-36 shrink-0">
+      <svg
+        role="img"
+        aria-label={`${complete} of ${total} sections complete`}
+        viewBox="0 0 144 144"
+        className="h-full w-full -rotate-90"
+      >
+        {/* Track ring — muted so the progress arc reads against it. */}
+        <circle
+          cx="72"
+          cy="72"
+          r={radius}
+          fill="none"
+          stroke="var(--color-muted)"
+          strokeWidth="10"
         />
-      ) : (
-        <Circle
-          size={18}
-          className="shrink-0 text-muted-foreground"
-          aria-hidden
+        {/* Progress arc — cobalt, transitioned via stroke-dashoffset. */}
+        <circle
+          cx="72"
+          cy="72"
+          r={radius}
+          fill="none"
+          stroke="var(--color-primary)"
+          strokeWidth="10"
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          className="transition-[stroke-dashoffset] duration-700 ease-out"
         />
-      )}
-
-      {/* Section label and dynamic description */}
-      <div className="min-w-0 flex-1">
-        <p className="text-sm font-medium text-foreground">{label}</p>
-        <p className="text-xs text-muted-foreground">{description}</p>
+      </svg>
+      {/* Center label — "n/N" in the editorial serif. */}
+      <div className="pointer-events-none absolute inset-0 grid place-items-center">
+        <div className="text-center">
+          <div className="font-display text-4xl leading-none tracking-tight text-foreground">
+            {complete}
+            <span className="text-muted-foreground">/{total}</span>
+          </div>
+          <div className="mt-1 text-[0.65rem] font-medium uppercase tracking-[0.2em] text-muted-foreground">
+            done
+          </div>
+        </div>
       </div>
-
-      {/* "Complete" link — only visible when the section is not done yet.
-       * Hidden once complete so the card doesn't imply further action. */}
-      {!isComplete && (
-        <Link
-          href={href}
-          className="flex shrink-0 items-center gap-1 text-xs font-medium text-primary hover:underline"
-        >
-          Complete
-          <ArrowRight size={12} aria-hidden />
-        </Link>
-      )}
     </div>
   );
 }
 
-// ─── ProfileCompleteness ──────────────────────────────────────────────────────
+// ─── SectionCard ─────────────────────────────────────────────────────────────
+
+interface SectionCardProps {
+  label: string;
+  description: string;
+  href: string;
+  icon: LucideIcon;
+  status: Exclude<SectionStatus, "loading">;
+}
+
+function SectionCard({
+  label,
+  description,
+  href,
+  icon: Icon,
+  status,
+}: SectionCardProps) {
+  const isComplete = status === "complete";
+  return (
+    <Card
+      variant="paper"
+      className={cn(
+        "group flex h-full flex-col gap-4 p-5 transition-all duration-200",
+        // Complete cards are softly tinted and lifted; incomplete cards
+        // pop on hover so the call-to-action is felt before it's read.
+        isComplete
+          ? "border-success/25 bg-success/8"
+          : "hover:-translate-y-0.5 hover:border-foreground/20 hover:shadow-[var(--shadow-soft)]",
+      )}
+    >
+      {/* Icon + status pip — icon sits in a tinted disc; the pip bottom-
+       * right of the disc broadcasts complete vs not at a glance. */}
+      <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+        <Icon size={20} aria-hidden />
+        {isComplete && (
+          <span
+            aria-hidden
+            className="absolute -bottom-0.5 -right-0.5 grid h-4 w-4 place-items-center rounded-full border-2 border-background bg-success text-background"
+          >
+            <CheckCircle2 size={10} strokeWidth={3} />
+          </span>
+        )}
+      </div>
+
+      <div className="flex flex-1 flex-col gap-1">
+        <p className="text-sm font-medium text-foreground">{label}</p>
+        <p className="text-xs leading-relaxed text-muted-foreground">
+          {description}
+        </p>
+      </div>
+
+      {isComplete ? (
+        <span className="inline-flex items-center gap-1.5 text-xs font-medium text-success">
+          <CheckCircle2 size={14} strokeWidth={2.5} aria-hidden />
+          Done
+        </span>
+      ) : (
+        <Link
+          href={href}
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-primary transition-colors hover:text-primary/80"
+        >
+          Complete this section
+          <ArrowRight
+            size={12}
+            aria-hidden
+            className="transition-transform duration-200 group-hover:translate-x-0.5"
+          />
+        </Link>
+      )}
+    </Card>
+  );
+}
+
+// ─── ProfileCompleteness ─────────────────────────────────────────────────────
 
 export function ProfileCompleteness() {
   const router = useRouter();
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-  // All three sections start in loading so skeletons render on first paint.
   const [state, setState] = useState<CompletenessState>({
     profile: "loading",
     academicRecords: "loading",
@@ -141,8 +235,6 @@ export function ProfileCompleteness() {
       } = await supabase.auth.getSession();
       const token = session?.access_token;
 
-      // If there's no session or no API URL configured, mark everything
-      // incomplete rather than leaving the page stuck in loading.
       if (!token || !apiUrl) {
         setState({
           profile: "incomplete",
@@ -155,20 +247,13 @@ export function ProfileCompleteness() {
 
       const headers = { Authorization: `Bearer ${token}` };
 
-      // Fire all three checks at once so the page loads in one round-trip
-      // rather than three sequential requests.
       const [profileRes, recordsRes, docsRes] = await Promise.allSettled([
         fetch(`${apiUrl}/profile`, { headers }),
         fetch(`${apiUrl}/academic-records`, { headers }),
         fetch(`${apiUrl}/documents`, { headers }),
       ]);
 
-      // ── Profile ──────────────────────────────────────────────────────────
-      // A 404 specifically means the student hasn't set up their profile yet.
-      // Redirect them to the setup flow so they can't skip it.
-      // Any other non-OK status (500, 401, etc.) is treated as incomplete
-      // rather than triggering a redirect — we don't want a server error to
-      // bounce the student off the dashboard when they do have a profile.
+      // 404 on profile means setup hasn't been done — bounce to the flow.
       if (
         profileRes.status === "fulfilled" &&
         profileRes.value.status === 404
@@ -179,16 +264,9 @@ export function ProfileCompleteness() {
 
       const profileComplete =
         profileRes.status === "fulfilled" && profileRes.value.ok;
-
-      // ── Academic records ─────────────────────────────────────────────────
-      // Any 2xx response means records exist and are complete.
       const recordsComplete =
         recordsRes.status === "fulfilled" && recordsRes.value.ok;
 
-      // ── Documents ────────────────────────────────────────────────────────
-      // Count how many of the three required document types are present.
-      // This powers both the complete/incomplete status and the partial
-      // progress description ("2 of 3 documents uploaded").
       let documentsUploaded = 0;
       if (docsRes.status === "fulfilled" && docsRes.value.ok) {
         const docs = (await docsRes.value.json()) as Array<{ type: string }>;
@@ -211,28 +289,34 @@ export function ProfileCompleteness() {
     checkCompleteness();
   }, [apiUrl, router]);
 
-  // Show skeleton cards while any section is still loading.
+  // Show skeleton scaffold while any section is still loading.
   const isLoading = SECTIONS.some((s) => state[s.key] === "loading");
 
   if (isLoading) {
     return (
-      <div className="space-y-4">
-        <Skeleton className="h-4 w-48" />
-        <div className="space-y-3">
-          <Skeleton className="h-[58px] w-full" />
-          <Skeleton className="h-[58px] w-full" />
-          <Skeleton className="h-[58px] w-full" />
+      <div className="space-y-8">
+        <div className="flex items-center gap-6">
+          <Skeleton className="h-36 w-36 rounded-full" />
+          <div className="flex flex-1 flex-col gap-2">
+            <Skeleton className="h-7 w-3/5" />
+            <Skeleton className="h-4 w-4/5" />
+          </div>
+        </div>
+        <div className="grid gap-4 md:grid-cols-3">
+          <Skeleton className="h-[170px] w-full" />
+          <Skeleton className="h-[170px] w-full" />
+          <Skeleton className="h-[170px] w-full" />
         </div>
       </div>
     );
   }
 
-  // Count complete sections to drive the summary line.
   const completeCount = SECTIONS.filter(
     (s) => state[s.key] === "complete",
   ).length;
+  const allDone = completeCount === SECTIONS.length;
 
-  // Build the documents description based on partial progress.
+  // Documents description varies with partial progress; the others are static.
   const documentsDescription =
     state.documents === "complete"
       ? "All 3 documents uploaded."
@@ -241,27 +325,40 @@ export function ProfileCompleteness() {
         : `${state.documentsUploaded} of 3 documents uploaded.`;
 
   return (
-    <div className="space-y-4">
-      {/* Summary line — updates as the student completes each section */}
-      <p className="text-sm text-muted-foreground">
-        {completeCount === SECTIONS.length ? (
-          "Your profile is complete."
-        ) : (
-          <>
-            <span className="font-medium text-foreground">
-              {completeCount} of {SECTIONS.length}
-            </span>{" "}
-            sections complete. Finish the remaining sections to start applying.
-          </>
-        )}
-      </p>
+    <div className="space-y-8">
+      {/* Header — completeness ring + summary copy */}
+      <div className="flex flex-col items-start gap-6 md:flex-row md:items-center md:gap-8">
+        <CompletenessRing complete={completeCount} total={SECTIONS.length} />
+        <div className="space-y-2">
+          <h2 className="font-display text-3xl leading-tight tracking-tight text-foreground md:text-4xl">
+            {allDone ? (
+              <>
+                You&rsquo;re ready to{" "}
+                <span className="text-primary">apply.</span>
+              </>
+            ) : (
+              <>
+                You&rsquo;re{" "}
+                <span className="text-primary">
+                  {Math.round((completeCount / SECTIONS.length) * 100)}%
+                </span>{" "}
+                there.
+              </>
+            )}
+          </h2>
+          <p className="max-w-md text-sm leading-relaxed text-muted-foreground md:text-base">
+            {allDone
+              ? "Your profile is complete. Pick the universities you want and we'll handle the rest."
+              : "Finish the remaining sections so we can match you with universities and start applying on your behalf."}
+          </p>
+        </div>
+      </div>
 
-      {/* One card per section — rendered from SECTIONS so label/href stay
-       * in one place. Documents gets a dynamic description based on partial
-       * progress; the other two sections use the static description from SECTIONS. */}
-      <div className="space-y-3">
+      {/* Section cards — three differentiated cards rather than identical
+       * bordered rows. Hover lift on incomplete cards reinforces the CTA. */}
+      <div className="grid gap-4 md:grid-cols-3">
         {SECTIONS.map((section) => (
-          <SectionItem
+          <SectionCard
             key={section.key}
             label={section.label}
             description={
@@ -270,6 +367,7 @@ export function ProfileCompleteness() {
                 : section.description
             }
             href={section.href}
+            icon={section.icon}
             status={state[section.key] as Exclude<SectionStatus, "loading">}
           />
         ))}

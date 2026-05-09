@@ -11,6 +11,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { Alert } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   GENDER_LABELS,
@@ -109,13 +110,7 @@ export function ProfileOverview() {
   }
 
   if (error) {
-    return (
-      <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4">
-        <p role="alert" className="text-sm text-destructive">
-          {error}
-        </p>
-      </div>
-    );
+    return <Alert tone="destructive">{error}</Alert>;
   }
 
   if (!profile) return null;

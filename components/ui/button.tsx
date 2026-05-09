@@ -1,15 +1,20 @@
-// Button — primary interactive element used across auth screens and forms.
+// Button — primary interactive element used across the app.
 //
 // Variants:
-//   primary — solid indigo background, cream text. Main call-to-action.
-//   ghost   — transparent with a border. Secondary / alternative actions.
+//   primary   — solid cobalt background, cream text. The default brand action.
+//   accent    — solid coral with a popped shadow. Reserved for the single
+//               most important action on the page (the marketing CTA, the
+//               "Submit applications" button). Carries a subtle hover lift.
+//   secondary — cream surface with a navy border and label. Use when both
+//               actions are equally weighted.
+//   ghost     — transparent with a hairline border. Tertiary actions.
 //
-// The `loading` prop disables the button and shows a spinning indicator
-// while an async operation (e.g. a Supabase auth call) is in flight.
+// `loading` disables the button and shows a spinner.
+// `fullWidth` makes the button span its container — useful in stacked forms.
 import { cn } from "@/lib/utils/cn";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "ghost";
+  variant?: "primary" | "accent" | "secondary" | "ghost";
   loading?: boolean;
   fullWidth?: boolean;
 }
@@ -27,14 +32,29 @@ export function Button({
     <button
       disabled={disabled || loading}
       className={cn(
-        // Base — shared across all variants
-        "inline-flex items-center justify-center gap-2 rounded-full px-6 py-2.5 text-sm font-medium transition-colors",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+        // Shared base — every variant inherits these utilities.
+        "inline-flex cursor-pointer items-center justify-center gap-2 rounded-full px-6 py-2.5 text-sm font-medium transition-all duration-200",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         "disabled:pointer-events-none disabled:opacity-50",
+
+        // primary — solid cobalt. Subtle vertical lift on hover.
         variant === "primary" &&
-          "bg-primary text-primary-foreground hover:bg-primary/90",
-        variant === "ghost" &&
-          "border border-border text-foreground hover:bg-muted",
+          "bg-primary text-primary-foreground shadow-[var(--shadow-soft)] hover:-translate-y-0.5 hover:bg-primary/95 active:translate-y-0",
+
+        // accent — navy CTA with shadow-pop. Tiny rotate on hover signals
+        // hand-applied/playful intent. A diagonal shimmer sweep runs every
+        // few seconds via the ::after pseudo so the button reads "alive"
+        // even when idle. motion-reduce strips the shimmer.
+        variant === "accent" &&
+          "relative overflow-hidden bg-accent text-accent-foreground shadow-[var(--shadow-pop)] hover:-translate-y-0.5 hover:[transform:translateY(-2px)_rotate(-0.5deg)] active:[transform:translateY(0)_rotate(0)] after:pointer-events-none after:absolute after:inset-0 after:bg-[linear-gradient(120deg,transparent_35%,rgba(255,255,255,0.35)_50%,transparent_65%)] after:[animation:shimmer_4.5s_ease-in-out_infinite] after:[animation-delay:1.2s] motion-reduce:after:hidden",
+
+        // secondary — cream-on-navy outline. Reads as "another good option".
+        variant === "secondary" &&
+          "border border-foreground/15 bg-background text-foreground shadow-[var(--shadow-paper)] hover:border-foreground/30 hover:bg-muted",
+
+        // ghost — minimal, lets surrounding content breathe.
+        variant === "ghost" && "text-foreground hover:bg-muted",
+
         fullWidth && "w-full",
         className,
       )}

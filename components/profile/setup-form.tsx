@@ -25,6 +25,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCircle2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
@@ -487,11 +488,7 @@ export function ProfileSetupForm() {
       {/* API-level error (session expired, network failure, server 4xx/5xx).
        * role="alert" makes screen readers announce it when it appears.
        * Shown below the fields and above the navigation buttons. */}
-      {apiError && (
-        <p role="alert" className="text-sm text-destructive">
-          {apiError}
-        </p>
-      )}
+      {apiError && <Alert tone="destructive">{apiError}</Alert>}
 
       {/* Navigation — Back only appears on steps 2 and 3.
        * Clicking Back clears any API error from the previous attempt so it

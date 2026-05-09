@@ -4,6 +4,10 @@
 // Mobile: fixed drawer that slides in from the left when the user taps
 //         the hamburger. A translucent backdrop covers the rest of the screen.
 //
+// Active-state design: soft sky tint background + cobalt text + a small
+// left-edge bar. Quieter than a fully-filled cobalt button and lets the
+// icon read as cobalt rather than fighting the fill colour.
+//
 // To add a new nav section, append an entry to NAV_ITEMS below.
 "use client";
 
@@ -18,6 +22,7 @@ import {
   X,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { Sprout } from "@/components/ui/motifs";
 import { cn } from "@/lib/utils/cn";
 
 interface SidebarProps {
@@ -105,17 +110,28 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 onClick={onClose}
                 aria-current={isActive ? "page" : undefined}
                 className={cn(
-                  "group flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
+                  "group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
                   isActive
-                    ? "bg-primary text-primary-foreground"
-                    : "text-foreground hover:bg-muted",
+                    ? "bg-primary/10 font-medium text-primary"
+                    : "text-foreground hover:bg-muted hover:text-primary",
                 )}
               >
+                {/* Active indicator — small cobalt bar pinned to the left edge
+                 * of the link so the navigation reads top-to-bottom even on a
+                 * scan. Hidden when inactive. */}
+                {isActive && (
+                  <span
+                    aria-hidden
+                    className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-primary"
+                  />
+                )}
                 <Icon
                   size={18}
                   className={cn(
-                    "shrink-0",
-                    isActive ? "text-accent" : "text-muted-foreground",
+                    "shrink-0 transition-colors",
+                    isActive
+                      ? "text-primary"
+                      : "text-muted-foreground group-hover:text-primary",
                   )}
                 />
                 <span className="truncate">{item.label}</span>
@@ -127,8 +143,9 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         {/* Footer hint — gives the sidebar visual closure and reinforces the
          * editorial tone. Small, muted, non-interactive. */}
         <div className="mt-auto border-t border-border p-4 text-xs leading-relaxed text-muted-foreground">
-          <p className="font-display text-sm text-foreground">
-            One application.
+          <p className="flex items-center gap-1.5 font-display text-sm text-foreground">
+            One application
+            <Sprout className="h-3.5 w-3.5 text-primary" />
           </p>
           <p>Every university.</p>
         </div>

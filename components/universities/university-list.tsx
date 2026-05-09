@@ -1,17 +1,21 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import { Search } from "lucide-react";
 import { apiClient, ApiError } from "@/lib/api/client";
 import type { components } from "@/lib/api/schema";
 import { useSelection } from "@/lib/state/selection";
 import { UniversityCard } from "./university-card";
+import { Alert } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
 type University = components["schemas"]["University"];
 
 function UniversityCardSkeleton() {
   return (
-    <div className="flex flex-col gap-4 rounded-lg border border-border p-5">
+    <div className="flex flex-col gap-4 rounded-xl border border-border p-5">
       <div className="flex items-start justify-between gap-3">
         <Skeleton className="h-4 w-3/4" />
         <Skeleton className="h-5 w-16 rounded-full" />
@@ -78,44 +82,54 @@ export function UniversityList({ initialUniversities }: UniversityListProps) {
 
   return (
     <div className="space-y-6">
-      <input
-        type="search"
-        aria-label="Search universities"
-        placeholder="Search universities…"
-        value={query}
-        onChange={handleQueryChange}
-        className="h-10 w-full max-w-sm rounded-lg border border-border bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground transition-colors focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20"
-      />
+      {/* Search field with a leading icon — the icon is purely decorative,
+       * the native search input handles its own clear/submit affordances. */}
+      <div className="relative max-w-sm">
+        <Search
+          size={16}
+          aria-hidden
+          className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+        />
+        <input
+          type="search"
+          aria-label="Search universities"
+          placeholder="Search universities…"
+          value={query}
+          onChange={handleQueryChange}
+          className="h-11 w-full rounded-lg border border-border bg-background pl-10 pr-3.5 text-sm text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_1px_0_rgba(13,26,61,0.04)] placeholder:text-muted-foreground transition-colors focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/25"
+        />
+      </div>
 
       {error && !searching && (
-        <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4">
-          <p role="alert" className="text-sm text-destructive">
-            {error}
-          </p>
-          <button
-            type="button"
-            onClick={() => fetchUniversities(query)}
-            className="mt-2 text-sm font-medium text-destructive underline underline-offset-2 hover:no-underline"
-          >
-            Try again
-          </button>
-        </div>
+        <Alert tone="destructive">
+          <div className="flex flex-col gap-2">
+            <span>{error}</span>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => fetchUniversities(query)}
+              className="self-start px-0 text-destructive hover:bg-transparent hover:text-destructive/80"
+            >
+              Try again
+            </Button>
+          </div>
+        </Alert>
       )}
 
       {searching ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 3 }).map((_, i) => (
+          {Array.from({ length: 6 }).map((_, i) => (
             <UniversityCardSkeleton key={i} />
           ))}
         </div>
       ) : universities.length === 0 ? (
-        <div className="rounded-lg border border-border p-8 text-center">
+        <Card variant="paper" className="p-8 text-center">
           <p className="text-sm text-muted-foreground">
             {query.trim()
               ? `No universities match “${query}”. Try a different search.`
               : "No universities are available right now."}
           </p>
-        </div>
+        </Card>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {universities.map((u) => (

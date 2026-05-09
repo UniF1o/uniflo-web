@@ -30,12 +30,15 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           aria-describedby={error ? `${id}-error` : undefined}
           aria-invalid={error ? true : undefined}
           className={cn(
-            "h-10 w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground",
+            "h-11 w-full rounded-lg border border-border bg-background px-3.5 text-sm text-foreground",
+            // Soft inset highlight at the top so the field reads as a real
+            // pressed-into-paper surface, not stamped flat onto cream.
+            "shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_1px_0_rgba(13,26,61,0.04)]",
             "placeholder:text-muted-foreground",
-            "transition-colors focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20",
+            "transition-colors focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/25",
             // Switch to destructive palette when there is a validation error.
             error &&
-              "border-destructive focus:border-destructive focus:ring-destructive/20",
+              "border-destructive focus:border-destructive focus:ring-destructive/25",
             className,
           )}
           {...props}

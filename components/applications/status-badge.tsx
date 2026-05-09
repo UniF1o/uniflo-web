@@ -1,37 +1,34 @@
+// StatusBadge — thin wrapper around the token-driven `Badge` for application
+// status pills. Maps the four status values from the OpenAPI schema onto a
+// `tone` + `label` pair so callers don't have to remember the mapping.
+import { Badge } from "@/components/ui/badge";
 import type { components } from "@/lib/api/schema";
-import { cn } from "@/lib/utils/cn";
 
 type ApplicationStatus = components["schemas"]["ApplicationStatus"];
+type BadgeTone = "info" | "success" | "warning" | "destructive" | "neutral";
 
-const BADGE: Record<ApplicationStatus, { label: string; className: string }> = {
-  pending: {
-    label: "Queued",
-    className: "bg-muted text-muted-foreground",
-  },
-  processing: {
-    label: "Submitting…",
-    className: "bg-blue-100 text-blue-700",
-  },
-  submitted: {
-    label: "Submitted",
-    className: "bg-emerald-50 text-emerald-600",
-  },
-  failed: {
-    label: "Failed",
-    className: "bg-destructive/10 text-destructive",
-  },
+const STATUS_MAP: Record<
+  ApplicationStatus,
+  { label: string; tone: BadgeTone; dot: boolean }
+> = {
+  // Queued — not yet picked up by the worker. Neutral so it doesn't claim
+  // urgency, no dot since "nothing's happening yet".
+  pending: { label: "Queued", tone: "neutral", dot: false },
+  // Submitting — the worker is actively driving the university portal.
+  // Info tone (cobalt) + dot signals motion.
+  processing: { label: "Submitting…", tone: "info", dot: true },
+  // Submitted — the happy path. Success tone + dot for the "done" feel.
+  submitted: { label: "Submitted", tone: "success", dot: true },
+  // Failed — needs the user's attention. Destructive tone, no dot (the
+  // colour itself does the work; a dot here feels celebratory).
+  failed: { label: "Failed", tone: "destructive", dot: false },
 };
 
 export function StatusBadge({ status }: { status: ApplicationStatus }) {
-  const { label, className } = BADGE[status];
+  const { label, tone, dot } = STATUS_MAP[status];
   return (
-    <span
-      className={cn(
-        "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium",
-        className,
-      )}
-    >
+    <Badge tone={tone} dot={dot}>
       {label}
-    </span>
+    </Badge>
   );
 }
