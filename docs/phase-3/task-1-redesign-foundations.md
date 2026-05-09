@@ -211,6 +211,57 @@ sparkle, squiggles, brand sprout, "and counting" caption). Marquee
 animating mid-frame visible (UCT entering, Wits leaving). Reveal data
 attributes flip from `hidden` → `shown` as sections come into view.
 
+## Iteration 2 — auth + post-login pages
+
+Iteration 2 brought every authenticated and auth screen onto the new identity.
+Landed as seven focused commits on `feature/redesign`, no PR opened in between.
+
+- **2A — auth screens** (`eb27c04`). Auth layout gains the same atmospheric
+  bloom as the landing page; login / signup / forgot-password forms moved
+  into elevated `Card` wrappers with tightened headlines, and a new
+  `components/ui/alert.tsx` standardises tonal callouts (destructive /
+  info / success / warning) for inline form errors. Signup gains a
+  three-bullet benefits checklist; success states wear a `<DotCluster>`.
+- **2B — AppShell** (`f9c09ef`). Sidebar's heavy "fill the link cobalt"
+  active state replaced with a soft-tint background, a left-edge bar
+  indicator, and `text-primary` icons on hover. UserMenu avatar grew
+  slightly and gained the paper shadow; dropdown moves to `--shadow-soft`
+  + `rounded-xl`. Navbar picks up the landing's `supports-[backdrop-filter]`
+  fallback.
+- **2C — dashboard** (`d7ba50b`). `ProfileCompleteness` rebuilt around an
+  SVG completeness ring (animated stroke-dashoffset) plus three
+  differentiated `SectionCard`s with section-specific Lucide icons inside
+  tinted discs. Complete cards switch to a soft success tint with a tiny
+  pip; incomplete cards lift on hover. The page header gains an info
+  Badge eyebrow and a tinted summary card for the applications block.
+- **2D — applications** (`343065b`). `StatusBadge` is now a thin wrapper
+  over the token-driven `Badge` (info dot / success dot / neutral /
+  destructive). `ApplicationList` rows became per-row `Card` Links with a
+  hover lift and a nudge-on-hover "View" arrow. `ApplicationDetail`
+  switched its `<dl>` blocks to `Card variant="paper" as="dl"` with
+  hairline border-bs and uppercase tracking eyebrows.
+- **2E — universities + selection** (`7e4946d`). `UniversityCard` rebuilt
+  on `Card` with hover lift, soft sky tint + ring when selected, and the
+  Select button toggles between `secondary` and `primary` (cobalt) with a
+  leading check icon. `SelectionBar` got a cobalt counter pill in the
+  display serif and an accent-variant Continue CTA. Search input gained
+  a leading icon and the inset-shadow paper feel.
+- **2F — forms** (`b4f944f`). Profile setup, academic records, and the
+  profile overview switched their API/page-level errors to the new
+  `Alert` component for visual consistency with the auth flows.
+- **2G — shared shells** (this commit). `app/(app)/loading.tsx` skeleton
+  reshaped to mirror the redesigned dashboard (hero ring + 3-card grid)
+  so hydration shifts less. New `app/(app)/error.tsx` boundary with a
+  feature-card recovery screen + DotCluster motif and a "Try again" /
+  "Back to dashboard" CTA pair.
+
+After iteration 2, all surfaces in the app share the cobalt + deep navy +
+cream identity, the motif system, the token-driven Badge / Alert /
+Button / Card primitives, and the same scroll-reveal + marquee energy
+introduced on the landing page.
+
+A single consolidated PR against `main` is the next step.
+
 ## What the next iteration must do
 
 - Auth screens (`/login`, `/signup`, `/forgot-password`) — apply motifs and
