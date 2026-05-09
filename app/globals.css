@@ -15,15 +15,18 @@
 @theme {
   /* ── Colors ──────────────────────────────────────────────────────────── */
   --color-background: #fbf6ec; /* cream paper — warmer than office white */
-  --color-foreground: #0d1a3d; /* deep navy ink (~16:1 on background) */
+  --color-foreground: #14182b; /* charcoal-blue ink, kept clearly distinct
+                                * from the navy accent below (~15:1 on bg) */
   --color-muted: #ede2cd; /* warm sand for muted surfaces */
-  --color-muted-foreground: #5a5b66; /* low-emphasis text */
+  --color-muted-foreground: #4f5163; /* low-emphasis text */
   --color-border: #d8d0bd; /* hairline border on cream */
-  --color-primary: #1f4ed8; /* cobalt — the brand colour */
+  --color-primary: #1f4ed8; /* cobalt — the brand colour, used for active
+                             * states, links, focus rings */
   --color-primary-foreground: #fbf6ec; /* cream on cobalt */
-  --color-accent: #b8421f; /* deep burnt sienna — heavier than coral for
-                            * stronger contrast against the cream surface */
-  --color-accent-foreground: #fbf6ec; /* cream-on-burnt-sienna ~5.2:1 — AA */
+  --color-accent: #0a2540; /* deep navy — the weighted accent.
+                            * Cream-on-navy clears AA at ~14:1, so CTAs read
+                            * confident without losing the warmth of cream. */
+  --color-accent-foreground: #fbf6ec;
   --color-soft: #e3ebff; /* pale sky tint — badges, illustration washes */
   --color-success: #25664a; /* darkened from #2f7a55 to clear AA on cream */
   --color-warning: #8a5d10; /* darkened from #c98a1d to clear AA on cream */
@@ -48,10 +51,12 @@
    * `--shadow-soft` is the default lift for layered cards.
    * `--shadow-pop` is reserved for the coral accent button so it broadcasts
    * its importance without us needing to size it up.                      */
-  --shadow-soft: 0 8px 24px -12px rgba(13, 26, 61, 0.18);
-  --shadow-pop: 0 12px 36px -10px rgba(184, 66, 31, 0.45);
+  --shadow-soft: 0 8px 24px -12px rgba(20, 24, 43, 0.18);
+  /* Cobalt halo behind the accent CTA — the primary illuminating from
+   * underneath the navy button. Ties primary and accent together visually. */
+  --shadow-pop: 0 12px 38px -10px rgba(31, 78, 216, 0.4);
   --shadow-paper:
-    0 1px 0 rgba(13, 26, 61, 0.04), 0 1px 2px rgba(13, 26, 61, 0.06);
+    0 1px 0 rgba(20, 24, 43, 0.04), 0 1px 2px rgba(20, 24, 43, 0.06);
 }
 
 /* Right-to-left marquee track. The component duplicates its children so

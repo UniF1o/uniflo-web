@@ -17,7 +17,7 @@ export function BrandMark({ href = "/" }: { href?: string }) {
       aria-label="Uniflo home"
     >
       <span>Uniflo</span>
-      <Sprout className="h-4 w-4 translate-y-[0.05em] text-accent transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110" />
+      <Sprout className="h-4 w-4 translate-y-[0.05em] text-primary transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110" />
     </Link>
   );
 }

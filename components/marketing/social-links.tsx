@@ -33,7 +33,7 @@ export function SocialLinks() {
             target="_blank"
             rel="noreferrer"
             aria-label={`Uniflo on ${label}`}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:border-accent hover:bg-accent/10 hover:text-accent"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:border-primary hover:bg-primary/10 hover:text-primary"
           >
             <Icon size={18} className="shrink-0" />
           </a>

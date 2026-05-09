@@ -34,7 +34,7 @@ export function TestimonialCard({
       {/* Big editorial quote glyph — purely decorative. */}
       <span
         aria-hidden
-        className="font-display text-5xl leading-none text-accent/70"
+        className="font-display text-5xl leading-none text-primary/70"
       >
         “
       </span>

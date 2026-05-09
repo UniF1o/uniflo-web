@@ -49,13 +49,13 @@ export function DashboardMockup() {
 
       {/* Decorative dot scatter — sits just outside the upper-left corner
        * to break the rectangle. */}
-      <DotCluster className="absolute -left-6 -top-6 h-8 w-12 text-accent" />
+      <DotCluster className="absolute -left-6 -top-6 h-8 w-12 text-primary" />
 
       {/* Submitted stamp — overlapping the top-right corner. The rotation
        * sells the hand-applied feel. */}
       <Sticker
         label="Submitted"
-        className="absolute -right-8 -top-10 h-24 w-24 rotate-12 text-accent drop-shadow-sm"
+        className="absolute -right-8 -top-10 h-24 w-24 rotate-12 text-primary drop-shadow-sm"
       />
 
       <div className="rotate-[1.2deg] rounded-2xl border border-foreground/10 bg-background p-5 shadow-[var(--shadow-soft)]">

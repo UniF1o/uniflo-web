@@ -44,15 +44,16 @@ export default function Home() {
 
   return (
     <div className="relative flex min-h-dvh flex-col overflow-hidden">
-      {/* Atmospheric washes — burnt-sienna bloom top-right, cobalt haze on
-       * the lower right so wide viewports never read as blank cream. */}
+      {/* Atmospheric washes — pale sky bloom top-right and a deeper cobalt
+       * haze lower down. Replaces the warm coral wash now that the brand is
+       * fully blue-led; the soft tint keeps the corner from reading flat. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[80vh] bg-[radial-gradient(ellipse_70%_60%_at_85%_5%,_var(--color-accent)_0%,_transparent_55%)] opacity-25"
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[80vh] bg-[radial-gradient(ellipse_70%_60%_at_85%_5%,_var(--color-soft)_0%,_transparent_60%)]"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[120vh] bg-[radial-gradient(ellipse_55%_50%_at_92%_50%,_var(--color-primary)_0%,_transparent_65%)] opacity-[0.07]"
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[120vh] bg-[radial-gradient(ellipse_55%_50%_at_92%_50%,_var(--color-primary)_0%,_transparent_65%)] opacity-[0.08]"
       />
 
       {/* ── Sticky header ────────────────────────────────────────────── */}
@@ -87,13 +88,13 @@ export default function Home() {
             <h1 className="font-display text-5xl leading-[0.98] tracking-tight text-foreground md:text-7xl">
               Apply to every university.{" "}
               <span className="relative inline-block">
-                <span className="text-accent">In one go.</span>
+                <span className="text-primary">In one go.</span>
                 {/* Hand-script accent floating above the headline word —
                  * tilts away from the reading line so it feels like a
                  * margin note rather than copy. */}
                 <span
                   aria-hidden
-                  className="absolute -right-4 -top-6 hidden font-script text-2xl text-accent/80 [transform:rotate(-8deg)] md:block"
+                  className="absolute -right-4 -top-6 hidden font-script text-2xl text-primary/80 [transform:rotate(-8deg)] md:block"
                 >
                   you got this
                 </span>
@@ -120,7 +121,7 @@ export default function Home() {
 
             {/* Tiny trust line under the CTAs — concrete, scannable. */}
             <p className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Sparkles size={14} aria-hidden className="text-accent" />
+              <Sparkles size={14} aria-hidden className="text-primary" />
               No card needed. Free to start.
             </p>
           </Reveal>
@@ -163,7 +164,7 @@ export default function Home() {
          * the most recognisable handful as a moving banner. The marquee
          * pauses on hover so a curious user can read a card. */}
         <section className="py-16 md:py-24">
-          <Reveal>
+          <Reveal from="left">
             <div className="mx-auto max-w-6xl px-6 md:px-10">
               <SectionHeading
                 eyebrow="Top universities"
@@ -174,7 +175,7 @@ export default function Home() {
             </div>
           </Reveal>
 
-          <Reveal delayMs={120} className="mt-10">
+          <Reveal from="right" delayMs={150} className="mt-10">
             {/* Full-bleed: the marquee escapes the inner container so the
              * track has room to scroll edge-to-edge on desktop. */}
             <Marquee speed="medium">
@@ -189,7 +190,7 @@ export default function Home() {
         <section className="relative mx-auto max-w-6xl px-6 py-20 md:px-10 md:py-28">
           <DotCluster
             aria-hidden
-            className="absolute right-4 top-12 hidden h-10 w-16 text-accent/70 md:block"
+            className="absolute right-4 top-12 hidden h-10 w-16 text-primary/70 md:block"
           />
 
           <Reveal>
@@ -202,7 +203,7 @@ export default function Home() {
           </Reveal>
 
           <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-3 md:gap-6">
-            <Reveal delayMs={0}>
+            <Reveal delayMs={0} scale>
               <TestimonialCard
                 badge="Accepted to UCT"
                 initials="LM"
@@ -211,7 +212,7 @@ export default function Home() {
                 quote="I almost gave up halfway through filling forms for the third time. Uniflo did the boring part. I just had to read and tick. UCT confirmed two weeks later."
               />
             </Reveal>
-            <Reveal delayMs={120}>
+            <Reveal delayMs={140} scale>
               <TestimonialCard
                 badge="Bursary + Wits"
                 initials="TS"
@@ -220,7 +221,7 @@ export default function Home() {
                 quote="My mom couldn't believe how quick it was. Three universities applied to in one evening, and I got to check every form before it went out."
               />
             </Reveal>
-            <Reveal delayMs={240}>
+            <Reveal delayMs={280} scale>
               <TestimonialCard
                 badge="Accepted at NMU"
                 initials="JV"
@@ -235,7 +236,7 @@ export default function Home() {
         {/* ── FAQ ────────────────────────────────────────────────────── */}
         <section className="mx-auto max-w-6xl px-6 py-20 md:px-10 md:py-28">
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_1.4fr]">
-            <Reveal>
+            <Reveal from="left">
               <SectionHeading
                 eyebrow="Common questions"
                 title="The stuff your matric WhatsApp group keeps asking."
@@ -244,7 +245,7 @@ export default function Home() {
               />
             </Reveal>
 
-            <Reveal delayMs={120} className="lg:pt-2">
+            <Reveal from="right" delayMs={150} className="lg:pt-2">
               <FAQItem
                 defaultOpen
                 question="Does Uniflo pay my application fees?"
@@ -310,17 +311,17 @@ export default function Home() {
 
         {/* ── Closing CTA ────────────────────────────────────────────── */}
         <section className="mx-auto max-w-6xl px-6 py-16 md:px-10 md:py-24">
-          <Reveal>
+          <Reveal scale>
             <Card
               variant="feature"
               className="relative overflow-hidden p-8 md:p-12"
             >
               <DotCluster
                 aria-hidden
-                className="absolute right-8 top-8 h-10 w-16 text-accent/70"
+                className="absolute right-8 top-8 h-10 w-16 text-primary/70"
               />
               <div className="flex flex-col items-start gap-6 md:max-w-2xl">
-                <span className="font-script text-2xl text-accent">
+                <span className="font-script text-2xl text-primary">
                   ready when you are
                 </span>
                 <h2 className="font-display text-4xl leading-[1.05] tracking-tight text-foreground md:text-6xl">
@@ -368,7 +369,7 @@ export default function Home() {
                 <li key={link.label}>
                   <Link
                     href={link.href}
-                    className="text-foreground transition-colors hover:text-accent"
+                    className="text-foreground transition-colors hover:text-primary"
                   >
                     {link.label}
                   </Link>
@@ -385,7 +386,7 @@ export default function Home() {
               <li>
                 <a
                   href="mailto:hello@uniflo.app"
-                  className="text-foreground transition-colors hover:text-accent"
+                  className="text-foreground transition-colors hover:text-primary"
                 >
                   hello@uniflo.app
                 </a>
@@ -402,7 +403,7 @@ export default function Home() {
             <p>© {year} Uniflo. Apply smarter.</p>
             <span className="inline-flex items-center gap-2">
               Made for SA matrics
-              <Sprout className="h-4 w-4 text-accent" />
+              <Sprout className="h-4 w-4 text-primary" />
             </span>
           </div>
         </div>

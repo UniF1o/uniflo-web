@@ -53,10 +53,10 @@ export function SectionHeading({
           <>
             {parts[0]}
             <span className="relative inline-block">
-              <span className="text-accent">{accentText}</span>
+              <span className="text-primary">{accentText}</span>
               {/* Squiggle sits below the baseline so it reads as an
                * underline scribble, not a strikethrough. */}
-              <Squiggle className="pointer-events-none absolute -bottom-2 left-0 h-3 w-full text-accent" />
+              <Squiggle className="pointer-events-none absolute -bottom-2 left-0 h-3 w-full text-primary" />
             </span>
             {parts.slice(1).join(accentText)}
           </>

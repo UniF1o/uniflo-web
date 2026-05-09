@@ -29,7 +29,7 @@ export function Stat({ value, label, note, className, ...props }: StatProps) {
       <span className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
         {label}
       </span>
-      {note && <span className="font-script text-lg text-accent">{note}</span>}
+      {note && <span className="font-script text-lg text-primary">{note}</span>}
     </div>
   );
 }
