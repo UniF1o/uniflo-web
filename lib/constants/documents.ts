@@ -1,13 +1,13 @@
 export const REQUIRED_DOC_TYPES = [
-  "id_document",
-  "matric_results",
-  "transcripts",
+  "ID_COPY",
+  "MATRIC_RESULTS",
+  "TRANSCRIPT",
 ] as const;
 
 export type RequiredDocType = (typeof REQUIRED_DOC_TYPES)[number];
 
 export const DOC_LABELS: Record<RequiredDocType, string> = {
-  id_document: "ID Document",
-  matric_results: "Matric Results",
-  transcripts: "Transcripts",
+  ID_COPY: "ID Document",
+  MATRIC_RESULTS: "Matric Results",
+  TRANSCRIPT: "Transcripts",
 };

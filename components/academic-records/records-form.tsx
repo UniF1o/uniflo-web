@@ -29,8 +29,6 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { NSC_SUBJECTS } from "@/lib/constants/nsc-subjects";
 import { cn } from "@/lib/utils/cn";
-import type { components } from "@/lib/api/schema";
-
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 // Represents one row in the subject list while the form is being filled in.
@@ -43,7 +41,16 @@ type SubjectRow = {
   mark: string; // Raw input value, e.g. "78" or "". Parsed on submit.
 };
 
-type AcademicRecordsPayload = components["schemas"]["AcademicRecordCreate"];
+// Local type — academic-records endpoint is not yet in the backend spec.
+type AcademicRecordsPayload = {
+  institution: string;
+  year: number;
+  aggregate: number;
+  subjects: (
+    | { name: string; mark: number }
+    | { name: "Other"; custom_name: string; mark: number }
+  )[];
+};
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 

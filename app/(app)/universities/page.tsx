@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   title: "Universities",
 };
 
-type University = components["schemas"]["University"];
+type University = components["schemas"]["UniversityRead"];
 
 async function fetchInitialUniversities(token: string): Promise<University[]> {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;

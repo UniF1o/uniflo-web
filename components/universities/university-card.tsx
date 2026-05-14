@@ -7,10 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils/cn";
 
-type University = components["schemas"]["University"];
+type University = components["schemas"]["UniversityRead"];
 
 function getStatus(u: University): "open" | "upcoming" | "closed" {
   if (!u.is_active) return "closed";
+  if (!u.open_date || !u.close_date) return "closed";
   const now = Date.now();
   const open = new Date(u.open_date).getTime();
   const close = new Date(u.close_date).getTime();
@@ -19,7 +20,11 @@ function getStatus(u: University): "open" | "upcoming" | "closed" {
   return "open";
 }
 
-function formatDateRange(open: string, close: string): string {
+function formatDateRange(
+  open: string | null | undefined,
+  close: string | null | undefined,
+): string {
+  if (!open || !close) return "Dates not available";
   const fmt = (d: string) =>
     new Intl.DateTimeFormat("en-ZA", {
       day: "numeric",
@@ -28,7 +33,8 @@ function formatDateRange(open: string, close: string): string {
   return `${fmt(open)} – ${fmt(close)}`;
 }
 
-function daysUntil(dateStr: string): number {
+function daysUntil(dateStr: string | null | undefined): number {
+  if (!dateStr) return 0;
   return Math.ceil((new Date(dateStr).getTime() - Date.now()) / 86400000);
 }
 

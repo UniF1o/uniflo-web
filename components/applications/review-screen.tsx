@@ -15,9 +15,8 @@ import { formatDate } from "@/lib/utils/format";
 import { REQUIRED_DOC_TYPES, DOC_LABELS } from "@/lib/constants/documents";
 import type { components } from "@/lib/api/schema";
 
-type ProfileResponse = components["schemas"]["ProfileResponse"];
-type AcademicRecord = components["schemas"]["AcademicRecord"];
-type Document = components["schemas"]["Document"];
+type StudentProfileResponse = components["schemas"]["StudentProfileResponse"];
+type DocumentResponse = components["schemas"]["DocumentResponse"];
 
 const REQUIRED_PROFILE_FIELDS = [
   "first_name",
@@ -34,9 +33,8 @@ const REQUIRED_PROFILE_FIELDS = [
 type SubmitStatus = "idle" | "submitting" | "success" | "error";
 
 export interface ReviewScreenProps {
-  profile: ProfileResponse | null;
-  academicRecords: AcademicRecord[] | null;
-  documents: Document[] | null;
+  profile: StudentProfileResponse | null;
+  documents: DocumentResponse[] | null;
 }
 
 function ReviewSection({
@@ -81,11 +79,7 @@ function InlineAlert({
   );
 }
 
-export function ReviewScreen({
-  profile,
-  academicRecords,
-  documents,
-}: ReviewScreenProps) {
+export function ReviewScreen({ profile, documents }: ReviewScreenProps) {
   const router = useRouter();
   const { entries, clear } = useSelection();
 
@@ -111,9 +105,9 @@ export function ReviewScreen({
 
   const profileComplete =
     !!profile &&
-    REQUIRED_PROFILE_FIELDS.every((f) => !!profile[f as keyof ProfileResponse]);
-
-  const recordsOk = academicRecords !== null && academicRecords.length > 0;
+    REQUIRED_PROFILE_FIELDS.every(
+      (f) => !!profile[f as keyof StudentProfileResponse],
+    );
 
   const uploadedTypes = new Set(documents?.map((d) => d.type) ?? []);
   const docsOk =
@@ -125,8 +119,7 @@ export function ReviewScreen({
   const hasPartialFailure = entries.some(
     (e) => statuses[e.universityId] === "error",
   );
-  const canSubmit =
-    profileComplete && recordsOk && docsOk && consent && !isSubmitting;
+  const canSubmit = profileComplete && docsOk && consent && !isSubmitting;
 
   async function handleSubmit() {
     setIsSubmitting(true);
@@ -258,51 +251,6 @@ export function ReviewScreen({
               </InlineAlert>
             )}
           </>
-        )}
-      </ReviewSection>
-
-      {/* Academic records */}
-      <ReviewSection title="Academic records">
-        {academicRecords === null ? (
-          <InlineAlert>
-            Couldn&apos;t load your academic records. Refresh the page and try
-            again.
-          </InlineAlert>
-        ) : academicRecords.length === 0 ? (
-          <InlineAlert href="/profile/setup" linkLabel="Add your results">
-            No academic records found.
-          </InlineAlert>
-        ) : (
-          <div className="divide-y divide-border rounded-lg border border-border">
-            {academicRecords.map((record) => (
-              <div key={record.id} className="space-y-3 px-5 py-4">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-foreground">
-                    {record.institution}
-                  </p>
-                  <span className="text-xs text-muted-foreground">
-                    {record.year} · Aggregate: {record.aggregate}%
-                  </span>
-                </div>
-                <ul className="flex flex-wrap gap-2">
-                  {record.subjects.map((subject, i) => {
-                    const name =
-                      "custom_name" in subject
-                        ? subject.custom_name
-                        : subject.name;
-                    return (
-                      <li
-                        key={i}
-                        className="rounded-md bg-muted px-2 py-1 text-xs text-foreground"
-                      >
-                        {name}: {subject.mark}%
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            ))}
-          </div>
         )}
       </ReviewSection>
 

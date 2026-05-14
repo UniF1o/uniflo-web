@@ -20,10 +20,10 @@ async function fetchApplicationCounts(
       headers: { Authorization: `Bearer ${token}` },
     });
     if (!res.ok) return null;
-    const data: { items: Array<{ status: string }> } = await res.json();
+    const data: Array<{ status: string }> = await res.json();
     return {
-      total: data.items.length,
-      submitted: data.items.filter((a) => a.status === "submitted").length,
+      total: data.length,
+      submitted: data.filter((a) => a.status === "submitted").length,
     };
   } catch {
     return null;

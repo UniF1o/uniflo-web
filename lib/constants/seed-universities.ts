@@ -1,6 +1,6 @@
 import type { components } from "@/lib/api/schema";
 
-type University = components["schemas"]["University"];
+type University = components["schemas"]["UniversityRead"];
 
 // Placeholder universities for local development and UI testing.
 // Remove once Partner B has seeded real data in the staging environment.

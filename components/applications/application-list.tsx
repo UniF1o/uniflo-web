@@ -11,10 +11,10 @@ import { StatusBadge } from "./status-badge";
 import { cn } from "@/lib/utils/cn";
 import type { components } from "@/lib/api/schema";
 
-type ApplicationWithJob = components["schemas"]["ApplicationWithJob"];
+type ApplicationRead = components["schemas"]["ApplicationRead"];
 
 interface ApplicationListProps {
-  initialItems: ApplicationWithJob[];
+  initialItems: ApplicationRead[];
   // id → name lookup built server-side from GET /universities
   universityNames: Record<string, string>;
 }
@@ -33,7 +33,7 @@ export function ApplicationList({
   initialItems,
   universityNames,
 }: ApplicationListProps) {
-  const [items, setItems] = useState(initialItems);
+  const [items, setItems] = useState<ApplicationRead[]>(initialItems);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [refreshError, setRefreshError] = useState(false);
 
@@ -41,10 +41,8 @@ export function ApplicationList({
     setIsRefreshing(true);
     setRefreshError(false);
     try {
-      const data = await apiClient.get<{ items: ApplicationWithJob[] }>(
-        "/applications",
-      );
-      setItems(data.items);
+      const data = await apiClient.get<ApplicationRead[]>("/applications");
+      setItems(data);
     } catch {
       setRefreshError(true);
     } finally {
@@ -102,7 +100,7 @@ export function ApplicationList({
                       <p className="text-sm font-medium text-foreground">
                         {uniName}
                       </p>
-                      <StatusBadge status={app.status} />
+                      {app.status && <StatusBadge status={app.status} />}
                     </div>
                     <p className="text-xs text-muted-foreground">
                       {app.programme} · {app.application_year}
@@ -110,7 +108,9 @@ export function ApplicationList({
                   </div>
                   <div className="flex shrink-0 items-center gap-4">
                     <span className="text-xs text-muted-foreground">
-                      {formatRelativeTime(app.updated_at)}
+                      {app.updated_at
+                        ? formatRelativeTime(app.updated_at)
+                        : "—"}
                     </span>
                     <span className="inline-flex items-center gap-1 text-xs font-medium text-primary">
                       View

@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
-type University = components["schemas"]["University"];
+type University = components["schemas"]["UniversityRead"];
 
 function UniversityCardSkeleton() {
   return (
@@ -46,7 +46,9 @@ export function UniversityList({ initialUniversities }: UniversityListProps) {
         ? `/universities?q=${encodeURIComponent(q.trim())}`
         : "/universities";
       const data =
-        await apiClient.get<components["schemas"]["UniversityList"]>(path);
+        await apiClient.get<components["schemas"]["UniversitiesListResponse"]>(
+          path,
+        );
       setUniversities(data.items);
     } catch (err) {
       setError(

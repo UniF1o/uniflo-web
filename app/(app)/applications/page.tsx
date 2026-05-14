@@ -6,12 +6,12 @@ import type { components } from "@/lib/api/schema";
 
 export const metadata: Metadata = { title: "Applications" };
 
-type ApplicationWithJob = components["schemas"]["ApplicationWithJob"];
-type University = components["schemas"]["University"];
+type ApplicationRead = components["schemas"]["ApplicationRead"];
+type UniversityRead = components["schemas"]["UniversityRead"];
 
 async function fetchApplications(
   token: string,
-): Promise<ApplicationWithJob[] | null> {
+): Promise<ApplicationRead[] | null> {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   if (!apiUrl) return null;
   try {
@@ -19,14 +19,15 @@ async function fetchApplications(
       headers: { Authorization: `Bearer ${token}` },
     });
     if (!res.ok) return null;
-    const data: { items: ApplicationWithJob[] } = await res.json();
-    return data.items;
+    return res.json() as Promise<ApplicationRead[]>;
   } catch {
     return null;
   }
 }
 
-async function fetchUniversities(token: string): Promise<University[] | null> {
+async function fetchUniversities(
+  token: string,
+): Promise<UniversityRead[] | null> {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   if (!apiUrl) return null;
   try {
@@ -34,7 +35,7 @@ async function fetchUniversities(token: string): Promise<University[] | null> {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (!res.ok) return null;
-    const data: { items: University[] } = await res.json();
+    const data: { items: UniversityRead[] } = await res.json();
     return data.items;
   } catch {
     return null;

@@ -1,10 +1,9 @@
-// ProfileCompleteness — fetches the student's completion status across all
-// three Phase 1 sections and renders a visual checklist on the dashboard.
+// ProfileCompleteness — fetches the student's completion status across the
+// two Phase 2 sections and renders a visual checklist on the dashboard.
 //
-// Three sections are checked in parallel on mount:
-//   1. Personal profile  — GET /profile
-//   2. Academic records  — GET /academic-records
-//   3. Documents         — GET /documents (counts how many of 3 types are present)
+// Two sections are checked in parallel on mount:
+//   1. Personal profile — GET /profile
+//   2. Documents        — GET /documents (counts how many of 3 types are present)
 //
 // Auto-redirect rule: if the profile endpoint returns 404 (no profile exists),
 // the student is sent to /profile/setup before any content renders. Other
@@ -17,13 +16,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import {
-  ArrowRight,
-  CheckCircle2,
-  FileText,
-  GraduationCap,
-  UserCircle2,
-} from "lucide-react";
+import { ArrowRight, CheckCircle2, FileText, UserCircle2 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { REQUIRED_DOC_TYPES } from "@/lib/constants/documents";
 import { Card } from "@/components/ui/card";
@@ -36,7 +29,6 @@ type SectionStatus = "loading" | "complete" | "incomplete";
 
 type CompletenessState = {
   profile: SectionStatus;
-  academicRecords: SectionStatus;
   documents: SectionStatus;
   // Tracks partial document progress (0–3) so we can show "2 of 3 uploaded".
   documentsUploaded: number;
@@ -59,13 +51,6 @@ const SECTIONS: readonly SectionConfig[] = [
     description: "Your personal and contact details.",
     href: "/profile/setup",
     icon: UserCircle2,
-  },
-  {
-    key: "academicRecords",
-    label: "Academic records",
-    description: "Your matric results and subject marks.",
-    href: "/academic-records",
-    icon: GraduationCap,
   },
   {
     key: "documents",
@@ -222,7 +207,6 @@ export function ProfileCompleteness() {
 
   const [state, setState] = useState<CompletenessState>({
     profile: "loading",
-    academicRecords: "loading",
     documents: "loading",
     documentsUploaded: 0,
   });
@@ -238,7 +222,6 @@ export function ProfileCompleteness() {
       if (!token || !apiUrl) {
         setState({
           profile: "incomplete",
-          academicRecords: "incomplete",
           documents: "incomplete",
           documentsUploaded: 0,
         });
@@ -247,9 +230,8 @@ export function ProfileCompleteness() {
 
       const headers = { Authorization: `Bearer ${token}` };
 
-      const [profileRes, recordsRes, docsRes] = await Promise.allSettled([
+      const [profileRes, docsRes] = await Promise.allSettled([
         fetch(`${apiUrl}/profile`, { headers }),
-        fetch(`${apiUrl}/academic-records`, { headers }),
         fetch(`${apiUrl}/documents`, { headers }),
       ]);
 
@@ -264,8 +246,6 @@ export function ProfileCompleteness() {
 
       const profileComplete =
         profileRes.status === "fulfilled" && profileRes.value.ok;
-      const recordsComplete =
-        recordsRes.status === "fulfilled" && recordsRes.value.ok;
 
       let documentsUploaded = 0;
       if (docsRes.status === "fulfilled" && docsRes.value.ok) {
@@ -277,7 +257,6 @@ export function ProfileCompleteness() {
 
       setState({
         profile: profileComplete ? "complete" : "incomplete",
-        academicRecords: recordsComplete ? "complete" : "incomplete",
         documents:
           documentsUploaded === REQUIRED_DOC_TYPES.length
             ? "complete"
@@ -302,8 +281,7 @@ export function ProfileCompleteness() {
             <Skeleton className="h-4 w-4/5" />
           </div>
         </div>
-        <div className="grid gap-4 md:grid-cols-3">
-          <Skeleton className="h-[170px] w-full" />
+        <div className="grid gap-4 md:grid-cols-2">
           <Skeleton className="h-[170px] w-full" />
           <Skeleton className="h-[170px] w-full" />
         </div>
@@ -354,9 +332,8 @@ export function ProfileCompleteness() {
         </div>
       </div>
 
-      {/* Section cards — three differentiated cards rather than identical
-       * bordered rows. Hover lift on incomplete cards reinforces the CTA. */}
-      <div className="grid gap-4 md:grid-cols-3">
+      {/* Section cards */}
+      <div className="grid gap-4 md:grid-cols-2">
         {SECTIONS.map((section) => (
           <SectionCard
             key={section.key}

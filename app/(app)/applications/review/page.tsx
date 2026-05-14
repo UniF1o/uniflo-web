@@ -5,11 +5,12 @@ import { ReviewScreen } from "@/components/applications/review-screen";
 
 export const metadata: Metadata = { title: "Review Application" };
 
-type ProfileResponse = components["schemas"]["ProfileResponse"];
-type AcademicRecord = components["schemas"]["AcademicRecord"];
-type Document = components["schemas"]["Document"];
+type StudentProfileResponse = components["schemas"]["StudentProfileResponse"];
+type DocumentResponse = components["schemas"]["DocumentResponse"];
 
-async function fetchProfile(token: string): Promise<ProfileResponse | null> {
+async function fetchProfile(
+  token: string,
+): Promise<StudentProfileResponse | null> {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   if (!apiUrl) return null;
   try {
@@ -23,23 +24,9 @@ async function fetchProfile(token: string): Promise<ProfileResponse | null> {
   }
 }
 
-async function fetchAcademicRecords(
+async function fetchDocuments(
   token: string,
-): Promise<AcademicRecord[] | null> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-  if (!apiUrl) return null;
-  try {
-    const res = await fetch(`${apiUrl}/academic-records`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!res.ok) return null;
-    return res.json();
-  } catch {
-    return null;
-  }
-}
-
-async function fetchDocuments(token: string): Promise<Document[] | null> {
+): Promise<DocumentResponse[] | null> {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   if (!apiUrl) return null;
   try {
@@ -60,17 +47,10 @@ export default async function ReviewPage() {
   } = await supabase.auth.getSession();
   const token = session?.access_token ?? null;
 
-  const [profile, academicRecords, documents] = await Promise.all([
+  const [profile, documents] = await Promise.all([
     token ? fetchProfile(token) : Promise.resolve(null),
-    token ? fetchAcademicRecords(token) : Promise.resolve(null),
     token ? fetchDocuments(token) : Promise.resolve(null),
   ]);
 
-  return (
-    <ReviewScreen
-      profile={profile}
-      academicRecords={academicRecords}
-      documents={documents}
-    />
-  );
+  return <ReviewScreen profile={profile} documents={documents} />;
 }
