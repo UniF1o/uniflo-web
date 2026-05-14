@@ -11,28 +11,26 @@ export interface EnumOption {
   label: string;
 }
 
-// Four gender options the backend accepts on student_profiles.
+// Gender options accepted by the backend GenderEnum.
 export const GENDER_OPTIONS: EnumOption[] = [
-  { value: "male", label: "Male" },
-  { value: "female", label: "Female" },
-  { value: "other", label: "Other" },
-  { value: "prefer_not_to_say", label: "Prefer not to say" },
+  { value: "Male", label: "Male" },
+  { value: "Female", label: "Female" },
 ];
 
-// All 11 South African official languages. Ordering is deliberately the same
-// as the census-frequency ranking so the most-spoken languages appear first.
+// All 11 South African official languages. Values match the backend
+// HomeLanguageEnum exactly. Ordering follows census-frequency ranking.
 export const HOME_LANGUAGE_OPTIONS: EnumOption[] = [
-  { value: "zulu", label: "isiZulu" },
-  { value: "xhosa", label: "isiXhosa" },
-  { value: "afrikaans", label: "Afrikaans" },
-  { value: "english", label: "English" },
-  { value: "sepedi", label: "Sepedi" },
-  { value: "tswana", label: "Setswana" },
-  { value: "sesotho", label: "Sesotho" },
-  { value: "tsonga", label: "Xitsonga" },
-  { value: "swati", label: "siSwati" },
-  { value: "venda", label: "Tshivenda" },
-  { value: "ndebele", label: "isiNdebele" },
+  { value: "isiZulu", label: "isiZulu" },
+  { value: "isiXhosa", label: "isiXhosa" },
+  { value: "Afrikaans", label: "Afrikaans" },
+  { value: "English", label: "English" },
+  { value: "Sepedi", label: "Sepedi" },
+  { value: "Setswana", label: "Setswana" },
+  { value: "Sesotho", label: "Sesotho" },
+  { value: "Xitsonga", label: "Xitsonga" },
+  { value: "siSwati", label: "siSwati" },
+  { value: "Tshivenda", label: "Tshivenda" },
+  { value: "isiNdebele", label: "isiNdebele" },
 ];
 
 // Convenience lookups so consumers can convert a stored enum value back

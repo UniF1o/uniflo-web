@@ -5,13 +5,13 @@ import { createClient } from "@/lib/supabase/server";
 import { ApplicationDetail } from "@/components/applications/application-detail";
 import type { components } from "@/lib/api/schema";
 
-type ApplicationWithJob = components["schemas"]["ApplicationWithJob"];
-type University = components["schemas"]["University"];
+type ApplicationRead = components["schemas"]["ApplicationRead"];
+type UniversityRead = components["schemas"]["UniversityRead"];
 
 async function fetchApplication(
   token: string,
   id: string,
-): Promise<ApplicationWithJob | "not_found" | null> {
+): Promise<ApplicationRead | "not_found" | null> {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   if (!apiUrl) return null;
   try {
@@ -26,10 +26,10 @@ async function fetchApplication(
   }
 }
 
-async function fetchUniversity(
+async function fetchUniversityRead(
   token: string,
   id: string,
-): Promise<University | null> {
+): Promise<UniversityRead | null> {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   if (!apiUrl) return null;
   try {
@@ -46,7 +46,7 @@ async function fetchUniversity(
 // React.cache deduplicates calls within a single request so generateMetadata
 // and the page component share one network round-trip for the application fetch.
 const getApplicationById = cache(
-  async (id: string): Promise<ApplicationWithJob | "not_found" | null> => {
+  async (id: string): Promise<ApplicationRead | "not_found" | null> => {
     const supabase = await createClient();
     const {
       data: { session },
@@ -98,7 +98,7 @@ export default async function ApplicationPage({
   const token = session?.access_token ?? null;
 
   const university = token
-    ? await fetchUniversity(token, application.university_id)
+    ? await fetchUniversityRead(token, application.university_id)
     : null;
   const universityName = university?.name ?? application.university_id;
 

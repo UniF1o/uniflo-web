@@ -22,7 +22,7 @@ import type { components } from "@/lib/api/schema";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type ProfileResponse = components["schemas"]["ProfileResponse"];
+type ProfileResponse = components["schemas"]["StudentProfileResponse"];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 

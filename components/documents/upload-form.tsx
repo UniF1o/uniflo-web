@@ -26,9 +26,8 @@ import type { components } from "@/lib/api/schema";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-// The three document types the backend /documents endpoint accepts.
-// Do not change without coordinating with Partner B.
-type DocumentType = components["schemas"]["Document"]["type"];
+// Document type enum from the backend schema.
+type DocumentType = components["schemas"]["DocumentType"];
 
 // Tracks the state of a single upload zone throughout its lifecycle.
 //   idle      — no file chosen yet, or validation error shown before upload
@@ -47,7 +46,7 @@ type ZoneState = {
 
 // storage_url is present in the API response but deliberately unused on
 // the frontend — see the security note at the top of this file.
-type ExistingDocument = components["schemas"]["Document"];
+type ExistingDocument = components["schemas"]["DocumentResponse"];
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -65,17 +64,17 @@ const ZONE_CONFIGS: Array<{
   description: string;
 }> = [
   {
-    type: "id_document",
+    type: "ID_COPY",
     label: "South African ID document",
     description: "Clear copy of your SA ID book or smart ID card.",
   },
   {
-    type: "matric_results",
+    type: "MATRIC_RESULTS",
     label: "Matric results / NSC certificate",
     description: "Your official NSC results or matric certificate.",
   },
   {
-    type: "transcripts",
+    type: "TRANSCRIPT",
     label: "Academic transcripts",
     description: "Official transcripts for any post-matric qualifications.",
   },
@@ -136,7 +135,7 @@ function uploadViaXhr(
     // `file` carries the binary data. `type` tells the backend which document
     // slot to assign the upload to.
     formData.append("file", file);
-    formData.append("type", type);
+    formData.append("document_type", type);
 
     // Fires repeatedly as the request body is sent to the server.
     // lengthComputable is false if the request size is unknown, so we guard it.
@@ -177,7 +176,7 @@ function uploadViaXhr(
       );
     });
 
-    xhr.open("POST", `${apiUrl}/documents`);
+    xhr.open("POST", `${apiUrl}/documents/upload`);
     // JWT in the Authorization header per the API convention used across all
     // endpoints in this project.
     xhr.setRequestHeader("Authorization", `Bearer ${token}`);
@@ -359,9 +358,9 @@ export function DocumentsUploadForm() {
   // Each document type gets its own ZoneState. They update independently
   // so a slow upload on one document doesn't block the others.
   const [zones, setZones] = useState<Record<DocumentType, ZoneState>>({
-    id_document: { ...INITIAL_ZONE },
-    matric_results: { ...INITIAL_ZONE },
-    transcripts: { ...INITIAL_ZONE },
+    ID_COPY: { ...INITIAL_ZONE },
+    MATRIC_RESULTS: { ...INITIAL_ZONE },
+    TRANSCRIPT: { ...INITIAL_ZONE },
   });
 
   // Read once at component initialisation. NEXT_PUBLIC_ vars are safe to read

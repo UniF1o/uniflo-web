@@ -11,9 +11,8 @@ import { StatusBadge } from "./status-badge";
 import { formatDate } from "@/lib/utils/format";
 import type { components } from "@/lib/api/schema";
 
-type ApplicationWithJob = components["schemas"]["ApplicationWithJob"];
+type ApplicationRead = components["schemas"]["ApplicationRead"];
 type ApplicationStatus = components["schemas"]["ApplicationStatus"];
-type Application = components["schemas"]["Application"];
 
 function DetailRow({
   label,
@@ -42,7 +41,7 @@ function cnRow(isLast?: boolean): string {
 }
 
 export interface ApplicationDetailProps {
-  application: ApplicationWithJob;
+  application: ApplicationRead;
   universityName: string;
 }
 
@@ -50,7 +49,7 @@ export function ApplicationDetail({
   application,
   universityName,
 }: ApplicationDetailProps) {
-  const [currentStatus, setCurrentStatus] = useState<ApplicationStatus>(
+  const [currentStatus, setCurrentStatus] = useState<ApplicationStatus | null>(
     application.status,
   );
   const [isRetrying, setIsRetrying] = useState(false);
@@ -60,7 +59,7 @@ export function ApplicationDetail({
     setIsRetrying(true);
     setRetryError(null);
     try {
-      const updated = await apiClient.post<Application>(
+      const updated = await apiClient.post<ApplicationRead>(
         `/applications/${application.id}/retry`,
       );
       setCurrentStatus(updated.status);
@@ -93,7 +92,7 @@ export function ApplicationDetail({
           <h1 className="font-display text-3xl tracking-tight text-foreground md:text-4xl">
             {universityName}
           </h1>
-          <StatusBadge status={currentStatus} />
+          {currentStatus && <StatusBadge status={currentStatus} />}
         </div>
         <p className="text-sm text-muted-foreground">
           {application.programme} · {application.application_year}
@@ -124,9 +123,11 @@ export function ApplicationDetail({
             Automation
           </h2>
           <Card variant="paper" as="dl" className="overflow-hidden">
-            <DetailRow label="Status">
-              <StatusBadge status={job.status} />
-            </DetailRow>
+            {job.status && (
+              <DetailRow label="Status">
+                <StatusBadge status={job.status} />
+              </DetailRow>
+            )}
             <DetailRow label="Attempts">{job.attempts}</DetailRow>
             {job.last_error && (
               <DetailRow label="Last error">

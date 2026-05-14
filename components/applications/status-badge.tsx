@@ -24,7 +24,8 @@ const STATUS_MAP: Record<
   failed: { label: "Failed", tone: "destructive", dot: false },
 };
 
-export function StatusBadge({ status }: { status: ApplicationStatus }) {
+export function StatusBadge({ status }: { status: ApplicationStatus | null }) {
+  if (!status) return null;
   const { label, tone, dot } = STATUS_MAP[status];
   return (
     <Badge tone={tone} dot={dot}>
