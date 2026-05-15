@@ -10,7 +10,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Button, buttonClasses } from "@/components/ui/button";
 import { DotCluster } from "@/components/ui/motifs";
 
 interface ErrorProps {
@@ -51,8 +51,14 @@ export default function AppError({ error, reset }: ErrorProps) {
           <Button type="button" onClick={reset}>
             Try again
           </Button>
-          <Link href="/dashboard" className="contents">
-            <Button variant="ghost">Back to dashboard</Button>
+          {/* Styled <Link> rather than <Link><Button> to keep the markup
+           * valid (no <button> nested inside <a>) while preserving the
+           * ghost button visual treatment. */}
+          <Link
+            href="/dashboard"
+            className={buttonClasses({ variant: "ghost" })}
+          >
+            Back to dashboard
           </Link>
         </div>
       </Card>

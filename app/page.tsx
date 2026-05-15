@@ -10,7 +10,7 @@
 import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { BrandMark } from "@/components/layout/brand-mark";
-import { Button } from "@/components/ui/button";
+import { buttonClasses } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Stat } from "@/components/ui/stat";
@@ -73,7 +73,10 @@ export default function Home() {
           </Link>
           <Link
             href="/signup"
-            className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2 text-sm font-medium text-accent-foreground shadow-[var(--shadow-pop)] transition-transform duration-200 hover:-translate-y-0.5"
+            className={buttonClasses({
+              variant: "accent",
+              className: "px-5 py-2",
+            })}
           >
             Start free
             <ArrowRight size={14} className="shrink-0" />
@@ -150,14 +153,18 @@ export default function Home() {
             </p>
 
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-              <Link href="/signup" className="contents">
-                <Button variant="accent">
-                  Start your application
-                  <ArrowRight size={16} aria-hidden />
-                </Button>
+              <Link
+                href="/signup"
+                className={buttonClasses({ variant: "accent" })}
+              >
+                Start your application
+                <ArrowRight size={16} aria-hidden />
               </Link>
-              <Link href="/login" className="contents">
-                <Button variant="ghost">I already have an account</Button>
+              <Link
+                href="/login"
+                className={buttonClasses({ variant: "ghost" })}
+              >
+                I already have an account
               </Link>
             </div>
 
@@ -382,14 +389,18 @@ export default function Home() {
                   dashboard handle every university you choose.
                 </p>
                 <div className="flex flex-col gap-3 sm:flex-row">
-                  <Link href="/signup" className="contents">
-                    <Button variant="accent">
-                      Start free
-                      <ArrowRight size={16} aria-hidden />
-                    </Button>
+                  <Link
+                    href="/signup"
+                    className={buttonClasses({ variant: "accent" })}
+                  >
+                    Start free
+                    <ArrowRight size={16} aria-hidden />
                   </Link>
-                  <Link href="/login" className="contents">
-                    <Button variant="secondary">Sign in</Button>
+                  <Link
+                    href="/login"
+                    className={buttonClasses({ variant: "secondary" })}
+                  >
+                    Sign in
                   </Link>
                 </div>
               </div>

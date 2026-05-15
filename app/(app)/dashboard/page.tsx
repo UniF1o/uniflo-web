@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { serverApiGet } from "@/lib/api/server";
 import { ProfileCompleteness } from "@/components/dashboard/completeness";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,24 +11,20 @@ export const metadata: Metadata = {
   title: "Dashboard",
 };
 
+type ApplicationCounts = { total: number; submitted: number };
+
 async function fetchApplicationCounts(
-  token: string,
-): Promise<{ total: number; submitted: number } | null> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-  if (!apiUrl) return null;
-  try {
-    const res = await fetch(`${apiUrl}/applications`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!res.ok) return null;
-    const data: Array<{ status: string }> = await res.json();
-    return {
-      total: data.length,
-      submitted: data.filter((a) => a.status === "submitted").length,
-    };
-  } catch {
-    return null;
-  }
+  token: string | null,
+): Promise<ApplicationCounts | null> {
+  const result = await serverApiGet<Array<{ status: string }>>(
+    "/applications",
+    token,
+  );
+  if (!result.ok) return null;
+  return {
+    total: result.data.length,
+    submitted: result.data.filter((a) => a.status === "submitted").length,
+  };
 }
 
 export default async function DashboardPage() {
@@ -37,7 +34,7 @@ export default async function DashboardPage() {
   } = await supabase.auth.getSession();
   const token = session?.access_token ?? null;
 
-  const appCounts = token ? await fetchApplicationCounts(token) : null;
+  const appCounts = await fetchApplicationCounts(token);
 
   return (
     <div className="space-y-10">
@@ -49,8 +46,8 @@ export default async function DashboardPage() {
           Welcome back.
         </h1>
         <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground md:text-base">
-          Complete the three sections below before you apply to universities.
-          Once your profile is ready, head to{" "}
+          Complete the sections below before you apply to universities. Once
+          your profile is ready, head to{" "}
           <Link
             href="/universities"
             className="font-medium text-foreground underline-offset-4 hover:text-primary hover:underline"

@@ -296,7 +296,7 @@ function DocumentZoneCard({
           <div className="flex items-start gap-2">
             <CheckCircle2
               size={14}
-              className="mt-0.5 shrink-0 text-green-600"
+              className="mt-0.5 shrink-0 text-success"
               aria-hidden
             />
             <div className="min-w-0 space-y-0.5">

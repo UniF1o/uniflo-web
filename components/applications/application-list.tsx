@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { StatusBadge } from "./status-badge";
 import { cn } from "@/lib/utils/cn";
+import { formatRelativeTime } from "@/lib/utils/format";
 import type { components } from "@/lib/api/schema";
 
 type ApplicationRead = components["schemas"]["ApplicationRead"];
@@ -17,16 +18,6 @@ interface ApplicationListProps {
   initialItems: ApplicationRead[];
   // id → name lookup built server-side from GET /universities
   universityNames: Record<string, string>;
-}
-
-function formatRelativeTime(iso: string): string {
-  const diff = Date.now() - new Date(iso).getTime();
-  const minutes = Math.floor(diff / 60_000);
-  if (minutes < 1) return "just now";
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  return `${Math.floor(hours / 24)}d ago`;
 }
 
 export function ApplicationList({
