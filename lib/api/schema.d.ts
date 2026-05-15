@@ -382,24 +382,21 @@ export interface components {
     /** StudentProfileCreate */
     StudentProfileCreate: {
       /** First Name */
-      first_name: string;
+      first_name?: string | null;
       /** Last Name */
-      last_name: string;
+      last_name?: string | null;
       /** Id Number */
-      id_number: string;
-      /**
-       * Date Of Birth
-       * Format: date
-       */
-      date_of_birth: string;
+      id_number?: string | null;
+      /** Date Of Birth */
+      date_of_birth?: string | null;
       /** Phone */
-      phone: string;
+      phone?: string | null;
       /** Address */
-      address: string;
+      address?: string | null;
       /** Nationality */
-      nationality: string;
-      gender: components["schemas"]["GenderEnum"];
-      home_language: components["schemas"]["HomeLanguageEnum"];
+      nationality?: string | null;
+      gender?: components["schemas"]["GenderEnum"] | null;
+      home_language?: components["schemas"]["HomeLanguageEnum"] | null;
     };
     /** StudentProfileResponse */
     StudentProfileResponse: {
@@ -414,24 +411,21 @@ export interface components {
        */
       user_id: string;
       /** First Name */
-      first_name: string;
+      first_name?: string | null;
       /** Last Name */
-      last_name: string;
+      last_name?: string | null;
       /** Id Number */
-      id_number: string;
-      /**
-       * Date Of Birth
-       * Format: date
-       */
-      date_of_birth: string;
+      id_number?: string | null;
+      /** Date Of Birth */
+      date_of_birth?: string | null;
       /** Phone */
-      phone: string;
+      phone?: string | null;
       /** Address */
-      address: string;
+      address?: string | null;
       /** Nationality */
-      nationality: string;
-      gender: components["schemas"]["GenderEnum"];
-      home_language: components["schemas"]["HomeLanguageEnum"];
+      nationality?: string | null;
+      gender?: components["schemas"]["GenderEnum"] | null;
+      home_language?: components["schemas"]["HomeLanguageEnum"] | null;
       /** Updated At */
       updated_at?: string | null;
     };
