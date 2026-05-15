@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
+import { serverApiGet } from "@/lib/api/server";
 import type { components } from "@/lib/api/schema";
 import { SEED_UNIVERSITIES } from "@/lib/constants/seed-universities";
 import { UniversityList } from "@/components/universities/university-list";
@@ -8,33 +9,26 @@ export const metadata: Metadata = {
   title: "Universities",
 };
 
-type University = components["schemas"]["UniversityRead"];
-
-async function fetchInitialUniversities(token: string): Promise<University[]> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-  if (!apiUrl) return [];
-  try {
-    const res = await fetch(`${apiUrl}/universities`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!res.ok) return [];
-    const data = (await res.json()) as { items: University[] };
-    return data.items;
-  } catch {
-    return [];
-  }
-}
+type UniversitiesListResponse =
+  components["schemas"]["UniversitiesListResponse"];
 
 export default async function UniversitiesPage() {
   const supabase = await createClient();
   const {
     data: { session },
   } = await supabase.auth.getSession();
+  const token = session?.access_token ?? null;
 
-  const fromApi = session?.access_token
-    ? await fetchInitialUniversities(session.access_token)
-    : [];
-  const universities = fromApi.length > 0 ? fromApi : SEED_UNIVERSITIES;
+  const result = await serverApiGet<UniversitiesListResponse>(
+    "/universities",
+    token,
+  );
+  // Fall back to seed data when the backend is unreachable so local dev and
+  // staging-without-data still render something useful.
+  const universities =
+    result.ok && result.data.items.length > 0
+      ? result.data.items
+      : SEED_UNIVERSITIES;
 
   return (
     <div className="max-w-5xl space-y-8">

@@ -1,5 +1,7 @@
 // Hardcoded list of South African public universities used by the landing
-// page's "Supported universities" grid as a trust signal.
+// page. `SA_UNIVERSITIES.length` powers the "26 universities covered" stat
+// in the social-proof bar; `FEATURED_UNIVERSITIES` (extended below) drives
+// the universities marquee.
 //
 // This is *marketing copy*, not the source of truth for application
 // targeting — the backend's `universities` table is authoritative there.
@@ -7,18 +9,25 @@
 export interface MarketingUniversity {
   name: string;
   city: string;
-  // Short marketing label, e.g. "UCT" — used for compact footer mentions.
+  // Short identifier (e.g. "UCT") used as the stable React key when an
+  // entry is rendered in a list — the full name can change but the
+  // shortName is durable.
   shortName: string;
 }
 
-// Featured universities surfaced on the landing-page marquee. Each carries a
-// brand colour so we can render a recognisable wordmark chip without
-// shipping copyrighted SVG logos. Replace `brandColor` mappings here when
-// official assets are sourced.
+// Featured universities surfaced on the landing-page marquee. Each carries
+// its actual brand colour so the row reads as six distinct institutions
+// rather than a uniform Uniflo grid. The Uniflo paper context is held by
+// the cream card surface, the editorial serif monogram, and the cream-
+// rather-than-white text inside the disc — those keep the chip on-brand
+// even though the disc fill comes from outside the palette.
 export interface FeaturedUniversity extends MarketingUniversity {
+  // Hex string used as the monogram disc's fill. Match the institution's
+  // own primary brand colour; the disc text is rendered in cream so any
+  // mid-to-dark colour clears AA against it.
   brandColor: string;
-  // The label shown inside the colored disc — usually the shortName, but
-  // some unis read better with a bespoke 2–4 character mark.
+  // Short monogram drawn inside the disc. Keep ≤ 4 characters so it
+  // stays legible at the disc size.
   mark: string;
 }
 

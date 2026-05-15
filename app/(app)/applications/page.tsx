@@ -1,46 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { serverApiGet } from "@/lib/api/server";
+import { Alert } from "@/components/ui/alert";
 import { ApplicationList } from "@/components/applications/application-list";
 import type { components } from "@/lib/api/schema";
 
 export const metadata: Metadata = { title: "Applications" };
 
 type ApplicationRead = components["schemas"]["ApplicationRead"];
-type UniversityRead = components["schemas"]["UniversityRead"];
-
-async function fetchApplications(
-  token: string,
-): Promise<ApplicationRead[] | null> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-  if (!apiUrl) return null;
-  try {
-    const res = await fetch(`${apiUrl}/applications`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!res.ok) return null;
-    return res.json() as Promise<ApplicationRead[]>;
-  } catch {
-    return null;
-  }
-}
-
-async function fetchUniversities(
-  token: string,
-): Promise<UniversityRead[] | null> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-  if (!apiUrl) return null;
-  try {
-    const res = await fetch(`${apiUrl}/universities`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!res.ok) return null;
-    const data: { items: UniversityRead[] } = await res.json();
-    return data.items;
-  } catch {
-    return null;
-  }
-}
+type UniversitiesListResponse =
+  components["schemas"]["UniversitiesListResponse"];
 
 export default async function ApplicationsPage() {
   const supabase = await createClient();
@@ -49,16 +20,20 @@ export default async function ApplicationsPage() {
   } = await supabase.auth.getSession();
   const token = session?.access_token ?? null;
 
-  const [applications, universities] = await Promise.all([
-    token ? fetchApplications(token) : Promise.resolve(null),
-    token ? fetchUniversities(token) : Promise.resolve(null),
+  const [applicationsResult, universitiesResult] = await Promise.all([
+    serverApiGet<ApplicationRead[]>("/applications", token),
+    serverApiGet<UniversitiesListResponse>("/universities", token),
   ]);
+
+  const applications = applicationsResult.ok ? applicationsResult.data : null;
 
   // Build id → name lookup so ApplicationList can display names without
   // a second round-trip per row. University list is small for MVP (3–5 rows).
   const universityNames: Record<string, string> = {};
-  for (const u of universities ?? []) {
-    universityNames[u.id] = u.name;
+  if (universitiesResult.ok) {
+    for (const u of universitiesResult.data.items) {
+      universityNames[u.id] = u.name;
+    }
   }
 
   return (
@@ -73,9 +48,9 @@ export default async function ApplicationsPage() {
       </div>
 
       {applications === null ? (
-        <p className="text-sm text-destructive">
+        <Alert tone="destructive">
           Could not load your applications. Refresh the page and try again.
-        </p>
+        </Alert>
       ) : applications.length === 0 ? (
         <div className="rounded-lg border border-border px-6 py-12 text-center">
           <p className="text-sm font-medium text-foreground">
@@ -86,9 +61,10 @@ export default async function ApplicationsPage() {
           </p>
           <Link
             href="/universities"
-            className="mt-4 inline-block text-sm font-medium text-primary hover:underline"
+            className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
           >
-            Browse universities →
+            Browse universities
+            <ArrowRight size={14} aria-hidden />
           </Link>
         </div>
       ) : (

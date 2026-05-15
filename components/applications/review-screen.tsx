@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { ChevronLeft, CheckCircle2, XCircle } from "lucide-react";
 import { useSelection } from "@/lib/state/selection";
 import { apiClient, ApiError } from "@/lib/api/client";
+import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
   GENDER_LABELS,
@@ -52,6 +53,9 @@ function ReviewSection({
   );
 }
 
+// Wrapper around the shared Alert that adds an optional inline action link.
+// Used to point students at /profile/setup or /documents when their data is
+// incomplete on the review screen.
 function InlineAlert({
   href,
   linkLabel = "Fix now",
@@ -62,7 +66,7 @@ function InlineAlert({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
+    <Alert tone="destructive">
       {children}
       {href && (
         <>
@@ -75,7 +79,7 @@ function InlineAlert({
           </Link>
         </>
       )}
-    </div>
+    </Alert>
   );
 }
 
@@ -274,7 +278,7 @@ export function ReviewScreen({ profile, documents }: ReviewScreenProps) {
                       {DOC_LABELS[type]}
                     </span>
                     {uploaded ? (
-                      <span className="flex items-center gap-1.5 text-xs font-medium text-emerald-600">
+                      <span className="flex items-center gap-1.5 text-xs font-medium text-success">
                         <CheckCircle2 size={14} aria-hidden />
                         Uploaded
                       </span>
@@ -322,7 +326,7 @@ export function ReviewScreen({ profile, documents }: ReviewScreenProps) {
                 </div>
                 <div className="flex shrink-0 items-center gap-3">
                   {status === "success" && (
-                    <span className="flex items-center gap-1 text-xs font-medium text-emerald-600">
+                    <span className="flex items-center gap-1 text-xs font-medium text-success">
                       <CheckCircle2 size={12} aria-hidden />
                       Submitted
                     </span>
