@@ -3,7 +3,8 @@
 import { execSync } from "node:child_process";
 
 const url =
-  process.env.OPENAPI_SPEC_URL ?? "https://uniflo-api-c21u.onrender.com/openapi.json";
+  process.env.OPENAPI_SPEC_URL ??
+  "https://uniflo-api-c21u.onrender.com/openapi.json";
 
 execSync(`npx openapi-typescript ${url} -o lib/api/schema.d.ts`, {
   stdio: "inherit",
