@@ -75,12 +75,50 @@ The only thing the array gave us was distinguishing "load failed" from
 "none yet" via `null` vs `[]`. That's preserved: the review page passes
 `undefined` for a failed fetch and `null` for a loaded-but-empty record.
 
-**Open follow-up (not in this branch):** the records form always `POST`s. If
-a student opens it when a record already exists, behaviour depends on what
-the backend does for `POST`-when-exists (409 vs overwrite). The clean fix is
-to `GET` first and `PATCH` when a record is present. Tracked as a follow-up;
-out of scope here because it needs the backend's `POST`-when-exists semantics
-confirmed.
+**Resolved — POST is an idempotent upsert.** The backend confirmed
+`POST /academic-records` is create-or-replace keyed on the student (DB
+`UNIQUE(student_id)`), always `201`, for both first submit and edit. So the
+form's "always POST" is correct; no GET-then-PATCH dance is needed. `PATCH`
+exists but the frontend doesn't use it. (`POST`/`PATCH` `403` with
+`profile_not_found` if no profile exists yet — not normally reachable since
+the flow routes through profile setup first.)
+
+## Backend contract confirmations
+
+- **GET no record →** `200` with literal JSON `null` (not `404`/`{}`). Code
+  branches on `=== null` / presence — correct.
+- **`aggregate` →** server-authoritative; client value silently dropped. It's
+  a **float** (e.g. `81.7`); `number` typing already covers this. Effectively
+  never `null` for an existing record (typed `Optional` only because the
+  column is nullable) — the review screen's null-guard is harmless and stays.
+- **`422` errors →** domain-rule violations return `detail` as a plain
+  string (surfaced directly); malformed-payload errors use FastAPI's default
+  array form (generic fallback). The form's existing
+  `typeof detail === "string"` branch handles both correctly.
+- **Server-enforced subject rules →** `custom_name` required iff
+  `name === "Other"` (and forbidden otherwise); duplicate non-`"Other"`
+  names rejected; `name` non-empty; `mark` int 0–100; `year`
+  2000..now+1; ≥1 subject. The form already met all but the duplicate rule,
+  which is now mirrored client-side so the student gets an inline error
+  instead of a round-trip 422.
+
+## ⚠️ Open decision — NSC subject-name authority
+
+The backend flagged a deliberate mismatch: **the server does *not* validate
+that a subject `name` is a canonical NSC subject.** The frozen list lives
+only in the frontend (`lib/constants/nsc-subjects.ts`); there is no backend
+mirror, and off-list names are accepted and stored.
+
+In practice the form constrains `name` to a `<select>` of the canonical list
++ `"Other"`, so a normal user can't submit an off-list name. The exposure is
+non-FE callers / a future client / an FE bug — a bad name would persist and
+break Partner B's Playwright field-mapping silently.
+
+This is a cross-repo product decision (Partner A's call): (a) accept
+FE-as-sole-authority for MVP and document the risk, (b) re-introduce a
+backend NSC list, or (c) extract the list into a shared source both repos
+consume. **Pending confirmation; the backend is awaiting Partner B's answer
+before assuming any server-side rejection of unknown subjects.**
 
 ## Verification
 

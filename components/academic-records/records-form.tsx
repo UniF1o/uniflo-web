@@ -319,6 +319,20 @@ export function AcademicRecordsForm() {
       }
     }
 
+    // Mirror the server rule: a non-"Other" subject can't be listed twice.
+    // Catching it here gives the student an inline error on the duplicate
+    // row instead of a round-trip 422. "Other" rows are exempt — multiple
+    // custom subjects are allowed.
+    const seenNames = new Set<string>();
+    for (const row of subjects) {
+      if (!row.name || row.name === "Other") continue;
+      if (seenNames.has(row.name)) {
+        newRowErrors[`${row.id}.name`] = "This subject is already added.";
+      } else {
+        seenNames.add(row.name);
+      }
+    }
+
     if (
       Object.keys(topErrors).length > 0 ||
       Object.keys(newRowErrors).length > 0
