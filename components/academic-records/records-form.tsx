@@ -29,6 +29,7 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { NSC_SUBJECTS } from "@/lib/constants/nsc-subjects";
 import { cn } from "@/lib/utils/cn";
+import type { AcademicRecordPayload } from "@/lib/api/academic-records";
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 // Represents one row in the subject list while the form is being filled in.
@@ -41,17 +42,6 @@ type SubjectRow = {
   mark: string; // Raw input value, e.g. "78" or "". Parsed on submit.
 };
 
-// Local type — academic-records endpoint is not yet in the backend spec.
-type AcademicRecordsPayload = {
-  institution: string;
-  year: number;
-  aggregate: number;
-  subjects: (
-    | { name: string; mark: number }
-    | { name: "Other"; custom_name: string; mark: number }
-  )[];
-};
-
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 // Subject options for the <select>: full NSC list followed by "Other".
@@ -61,6 +51,17 @@ const SUBJECT_OPTIONS = [
   ...NSC_SUBJECTS.map((s) => ({ value: s, label: s })),
   { value: "Other", label: "Other (specify below)" },
 ];
+
+// The backend returns machine codes (not prose) for a few non-validation
+// failures. Map the ones a student could realistically hit to plain
+// language. Anything not listed here is either an already-human-readable
+// domain-rule message (surfaced as-is) or falls back to a generic line.
+const ERROR_MESSAGES: Record<string, string> = {
+  // POST 403 when the student has no profile yet — normally unreachable
+  // since the flow routes through profile setup first, but deep-linkable.
+  profile_not_found:
+    "Complete your personal profile before saving academic records.",
+};
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -329,6 +330,20 @@ export function AcademicRecordsForm() {
       }
     }
 
+    // Mirror the server rule: a non-"Other" subject can't be listed twice.
+    // Catching it here gives the student an inline error on the duplicate
+    // row instead of a round-trip 422. "Other" rows are exempt — multiple
+    // custom subjects are allowed.
+    const seenNames = new Set<string>();
+    for (const row of subjects) {
+      if (!row.name || row.name === "Other") continue;
+      if (seenNames.has(row.name)) {
+        newRowErrors[`${row.id}.name`] = "This subject is already added.";
+      } else {
+        seenNames.add(row.name);
+      }
+    }
+
     if (
       Object.keys(topErrors).length > 0 ||
       Object.keys(newRowErrors).length > 0
@@ -341,14 +356,12 @@ export function AcademicRecordsForm() {
     setRowErrors({});
     setLoading(true);
 
-    // Build the payload. calculateAggregate() can't return null here because
-    // validateSubject() has already confirmed all marks are valid 0–100 ints.
-    const aggregate = calculateAggregate(subjects) ?? 0;
-
-    const payload: AcademicRecordsPayload = {
+    // Build the payload. `aggregate` is deliberately omitted — the backend
+    // computes it server-side from the submitted marks (it's still shown
+    // live in the form header for the student's own reference).
+    const payload: AcademicRecordPayload = {
       institution,
       year: parseInt(year, 10),
-      aggregate,
       subjects: subjects.map((row) => {
         const mark = parseInt(row.mark, 10);
         // "Other" entries carry custom_name per the locked JSON contract.
@@ -390,12 +403,15 @@ export function AcademicRecordsForm() {
       });
 
       if (!res.ok) {
-        // FastAPI validation errors (422) surface under a `detail` string key.
+        // Domain-rule failures return `detail` as a plain string; malformed
+        // payloads use FastAPI's default array form. Map known machine codes
+        // to friendly copy, surface human-readable strings directly, and fall
+        // back generically for the array case.
         const body = await res.json().catch(() => ({}));
-        const message =
-          typeof body.detail === "string"
-            ? body.detail
-            : "Failed to save. Please try again.";
+        const detail = typeof body.detail === "string" ? body.detail : null;
+        const message = detail
+          ? (ERROR_MESSAGES[detail] ?? detail)
+          : "Failed to save. Please try again.";
         setApiError(message);
         setLoading(false);
         return;
