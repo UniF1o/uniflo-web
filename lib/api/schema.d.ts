@@ -21,6 +21,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/webhooks/user-updated": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** User Updated */
+    post: operations["webhooks_user_updated"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/webhooks/user-deleted": {
     parameters: {
       query?: never;
@@ -72,6 +89,25 @@ export interface paths {
     head?: never;
     /** Update Profile */
     patch: operations["profiles_update"];
+    trace?: never;
+  };
+  "/academic-records": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Academic Record */
+    get: operations["academic_records_get"];
+    put?: never;
+    /** Create Academic Record */
+    post: operations["academic_records_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Update Academic Record */
+    patch: operations["academic_records_update"];
     trace?: never;
   };
   "/documents/upload": {
@@ -249,6 +285,45 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
   schemas: {
+    /** AcademicRecordCreate */
+    AcademicRecordCreate: {
+      /** Institution */
+      institution: string;
+      /** Year */
+      year: number;
+      /** Subjects */
+      subjects: components["schemas"]["SubjectIn"][];
+    };
+    /** AcademicRecordPatch */
+    AcademicRecordPatch: {
+      /** Institution */
+      institution?: string | null;
+      /** Year */
+      year?: number | null;
+      /** Subjects */
+      subjects?: components["schemas"]["SubjectIn"][] | null;
+    };
+    /** AcademicRecordResponse */
+    AcademicRecordResponse: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Student Id
+       * Format: uuid
+       */
+      student_id: string;
+      /** Institution */
+      institution: string;
+      /** Year */
+      year: number;
+      /** Subjects */
+      subjects: components["schemas"]["SubjectOut"][];
+      /** Aggregate */
+      aggregate?: number | null;
+    };
     /** ApplicationCreate */
     ApplicationCreate: {
       /**
@@ -379,25 +454,6 @@ export interface components {
       | "Xitsonga"
       | "siSwati"
       | "isiNdebele";
-    /** StudentProfileCreate */
-    StudentProfileCreate: {
-      /** First Name */
-      first_name?: string | null;
-      /** Last Name */
-      last_name?: string | null;
-      /** Id Number */
-      id_number?: string | null;
-      /** Date Of Birth */
-      date_of_birth?: string | null;
-      /** Phone */
-      phone?: string | null;
-      /** Address */
-      address?: string | null;
-      /** Nationality */
-      nationality?: string | null;
-      gender?: components["schemas"]["GenderEnum"] | null;
-      home_language?: components["schemas"]["HomeLanguageEnum"] | null;
-    };
     /** StudentProfileResponse */
     StudentProfileResponse: {
       /**
@@ -429,8 +485,8 @@ export interface components {
       /** Updated At */
       updated_at?: string | null;
     };
-    /** StudentProfileUpdate */
-    StudentProfileUpdate: {
+    /** StudentProfileWrite */
+    StudentProfileWrite: {
       /** First Name */
       first_name?: string | null;
       /** Last Name */
@@ -447,6 +503,24 @@ export interface components {
       nationality?: string | null;
       gender?: components["schemas"]["GenderEnum"] | null;
       home_language?: components["schemas"]["HomeLanguageEnum"] | null;
+    };
+    /** SubjectIn */
+    SubjectIn: {
+      /** Name */
+      name: string;
+      /** Mark */
+      mark: number;
+      /** Custom Name */
+      custom_name?: string | null;
+    };
+    /** SubjectOut */
+    SubjectOut: {
+      /** Name */
+      name: string;
+      /** Mark */
+      mark: number;
+      /** Custom Name */
+      custom_name?: string | null;
     };
     /** UniversitiesListResponse */
     UniversitiesListResponse: {
@@ -517,6 +591,23 @@ export interface components {
       /** Role */
       role: string;
     };
+    /** UserUpdatedPayload */
+    UserUpdatedPayload: {
+      record: components["schemas"]["UserUpdatedRecord"];
+    };
+    /** UserUpdatedRecord */
+    UserUpdatedRecord: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Email
+       * Format: email
+       */
+      email: string;
+    };
     /** ValidationError */
     ValidationError: {
       /** Location */
@@ -551,6 +642,41 @@ export interface operations {
     requestBody: {
       content: {
         "application/json": components["schemas"]["UserCreatedPayload"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  webhooks_user_updated: {
+    parameters: {
+      query?: never;
+      header?: {
+        "x-webhook-secret"?: string | null;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UserUpdatedPayload"];
       };
     };
     responses: {
@@ -658,7 +784,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["StudentProfileCreate"];
+        "application/json": components["schemas"]["StudentProfileWrite"];
       };
     };
     responses: {
@@ -691,7 +817,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["StudentProfileUpdate"];
+        "application/json": components["schemas"]["StudentProfileWrite"];
       };
     };
     responses: {
@@ -702,6 +828,94 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["StudentProfileResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  academic_records_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json":
+            | components["schemas"]["AcademicRecordResponse"]
+            | null;
+        };
+      };
+    };
+  };
+  academic_records_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AcademicRecordCreate"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AcademicRecordResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  academic_records_update: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AcademicRecordPatch"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AcademicRecordResponse"];
         };
       };
       /** @description Validation Error */

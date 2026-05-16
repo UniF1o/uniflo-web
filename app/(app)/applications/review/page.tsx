@@ -19,14 +19,16 @@ export default async function ReviewPage() {
 
   const [profileResult, recordsResult, documentsResult] = await Promise.all([
     serverApiGet<StudentProfileResponse>("/profile", token),
-    serverApiGet<AcademicRecordResponse[]>("/academic-records", token),
+    serverApiGet<AcademicRecordResponse | null>("/academic-records", token),
     serverApiGet<DocumentResponse[]>("/documents", token),
   ]);
 
   return (
     <ReviewScreen
       profile={profileResult.ok ? profileResult.data : null}
-      academicRecords={recordsResult.ok ? recordsResult.data : null}
+      // `undefined` = the fetch failed; `null` = loaded but the student has
+      // no record yet. The screen messages those two cases differently.
+      academicRecords={recordsResult.ok ? recordsResult.data : undefined}
       documents={documentsResult.ok ? documentsResult.data : null}
     />
   );

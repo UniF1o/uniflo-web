@@ -3,7 +3,7 @@
 //
 // Three sections are checked in parallel on mount:
 //   1. Personal profile  — GET /profile
-//   2. Academic records  — GET /academic-records (a non-empty array = done)
+//   2. Academic records  — GET /academic-records (a record present = done)
 //   3. Documents         — GET /documents (counts how many of 3 types present)
 //
 // Auto-redirect rule: if the profile endpoint returns 404 (no profile exists),
@@ -266,15 +266,15 @@ export function ProfileCompleteness() {
       const profileComplete =
         profileRes.status === "fulfilled" && profileRes.value.ok;
 
-      // The endpoint returns a bare array; an empty list means the student
-      // hasn't entered results yet, so a 200 with [] still reads as
-      // incomplete. Only a non-empty array counts as done.
+      // The endpoint returns the student's single record, or null when they
+      // haven't entered one yet (200 with a null body). Presence of a record
+      // object is what counts as done.
       let recordsComplete = false;
       if (recordsRes.status === "fulfilled" && recordsRes.value.ok) {
-        const records = (await recordsRes.value
+        const record = (await recordsRes.value
           .json()
-          .catch(() => [])) as AcademicRecordResponse[];
-        recordsComplete = Array.isArray(records) && records.length > 0;
+          .catch(() => null)) as AcademicRecordResponse | null;
+        recordsComplete = record !== null && typeof record === "object";
       }
 
       let documentsUploaded = 0;

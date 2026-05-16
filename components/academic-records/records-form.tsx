@@ -331,14 +331,12 @@ export function AcademicRecordsForm() {
     setRowErrors({});
     setLoading(true);
 
-    // Build the payload. calculateAggregate() can't return null here because
-    // validateSubject() has already confirmed all marks are valid 0–100 ints.
-    const aggregate = calculateAggregate(subjects) ?? 0;
-
+    // Build the payload. `aggregate` is deliberately omitted — the backend
+    // computes it server-side from the submitted marks (it's still shown
+    // live in the form header for the student's own reference).
     const payload: AcademicRecordPayload = {
       institution,
       year: parseInt(year, 10),
-      aggregate,
       subjects: subjects.map((row) => {
         const mark = parseInt(row.mark, 10);
         // "Other" entries carry custom_name per the locked JSON contract.

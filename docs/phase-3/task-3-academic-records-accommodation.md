@@ -1,97 +1,90 @@
-# Task 3 — Academic-records endpoint accommodation
+# Task 3 — Academic-records endpoint integration
 
 **Branch:** `feature/academic-records-endpoint`
-**Status:** frontend ready; depends on the backend shipping `/academic-records`
+**Status:** complete — endpoint shipped, types generated, consumers wired
 
 ## Why this exists
 
-`/academic-records` is the only Phase 1/2 data flow that was never added to the
+`/academic-records` was the only Phase 1/2 data flow never added to the
 backend OpenAPI spec. Because the spec drives `lib/api/schema.d.ts`, the
 endpoint's types could never be generated, so commit `d46d7d8`
 ("sync frontend ... to real backend spec") **removed** academic records from
-the two places it had been wired into:
+the dashboard completeness checklist (it was the 3rd card) and the
+application review screen (a gated section), even though the Phase 2 plan
+still required both.
 
-- the dashboard completeness checklist (it was the 3rd card), and
-- the application review screen (it was a gated review section).
+This branch landed in two stages:
 
-The Phase 2 plan (`docs/phase-2/partner-a-phase-2-plan.md`, lines 194–197,
-265) still calls for academic records in both places. With the backend agent
-now building the endpoint, this branch restores that integration and routes
-the whole thing through a single interim type file so the eventual switch to
-generated types is a one-file change.
+1. **Accommodation (commit `1101eac`).** Restored both integration points
+   behind a single interim type file (`lib/api/academic-records.ts`) so the
+   eventual switch to generated types would be a one-file change. At that
+   point the endpoint didn't exist yet, so the interim contract assumed a
+   bare array (mirroring `GET /documents`) as the safe placeholder.
+2. **Integration (this commit).** The backend shipped the endpoint. Ran
+   `npm run types:api`; `schema.d.ts` now carries the real contract. Swapped
+   the interim file to re-export the generated types and adapted the two
+   consumers to the actual shape.
 
-## What was built
+## The contract the backend chose
 
-### `lib/api/academic-records.ts` (new) — the swap point
+One matric record per student, mirroring `/profile` (not the array the
+interim placeholder assumed):
 
-The single source of truth for the academic-records request/response shapes
-while the endpoint is absent from the generated spec:
+| Method | Path | Body | Response |
+| --- | --- | --- | --- |
+| `GET` | `/academic-records` | — | `AcademicRecordResponse \| null` (200; `null` when none — not a 404) |
+| `POST` | `/academic-records` | `AcademicRecordCreate` | `AcademicRecordResponse` (201) |
+| `PATCH` | `/academic-records` | `AcademicRecordPatch` | `AcademicRecordResponse` |
 
-- `AcademicRecordSubject` — the locked subjects union (`"Other"` carries
-  `custom_name`; everything else is a canonical NSC name).
-- `AcademicRecordPayload` — `POST /academic-records` body.
-- `AcademicRecordResponse` — `GET /academic-records` item; the endpoint
-  returns a **bare array** (mirroring `GET /documents`).
+- `AcademicRecordCreate` has **no `aggregate`** — the backend computes it
+  server-side from the marks. The form still shows a live aggregate for the
+  student's own reference; it is no longer sent.
+- Subjects are flat: `{ name, mark, custom_name?: string | null }`
+  (`SubjectIn`/`SubjectOut`), not a discriminated union. `custom_name` is
+  populated only for `"Other"` subjects.
 
-When the backend ships the endpoint and `npm run types:api` regenerates
-`schema.d.ts`, delete the hand-written interfaces and re-export the generated
-ones from this file. Every consumer keeps compiling — only this file changes.
-The header comment in the file spells out the exact swap.
+This single-record model is what the backend brief recommended; see
+"Effect on the workflow" below for why it's the right call.
 
-### Consumers updated
+## Files
 
-| File | Change |
+| File | Final state |
 | --- | --- |
-| `components/academic-records/records-form.tsx` | Dropped its private `AcademicRecordsPayload`; imports `AcademicRecordPayload` from the shared file. Fetch/UX logic unchanged. |
-| `components/dashboard/completeness.tsx` | Restored the 3rd "Academic records" card (`GraduationCap`, links to `/academic-records`). Skeleton + section grids back to `md:grid-cols-3`. |
-| `app/(app)/applications/review/page.tsx` | Re-added the server-side `serverApiGet<AcademicRecordResponse[]>("/academic-records")` fetch; passes `academicRecords` to `ReviewScreen`. |
-| `components/applications/review-screen.tsx` | Restored the "Academic records" review section and the `recordsOk` submit gate (`canSubmit` now also requires a non-empty records list). |
-| `app/(app)/loading.tsx` | Skeleton back to a 3-card grid to match the dashboard. |
+| `lib/api/academic-records.ts` | Re-exports `AcademicRecordPayload = AcademicRecordCreate` and `AcademicRecordResponse` from the generated schema. The single swap point. |
+| `lib/api/schema.d.ts` | Regenerated from the live spec, then `prettier --write` (matches the established post-generation step; it is not prettier-ignored). |
+| `components/academic-records/records-form.tsx` | Imports the shared payload type; **no longer sends `aggregate`**. |
+| `components/dashboard/completeness.tsx` | 3rd "Academic records" card; gated on a record object being present (not array length). |
+| `app/(app)/applications/review/page.tsx` | `serverApiGet<AcademicRecordResponse \| null>`; passes `undefined` on fetch failure vs `null` for "no record" so the screen can message them differently. |
+| `components/applications/review-screen.tsx` | Single-record section + `recordsOk` submit gate; `undefined`/`null`/object three-state render; subject label via `custom_name ?? name`; aggregate display null-guarded. |
+| `app/(app)/loading.tsx` | 3-card skeleton grid. |
 
-## Design decisions / deviations
+## Effect on the workflow
 
-- **Empty array = incomplete, not "done".** The pre-removal dashboard code
-  marked academic records complete on any `res.ok`, which would wrongly pass a
-  `200 []`. The restore gates on a **non-empty array**, matching the review
-  screen's `recordsOk` and the `[]`-not-404 contract requested of the backend.
-  This is the one intentional behavioural improvement over the original.
-- **"Add your results" link fixed.** The original review-screen empty state
-  linked to `/profile/setup`; the records form lives at `/academic-records`.
-  The restored section links there (consistent with the dashboard card).
-- **No new fetch layer in the records form.** The form keeps its existing raw
-  `fetch` + bespoke error messaging; only the payload type was unified. A full
-  migration to `apiClient` was out of scope and would risk regressing a form
-  that can't be exercised end to end until the endpoint exists.
-- **`/profile` overview untouched.** The Phase 2 plan scopes that page to
-  personal details only; academic records is its own page/section, so it was
-  deliberately left out of the read-only profile overview.
+The backend's single-record choice **improves** the flow over the interim
+array and matches the backend brief's recommendation:
 
-## Behaviour until the endpoint lands
+- A student has exactly one matric result set. An array implied "many
+  records" — which the records form never supported (it posts one and routes
+  to `/documents`) and which would force "which record / add another?" UI.
+- `GET`-one / `POST`-create / `PATCH`-update mirrors `/profile`, an
+  already-built and reviewed pattern.
+- `POST` appending into an array would duplicate on resubmit; single-record
+  + `PATCH` avoids that.
 
-`GET /academic-records` will fail (no route), so:
+The only thing the array gave us was distinguishing "load failed" from
+"none yet" via `null` vs `[]`. That's preserved: the review page passes
+`undefined` for a failed fetch and `null` for a loaded-but-empty record.
 
-- Dashboard: the academic-records card shows **incomplete** with a "Complete
-  this section" link — correct, and no redirect (only a `/profile` 404
-  redirects).
-- Review screen: the section shows "Couldn't load…" and **Submit is blocked**
-  until records exist. This matches the intended Phase 2 gate; it becomes
-  functional the moment the backend endpoint + regenerated types land.
-
-## When the backend endpoint is ready
-
-1. Regenerate types: `npm run types:api` against the live OpenAPI doc.
-2. In `lib/api/academic-records.ts`, replace the hand-written interfaces with
-   re-exports of the generated `components["schemas"][...]` types.
-3. If the backend returns a single object instead of a bare array, adjust this
-   one file plus its two consumers (dashboard check, review screen) — both are
-   flagged in the swap-point comment.
-4. Re-run the CI suite and exercise the dashboard + review flow in a browser
-   (desktop + mobile) with a real authenticated session.
+**Open follow-up (not in this branch):** the records form always `POST`s. If
+a student opens it when a record already exists, behaviour depends on what
+the backend does for `POST`-when-exists (409 vs overwrite). The clean fix is
+to `GET` first and `PATCH` when a record is present. Tracked as a follow-up;
+out of scope here because it needs the backend's `POST`-when-exists semantics
+confirmed.
 
 ## Verification
 
-`prettier --check`, `tsc --noEmit`, `eslint .`, `vitest run` (4/4), and
-`next build` (17 routes) all pass on this branch. Live browser verification of
-the 3-card dashboard and the review section is deferred until the endpoint is
-reachable, since both require an authenticated session against a backend that
-serves `/academic-records`.
+`prettier --check` (incl. regenerated `schema.d.ts`), `tsc --noEmit`,
+`eslint .`, `vitest run` (4/4), and `next build` (17 routes) all pass. Live
+browser verification of the 3-card dashboard and the review section against a
+real authenticated session is the remaining manual step before merge.

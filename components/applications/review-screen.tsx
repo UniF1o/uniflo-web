@@ -36,7 +36,9 @@ type SubmitStatus = "idle" | "submitting" | "success" | "error";
 
 export interface ReviewScreenProps {
   profile: StudentProfileResponse | null;
-  academicRecords: AcademicRecordResponse[] | null;
+  // The student has at most one record. `undefined` = the fetch failed;
+  // `null` = loaded but none entered yet; an object = the record.
+  academicRecords: AcademicRecordResponse | null | undefined;
   documents: DocumentResponse[] | null;
 }
 
@@ -119,7 +121,7 @@ export function ReviewScreen({
       (f) => !!profile[f as keyof StudentProfileResponse],
     );
 
-  const recordsOk = academicRecords !== null && academicRecords.length > 0;
+  const recordsOk = academicRecords != null;
 
   const uploadedTypes = new Set(documents?.map((d) => d.type) ?? []);
   const docsOk =
@@ -269,45 +271,44 @@ export function ReviewScreen({
 
       {/* Academic records */}
       <ReviewSection title="Academic records">
-        {academicRecords === null ? (
+        {academicRecords === undefined ? (
           <InlineAlert>
             Couldn&apos;t load your academic records. Refresh the page and try
             again.
           </InlineAlert>
-        ) : academicRecords.length === 0 ? (
+        ) : academicRecords === null ? (
           <InlineAlert href="/academic-records" linkLabel="Add your results">
             No academic records found.
           </InlineAlert>
         ) : (
-          <div className="divide-y divide-border rounded-lg border border-border">
-            {academicRecords.map((record) => (
-              <div key={record.id} className="space-y-3 px-5 py-4">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-foreground">
-                    {record.institution}
-                  </p>
-                  <span className="text-xs text-muted-foreground">
-                    {record.year} · Aggregate: {record.aggregate}%
-                  </span>
-                </div>
-                <ul className="flex flex-wrap gap-2">
-                  {record.subjects.map((subject, i) => {
-                    const name =
-                      "custom_name" in subject
-                        ? subject.custom_name
-                        : subject.name;
-                    return (
-                      <li
-                        key={i}
-                        className="rounded-md bg-muted px-2 py-1 text-xs text-foreground"
-                      >
-                        {name}: {subject.mark}%
-                      </li>
-                    );
-                  })}
-                </ul>
+          <div className="rounded-lg border border-border">
+            <div className="space-y-3 px-5 py-4">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-medium text-foreground">
+                  {academicRecords.institution}
+                </p>
+                <span className="text-xs text-muted-foreground">
+                  {academicRecords.year}
+                  {academicRecords.aggregate != null &&
+                    ` · Aggregate: ${academicRecords.aggregate}%`}
+                </span>
               </div>
-            ))}
+              <ul className="flex flex-wrap gap-2">
+                {academicRecords.subjects.map((subject, i) => {
+                  // `custom_name` is set only for "Other" subjects; fall back
+                  // to the canonical name for everything else.
+                  const name = subject.custom_name ?? subject.name;
+                  return (
+                    <li
+                      key={i}
+                      className="rounded-md bg-muted px-2 py-1 text-xs text-foreground"
+                    >
+                      {name}: {subject.mark}%
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
           </div>
         )}
       </ReviewSection>
