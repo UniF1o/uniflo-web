@@ -5,8 +5,8 @@
 // navigation — only the main content area swaps out for this skeleton.
 //
 // Skeleton shape mirrors the most-visited authenticated page (the dashboard:
-// hero ring + summary, then a 2-card grid for profile + documents) so the
-// layout shift on hydration is minimal even on slower routes.
+// hero ring + summary, then a 3-card grid for profile + academic records +
+// documents) so the layout shift on hydration is minimal even on slower routes.
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function AppLoading() {
@@ -33,9 +33,10 @@ export default function AppLoading() {
         </div>
       </div>
 
-      {/* Two-card grid — matches the dashboard's profile + documents layout. */}
-      <div className="grid gap-4 md:grid-cols-2">
-        {Array.from({ length: 2 }).map((_, i) => (
+      {/* Three-card grid — matches the dashboard's profile + academic
+       * records + documents layout. */}
+      <div className="grid gap-4 md:grid-cols-3">
+        {Array.from({ length: 3 }).map((_, i) => (
           <Skeleton key={i} className="h-[170px] w-full rounded-xl" />
         ))}
       </div>

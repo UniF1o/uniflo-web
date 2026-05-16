@@ -15,6 +15,7 @@ import {
 import { formatDate } from "@/lib/utils/format";
 import { REQUIRED_DOC_TYPES, DOC_LABELS } from "@/lib/constants/documents";
 import type { components } from "@/lib/api/schema";
+import type { AcademicRecordResponse } from "@/lib/api/academic-records";
 
 type StudentProfileResponse = components["schemas"]["StudentProfileResponse"];
 type DocumentResponse = components["schemas"]["DocumentResponse"];
@@ -35,6 +36,7 @@ type SubmitStatus = "idle" | "submitting" | "success" | "error";
 
 export interface ReviewScreenProps {
   profile: StudentProfileResponse | null;
+  academicRecords: AcademicRecordResponse[] | null;
   documents: DocumentResponse[] | null;
 }
 
@@ -83,7 +85,11 @@ function InlineAlert({
   );
 }
 
-export function ReviewScreen({ profile, documents }: ReviewScreenProps) {
+export function ReviewScreen({
+  profile,
+  academicRecords,
+  documents,
+}: ReviewScreenProps) {
   const router = useRouter();
   const { entries, clear } = useSelection();
 
@@ -113,6 +119,8 @@ export function ReviewScreen({ profile, documents }: ReviewScreenProps) {
       (f) => !!profile[f as keyof StudentProfileResponse],
     );
 
+  const recordsOk = academicRecords !== null && academicRecords.length > 0;
+
   const uploadedTypes = new Set(documents?.map((d) => d.type) ?? []);
   const docsOk =
     documents !== null && REQUIRED_DOC_TYPES.every((t) => uploadedTypes.has(t));
@@ -123,7 +131,8 @@ export function ReviewScreen({ profile, documents }: ReviewScreenProps) {
   const hasPartialFailure = entries.some(
     (e) => statuses[e.universityId] === "error",
   );
-  const canSubmit = profileComplete && docsOk && consent && !isSubmitting;
+  const canSubmit =
+    profileComplete && recordsOk && docsOk && consent && !isSubmitting;
 
   async function handleSubmit() {
     setIsSubmitting(true);
@@ -255,6 +264,51 @@ export function ReviewScreen({ profile, documents }: ReviewScreenProps) {
               </InlineAlert>
             )}
           </>
+        )}
+      </ReviewSection>
+
+      {/* Academic records */}
+      <ReviewSection title="Academic records">
+        {academicRecords === null ? (
+          <InlineAlert>
+            Couldn&apos;t load your academic records. Refresh the page and try
+            again.
+          </InlineAlert>
+        ) : academicRecords.length === 0 ? (
+          <InlineAlert href="/academic-records" linkLabel="Add your results">
+            No academic records found.
+          </InlineAlert>
+        ) : (
+          <div className="divide-y divide-border rounded-lg border border-border">
+            {academicRecords.map((record) => (
+              <div key={record.id} className="space-y-3 px-5 py-4">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-medium text-foreground">
+                    {record.institution}
+                  </p>
+                  <span className="text-xs text-muted-foreground">
+                    {record.year} · Aggregate: {record.aggregate}%
+                  </span>
+                </div>
+                <ul className="flex flex-wrap gap-2">
+                  {record.subjects.map((subject, i) => {
+                    const name =
+                      "custom_name" in subject
+                        ? subject.custom_name
+                        : subject.name;
+                    return (
+                      <li
+                        key={i}
+                        className="rounded-md bg-muted px-2 py-1 text-xs text-foreground"
+                      >
+                        {name}: {subject.mark}%
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ))}
+          </div>
         )}
       </ReviewSection>
 
