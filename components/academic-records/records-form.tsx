@@ -52,6 +52,17 @@ const SUBJECT_OPTIONS = [
   { value: "Other", label: "Other (specify below)" },
 ];
 
+// The backend returns machine codes (not prose) for a few non-validation
+// failures. Map the ones a student could realistically hit to plain
+// language. Anything not listed here is either an already-human-readable
+// domain-rule message (surfaced as-is) or falls back to a generic line.
+const ERROR_MESSAGES: Record<string, string> = {
+  // POST 403 when the student has no profile yet — normally unreachable
+  // since the flow routes through profile setup first, but deep-linkable.
+  profile_not_found:
+    "Complete your personal profile before saving academic records.",
+};
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 // Generates a unique ID for new subject rows. crypto.randomUUID() is available
@@ -392,12 +403,15 @@ export function AcademicRecordsForm() {
       });
 
       if (!res.ok) {
-        // FastAPI validation errors (422) surface under a `detail` string key.
+        // Domain-rule failures return `detail` as a plain string; malformed
+        // payloads use FastAPI's default array form. Map known machine codes
+        // to friendly copy, surface human-readable strings directly, and fall
+        // back generically for the array case.
         const body = await res.json().catch(() => ({}));
-        const message =
-          typeof body.detail === "string"
-            ? body.detail
-            : "Failed to save. Please try again.";
+        const detail = typeof body.detail === "string" ? body.detail : null;
+        const message = detail
+          ? (ERROR_MESSAGES[detail] ?? detail)
+          : "Failed to save. Please try again.";
         setApiError(message);
         setLoading(false);
         return;
