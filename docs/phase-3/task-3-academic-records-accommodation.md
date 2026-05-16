@@ -102,23 +102,26 @@ the flow routes through profile setup first.)
   which is now mirrored client-side so the student gets an inline error
   instead of a round-trip 422.
 
-## ⚠️ Open decision — NSC subject-name authority
+## Decided — NSC subject-name authority: frontend-only for MVP
 
 The backend flagged a deliberate mismatch: **the server does *not* validate
 that a subject `name` is a canonical NSC subject.** The frozen list lives
 only in the frontend (`lib/constants/nsc-subjects.ts`); there is no backend
 mirror, and off-list names are accepted and stored.
 
-In practice the form constrains `name` to a `<select>` of the canonical list
-+ `"Other"`, so a normal user can't submit an off-list name. The exposure is
-non-FE callers / a future client / an FE bug — a bad name would persist and
-break Partner B's Playwright field-mapping silently.
+**Decision (Partner A, MVP): accept frontend-as-sole-authority.** The form
+constrains `name` to a `<select>` of the canonical list + `"Other"`, so a
+normal user cannot submit an off-list name — the realistic exposure is closed
+for the MVP user flow. No code change; backend stays as-is.
 
-This is a cross-repo product decision (Partner A's call): (a) accept
-FE-as-sole-authority for MVP and document the risk, (b) re-introduce a
-backend NSC list, or (c) extract the list into a shared source both repos
-consume. **Pending confirmation; the backend is awaiting Partner B's answer
-before assuming any server-side rejection of unknown subjects.**
+**Accepted risk:** a non-FE caller, a future client, or an FE bug could
+persist an off-list name, which would silently break Partner B's Playwright
+field-mapping (no validation error — it just fails to map). Mitigation is
+deferred.
+
+**Post-MVP follow-up:** revisit by extracting the NSC list into a single
+shared source both repos consume (the drift-free option), or a backend
+mirror. Tracked here; not scheduled.
 
 ## Verification
 
