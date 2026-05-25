@@ -1,7 +1,7 @@
-// DocumentsUploadForm — manages the upload state for all three required documents.
+// DocumentsUploadForm — manages the upload state for the two required documents.
 //
-// Three document zones are rendered in order: ID document, matric results,
-// transcripts. Each zone tracks its own status independently.
+// Two document zones are rendered in order: certified ID copy, Grade 11 results.
+// Each zone tracks its own status independently.
 //
 // Upload progress uses XHR (not fetch). The Fetch API does not expose upload
 // progress events in most environments, so XMLHttpRequest is used here so
@@ -19,10 +19,17 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { apiClient } from "@/lib/api/client";
-import { Button } from "@/components/ui/button";
-import { CheckCircle2, UploadCloud, AlertCircle } from "lucide-react";
+import { Button, buttonClasses } from "@/components/ui/button";
+import { DateInput } from "@/components/ui/date-input";
+import {
+  CheckCircle2,
+  UploadCloud,
+  AlertCircle,
+  ArrowRight,
+} from "lucide-react";
 import type { components } from "@/lib/api/schema";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -55,6 +62,12 @@ type ExistingDocument = components["schemas"]["DocumentResponse"];
 // request is made so the user gets immediate feedback on unsupported files.
 const ALLOWED_MIME_TYPES = ["application/pdf", "image/jpeg", "image/png"];
 
+// Cert date picker bounds — computed once at module load, not per render.
+const CERT_DATE_MAX = new Date().toISOString().split("T")[0];
+const CERT_DATE_MIN = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000)
+  .toISOString()
+  .split("T")[0];
+
 // 10 MB in bytes — warn and reject before uploading if the file exceeds this.
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
@@ -66,18 +79,20 @@ const ZONE_CONFIGS: Array<{
 }> = [
   {
     type: "ID_COPY",
-    label: "South African ID document",
-    description: "Clear copy of your SA ID book or smart ID card.",
+    label: "Certified copy of SA ID document",
+    description:
+      "Must be a commissioner-certified copy — green ID book or smart card. Certification must be within the last 3 months.",
   },
   {
     type: "MATRIC_RESULTS",
-    label: "Matric results / NSC certificate",
-    description: "Your official NSC results or matric certificate.",
+    label: "Grade 11 final results",
+    description: "Your official school report for Grade 11.",
   },
   {
-    type: "TRANSCRIPT",
-    label: "Academic transcripts",
-    description: "Official transcripts for any post-matric qualifications.",
+    type: "GRADE12_APRIL",
+    label: "Grade 12 April results",
+    description:
+      "Your official school progress report for Grade 12 April/mid-year. Required by UCT and some other universities.",
   },
 ];
 
@@ -89,6 +104,23 @@ const INITIAL_ZONE: ZoneState = {
   progress: 0,
   error: null,
 };
+
+// Returns an error string if the certification date is invalid, or null if ok.
+// A valid cert date is: present, not in the future, and within the last 3 months.
+function validateCertDate(dateStr: string): string | null {
+  if (!dateStr) return "Please enter the date your ID copy was certified.";
+  // Parse as local midnight to avoid UTC-offset surprises.
+  const date = new Date(dateStr + "T00:00:00");
+  const today = new Date();
+  today.setHours(23, 59, 59, 999);
+  if (date > today) return "Certification date cannot be in the future.";
+  const threeMonthsAgo = new Date();
+  threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+  threeMonthsAgo.setHours(0, 0, 0, 0);
+  if (date < threeMonthsAgo)
+    return "Your certified copy has expired — certification must be within the last 3 months. Please get a new certified copy.";
+  return null;
+}
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -201,12 +233,22 @@ interface DocumentZoneCardProps {
   state: ZoneState;
   // Called with the selected File object after the user picks one.
   onFileSelect: (file: File) => void;
+  // ID_COPY only: certification date value, change handler, and error message.
+  certDate?: string;
+  onCertDateChange?: (value: string) => void;
+  certDateError?: string;
+  // Called before the file picker opens. Return false to block the picker.
+  onBeforeSelect?: () => boolean;
 }
 
 function DocumentZoneCard({
   config,
   state,
   onFileSelect,
+  certDate,
+  onCertDateChange,
+  certDateError,
+  onBeforeSelect,
 }: DocumentZoneCardProps) {
   // Ref lets us call .click() on the hidden input from the styled button.
   const inputRef = useRef<HTMLInputElement>(null);
@@ -249,6 +291,19 @@ function DocumentZoneCard({
         aria-hidden
       />
 
+      {/* ── Cert date (ID_COPY only) ─────────────────────────────────────── */}
+      {certDate !== undefined && onCertDateChange && (
+        <DateInput
+          id={`cert-date-${config.type}`}
+          label="Date of certification"
+          value={certDate}
+          onChange={onCertDateChange}
+          error={certDateError}
+          min={CERT_DATE_MIN}
+          max={CERT_DATE_MAX}
+        />
+      )}
+
       {/* ── Idle: show upload button, and any validation error above it ───── */}
       {state.status === "idle" && (
         <div className="space-y-2">
@@ -265,7 +320,10 @@ function DocumentZoneCard({
             type="button"
             variant="ghost"
             aria-describedby={labelId}
-            onClick={() => inputRef.current?.click()}
+            onClick={() => {
+              if (onBeforeSelect && !onBeforeSelect()) return;
+              inputRef.current?.click();
+            }}
           >
             <UploadCloud size={16} aria-hidden />
             Select file
@@ -320,7 +378,10 @@ function DocumentZoneCard({
             type="button"
             variant="ghost"
             aria-describedby={labelId}
-            onClick={() => inputRef.current?.click()}
+            onClick={() => {
+              if (onBeforeSelect && !onBeforeSelect()) return;
+              inputRef.current?.click();
+            }}
           >
             Replace
           </Button>
@@ -342,7 +403,10 @@ function DocumentZoneCard({
             type="button"
             variant="ghost"
             aria-describedby={labelId}
-            onClick={() => inputRef.current?.click()}
+            onClick={() => {
+              if (onBeforeSelect && !onBeforeSelect()) return;
+              inputRef.current?.click();
+            }}
           >
             <UploadCloud size={16} aria-hidden />
             Try again
@@ -361,8 +425,14 @@ export function DocumentsUploadForm() {
   const [zones, setZones] = useState<Record<DocumentType, ZoneState>>({
     ID_COPY: { ...INITIAL_ZONE },
     MATRIC_RESULTS: { ...INITIAL_ZONE },
-    TRANSCRIPT: { ...INITIAL_ZONE },
+    GRADE12_APRIL: { ...INITIAL_ZONE },
+    TRANSCRIPT: { ...INITIAL_ZONE }, // kept so API load handles any legacy type
   });
+
+  // Certification date for the ID_COPY zone — stored separately from ZoneState
+  // because it is document metadata, not upload-process state.
+  const [certDate, setCertDate] = useState("");
+  const [certDateError, setCertDateError] = useState<string | null>(null);
 
   // Read once at component initialisation. NEXT_PUBLIC_ vars are safe to read
   // in a client component — they're inlined at build time.
@@ -487,16 +557,85 @@ export function DocumentsUploadForm() {
     }
   }
 
+  const uploadedCount = ZONE_CONFIGS.filter(
+    (c) => zones[c.type].status === "uploaded",
+  ).length;
+  const total = ZONE_CONFIGS.length;
+  const allUploaded = uploadedCount === total;
+
+  function handleCertDateChange(val: string) {
+    setCertDate(val);
+    // Clear the cert date error as soon as the user adjusts the date.
+    if (certDateError) setCertDateError(null);
+  }
+
+  // Called by the ID zone's upload button before opening the file picker.
+  // Returns false (and sets an error) if the cert date is missing or expired.
+  function handleBeforeIdSelect(): boolean {
+    const err = validateCertDate(certDate);
+    if (err) {
+      setCertDateError(err);
+      return false;
+    }
+    setCertDateError(null);
+    return true;
+  }
+
   return (
     <div className="space-y-4">
-      {ZONE_CONFIGS.map((config) => (
-        <DocumentZoneCard
-          key={config.type}
-          config={config}
-          state={zones[config.type]}
-          onFileSelect={(file) => handleFileSelect(config.type, file)}
-        />
-      ))}
+      {/* ── Upload progress summary ─────────────────────────────────────── */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between text-xs">
+          <span className="font-medium text-foreground">
+            {allUploaded
+              ? "All documents uploaded"
+              : `${uploadedCount} of ${total} uploaded`}
+          </span>
+          <span className="tabular-nums text-muted-foreground">
+            {uploadedCount}/{total}
+          </span>
+        </div>
+        <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+          <div
+            className={`h-full rounded-full transition-[width] duration-300 ease-out ${allUploaded ? "bg-success" : "bg-primary"}`}
+            style={{ width: `${(uploadedCount / total) * 100}%` }}
+          />
+        </div>
+      </div>
+
+      {ZONE_CONFIGS.map((config) => {
+        const isIdZone = config.type === "ID_COPY";
+        return (
+          <DocumentZoneCard
+            key={config.type}
+            config={config}
+            state={zones[config.type]}
+            onFileSelect={(file) => handleFileSelect(config.type, file)}
+            certDate={isIdZone ? certDate : undefined}
+            onCertDateChange={isIdZone ? handleCertDateChange : undefined}
+            certDateError={isIdZone ? (certDateError ?? undefined) : undefined}
+            onBeforeSelect={isIdZone ? handleBeforeIdSelect : undefined}
+          />
+        );
+      })}
+
+      {allUploaded && (
+        <div className="flex flex-col gap-3 pt-2 sm:flex-row">
+          <Link
+            href="/universities"
+            className={buttonClasses({ variant: "accent" })}
+          >
+            Browse universities
+            <ArrowRight size={16} aria-hidden />
+          </Link>
+          <Link
+            href="/dashboard"
+            className={buttonClasses({ variant: "secondary" })}
+          >
+            Go to dashboard
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

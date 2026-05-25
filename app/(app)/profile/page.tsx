@@ -27,9 +27,8 @@ export default function ProfilePage() {
             on your behalf.
           </p>
         </div>
-        {/* Edit action — sends the student back to the setup flow. */}
         <Link
-          href="/profile/setup"
+          href="/profile/edit"
           className="shrink-0 rounded-full border border-border px-4 py-2 text-sm text-foreground transition-colors hover:bg-muted"
         >
           Edit

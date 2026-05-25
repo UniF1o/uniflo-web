@@ -10,6 +10,9 @@ import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { SelectionProvider } from "@/lib/state/selection";
 import { SelectionBar } from "@/components/universities/selection-bar";
+import type { components } from "@/lib/api/schema";
+
+type ProfileResponse = components["schemas"]["StudentProfileResponse"];
 
 export default async function ProtectedLayout({
   children,
@@ -29,9 +32,40 @@ export default async function ProtectedLayout({
     redirect("/login");
   }
 
+  // Fetch the student's name from the backend profile so the UserMenu always
+  // reflects the latest saved name rather than the Supabase auth metadata
+  // (which is only set at OAuth sign-in and never updated on profile edits).
+  let profileName: string | undefined;
+  try {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    const token = session?.access_token;
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    if (token && apiUrl) {
+      const res = await fetch(`${apiUrl}/profile`, {
+        headers: { Authorization: `Bearer ${token}` },
+        // next.revalidate: 0 ensures this fetch is not cached between requests,
+        // so router.refresh() from the edit form picks up the updated name.
+        next: { revalidate: 0 },
+      });
+      if (res.ok) {
+        const data = (await res.json()) as ProfileResponse;
+        const name = [data.first_name, data.last_name]
+          .filter(Boolean)
+          .join(" ");
+        if (name) profileName = name;
+      }
+    }
+  } catch {
+    // Non-fatal — UserMenu falls back to Supabase metadata or email prefix.
+  }
+
   return (
     <SelectionProvider>
-      <AppShell user={user}>{children}</AppShell>
+      <AppShell user={user} profileName={profileName}>
+        {children}
+      </AppShell>
       <SelectionBar />
     </SelectionProvider>
   );

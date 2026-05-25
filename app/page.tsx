@@ -8,7 +8,7 @@
 // into view. The marquee runs on a CSS keyframe (see globals.css) and
 // pauses on hover.
 import Link from "next/link";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { BrandMark } from "@/components/layout/brand-mark";
 import { buttonClasses } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -71,16 +71,18 @@ export default function Home() {
           >
             Sign in
           </Link>
-          <Link
-            href="/signup"
-            className={buttonClasses({
-              variant: "accent",
-              className: "px-5 py-2",
-            })}
-          >
-            Start free
-            <ArrowRight size={14} className="shrink-0" />
-          </Link>
+          <div className="hidden sm:block">
+            <Link
+              href="/signup"
+              className={buttonClasses({
+                variant: "accent",
+                className: "px-5 py-2",
+              })}
+            >
+              Get started
+              <ArrowRight size={14} className="shrink-0" />
+            </Link>
+          </div>
         </div>
       </ScrollShadowHeader>
 
@@ -167,18 +169,6 @@ export default function Home() {
                 I already have an account
               </Link>
             </div>
-
-            {/* Tiny trust line under the CTAs — concrete, scannable. The
-             * sparkle twinkles to draw a moment of attention without competing
-             * with the hero CTA. */}
-            <p className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Sparkles
-                size={14}
-                aria-hidden
-                className="text-primary [animation:twinkle_2.2s_ease-in-out_infinite] motion-reduce:animate-none"
-              />
-              No card needed. Free to start.
-            </p>
           </Reveal>
 
           {/* Hero illustration — stacks below the copy on mobile/tablet. */}
@@ -225,7 +215,7 @@ export default function Home() {
                 eyebrow="Top universities"
                 title="The big six, all in one place."
                 accentText="big six"
-                description="A handful of the most-requested South African universities — and the marquee keeps moving so does our coverage. Hover any card to pause the scroll."
+                description="A handful of the most-requested South African universities — and the marquee keeps moving so does our coverage. Hover to pause the scroll."
               />
             </div>
           </Reveal>
@@ -385,15 +375,15 @@ export default function Home() {
                   Start your applications. It takes about 20 minutes.
                 </h2>
                 <p className="text-base text-muted-foreground md:text-lg">
-                  Sign up free, build your profile once, and watch a single
-                  dashboard handle every university you choose.
+                  Sign up, build your profile once, and watch a single dashboard
+                  handle every university you choose.
                 </p>
                 <div className="flex flex-col gap-3 sm:flex-row">
                   <Link
                     href="/signup"
                     className={buttonClasses({ variant: "accent" })}
                   >
-                    Start free
+                    Get started
                     <ArrowRight size={16} aria-hidden />
                   </Link>
                   <Link

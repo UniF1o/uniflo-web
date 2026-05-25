@@ -19,6 +19,7 @@ import {
   FileText,
   GraduationCap,
   ClipboardList,
+  Settings,
   X,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -46,6 +47,7 @@ const NAV_ITEMS: readonly NavItem[] = [
   { href: "/documents", label: "Documents", icon: FileText },
   { href: "/universities", label: "Universities", icon: GraduationCap },
   { href: "/applications", label: "Applications", icon: ClipboardList },
+  { href: "/settings", label: "Settings", icon: Settings },
 ] as const;
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {

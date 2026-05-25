@@ -3,7 +3,7 @@
 // Steps:
 //   1. Personal details — first name, last name, date of birth, SA ID number
 //   2. Contact details  — phone number, residential address, nationality
-//   3. Identity         — gender, home language
+//   3. Demographics     — gender, home language
 //
 // API saves:
 //   After each step the user clicks "Save and continue", which POSTs the
@@ -30,30 +30,54 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { cn } from "@/lib/utils/cn";
+import { validateSAID } from "@/lib/utils/sa-id";
+import { DateInput } from "@/components/ui/date-input";
 import {
+  DISABILITY_OPTIONS,
+  ETHNICITY_OPTIONS,
   GENDER_OPTIONS,
   HOME_LANGUAGE_OPTIONS,
+  MARITAL_STATUS_OPTIONS,
+  NATIONALITY_OPTIONS,
+  RELIGION_OPTIONS,
+  SA_PROVINCE_OPTIONS,
 } from "@/lib/constants/profile-enums";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
-const STEPS = ["Personal details", "Contact details", "Identity"] as const;
+const STEPS = [
+  "Personal details",
+  "Contact details",
+  "Demographics",
+  "Background",
+] as const;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 // All fields are optional because each step only sends what's been filled in.
 // The backend must handle partial updates (POST upsert, not a full replace).
 // Replace with the openapi-typescript generated type once the spec is available.
+// TODO: backend needs to add separate address columns + the four new fields
+// below. See the backend request message. Until then, these will be accepted
+// once the migration lands.
 interface ProfilePayload {
   first_name?: string;
   last_name?: string;
   id_number?: string;
   date_of_birth?: string; // ISO 8601 — "YYYY-MM-DD"
   phone?: string;
-  address?: string;
+  street_address?: string;
+  suburb?: string;
+  city?: string;
+  province?: string;
+  postal_code?: string;
   nationality?: string;
   gender?: string;
   home_language?: string;
+  religion?: string;
+  disability?: string;
+  marital_status?: string;
+  ethnicity?: string;
 }
 
 // ─── Validation ───────────────────────────────────────────────────────────────
@@ -74,24 +98,37 @@ function validateStep1(fields: {
   if (!fields.dateOfBirth) errors.dateOfBirth = "Date of birth is required.";
   if (!fields.idNumber) {
     errors.idNumber = "ID number is required.";
-  } else if (!/^\d{13}$/.test(fields.idNumber)) {
-    // Only checks digit count for MVP. Full Luhn checksum validation is
-    // post-MVP — it adds complexity without meaningful UX benefit at this stage.
-    errors.idNumber = "SA ID number must be exactly 13 digits.";
+  } else {
+    const idResult = validateSAID(
+      fields.idNumber,
+      fields.dateOfBirth || undefined,
+    );
+    if (!idResult.valid) errors.idNumber = idResult.reason;
   }
   return errors;
 }
 
 function validateStep2(fields: {
   phone: string;
-  address: string;
+  streetAddress: string;
+  suburb: string;
+  city: string;
+  province: string;
+  postalCode: string;
   nationality: string;
 }) {
   const errors: Record<string, string> = {};
   if (!fields.phone.trim()) errors.phone = "Phone number is required.";
-  if (!fields.address.trim()) errors.address = "Address is required.";
-  if (!fields.nationality.trim())
-    errors.nationality = "Nationality is required.";
+  if (!fields.streetAddress.trim())
+    errors.streetAddress = "Street address is required.";
+  if (!fields.city.trim()) errors.city = "City is required.";
+  if (!fields.province) errors.province = "Province is required.";
+  if (!fields.postalCode.trim()) {
+    errors.postalCode = "Postal code is required.";
+  } else if (!/^\d{4}$/.test(fields.postalCode)) {
+    errors.postalCode = "SA postal code must be 4 digits.";
+  }
+  if (!fields.nationality) errors.nationality = "Nationality is required.";
   return errors;
 }
 
@@ -100,6 +137,21 @@ function validateStep3(fields: { gender: string; homeLanguage: string }) {
   if (!fields.gender) errors.gender = "Please select a gender.";
   if (!fields.homeLanguage)
     errors.homeLanguage = "Please select a home language.";
+  return errors;
+}
+
+function validateStep4(fields: {
+  religion: string;
+  disability: string;
+  maritalStatus: string;
+  ethnicity: string;
+}) {
+  const errors: Record<string, string> = {};
+  if (!fields.religion) errors.religion = "Please select a religion.";
+  if (!fields.disability) errors.disability = "Please select an option.";
+  if (!fields.maritalStatus)
+    errors.maritalStatus = "Please select a marital status.";
+  if (!fields.ethnicity) errors.ethnicity = "Please select an ethnicity.";
   return errors;
 }
 
@@ -187,12 +239,22 @@ export function ProfileSetupForm() {
 
   // Step 2: contact details
   const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
+  const [streetAddress, setStreetAddress] = useState("");
+  const [suburb, setSuburb] = useState("");
+  const [city, setCity] = useState("");
+  const [province, setProvince] = useState("");
+  const [postalCode, setPostalCode] = useState("");
   const [nationality, setNationality] = useState("");
 
-  // Step 3: identity
+  // Step 3: demographics
   const [gender, setGender] = useState("");
   const [homeLanguage, setHomeLanguage] = useState("");
+
+  // Step 4: background
+  const [religion, setReligion] = useState("");
+  const [disability, setDisability] = useState("");
+  const [maritalStatus, setMaritalStatus] = useState("");
+  const [ethnicity, setEthnicity] = useState("");
 
   // Removes one field's error message the moment the user starts correcting it.
   // The early-return (`if (!prev[key]) return prev`) avoids a re-render when
@@ -275,8 +337,18 @@ export function ProfileSetupForm() {
       step === 1
         ? validateStep1({ firstName, lastName, dateOfBirth, idNumber })
         : step === 2
-          ? validateStep2({ phone, address, nationality })
-          : validateStep3({ gender, homeLanguage });
+          ? validateStep2({
+              phone,
+              streetAddress,
+              suburb,
+              city,
+              province,
+              postalCode,
+              nationality,
+            })
+          : step === 3
+            ? validateStep3({ gender, homeLanguage })
+            : validateStep4({ religion, disability, maritalStatus, ethnicity });
 
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
@@ -294,8 +366,22 @@ export function ProfileSetupForm() {
       last_name: lastName,
       id_number: idNumber,
       date_of_birth: dateOfBirth,
-      ...(step >= 2 && { phone, address, nationality }),
+      ...(step >= 2 && {
+        phone,
+        street_address: streetAddress,
+        suburb,
+        city,
+        province,
+        postal_code: postalCode,
+        nationality,
+      }),
       ...(step >= 3 && { gender, home_language: homeLanguage }),
+      ...(step >= 4 && {
+        religion,
+        disability,
+        marital_status: maritalStatus,
+        ethnicity,
+      }),
     };
 
     const saved = await saveProfile(payload);
@@ -303,10 +389,9 @@ export function ProfileSetupForm() {
 
     if (!saved) return;
 
-    if (step < 3) {
+    if (step < 4) {
       setStep((s) => s + 1);
     } else {
-      // All three steps done — move on to academic records (Task 5 / Phase 1).
       router.push("/academic-records");
     }
   }
@@ -365,14 +450,12 @@ export function ProfileSetupForm() {
             />
           </div>
 
-          <Input
+          <DateInput
             id="dateOfBirth"
             label="Date of birth"
-            type="date"
-            autoComplete="bday"
             value={dateOfBirth}
-            onChange={(e) => {
-              setDateOfBirth(e.target.value);
+            onChange={(val) => {
+              setDateOfBirth(val);
               clearError("dateOfBirth");
             }}
             error={fieldErrors.dateOfBirth}
@@ -420,25 +503,81 @@ export function ProfileSetupForm() {
           />
 
           <Input
-            id="address"
-            label="Residential address"
+            id="streetAddress"
+            label="Street address"
             type="text"
-            autoComplete="street-address"
-            placeholder="123 Main Street, Soweto, Johannesburg"
-            value={address}
+            autoComplete="address-line1"
+            placeholder="12 Vilakazi Street"
+            value={streetAddress}
             onChange={(e) => {
-              setAddress(e.target.value);
-              clearError("address");
+              setStreetAddress(e.target.value);
+              clearError("streetAddress");
             }}
-            error={fieldErrors.address}
+            error={fieldErrors.streetAddress}
           />
 
-          <Input
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Input
+              id="suburb"
+              label="Suburb"
+              type="text"
+              autoComplete="address-line2"
+              placeholder="Orlando West"
+              value={suburb}
+              onChange={(e) => {
+                setSuburb(e.target.value);
+              }}
+            />
+            <Input
+              id="city"
+              label="City / Town"
+              type="text"
+              autoComplete="address-level2"
+              placeholder="Soweto"
+              value={city}
+              onChange={(e) => {
+                setCity(e.target.value);
+                clearError("city");
+              }}
+              error={fieldErrors.city}
+            />
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Select
+              id="province"
+              label="Province"
+              placeholder="Select province"
+              options={SA_PROVINCE_OPTIONS}
+              value={province}
+              onChange={(e) => {
+                setProvince(e.target.value);
+                clearError("province");
+              }}
+              error={fieldErrors.province}
+            />
+            <Input
+              id="postalCode"
+              label="Postal code"
+              type="text"
+              inputMode="numeric"
+              autoComplete="postal-code"
+              maxLength={4}
+              placeholder="1804"
+              value={postalCode}
+              onChange={(e) => {
+                setPostalCode(e.target.value.replace(/\D/g, ""));
+                clearError("postalCode");
+              }}
+              error={fieldErrors.postalCode}
+            />
+          </div>
+
+          <Select
             id="nationality"
             label="Nationality"
-            type="text"
-            autoComplete="country-name"
-            placeholder="South African"
+            placeholder="Select nationality"
+            options={NATIONALITY_OPTIONS}
             value={nationality}
             onChange={(e) => {
               setNationality(e.target.value);
@@ -449,7 +588,7 @@ export function ProfileSetupForm() {
         </form>
       )}
 
-      {/* ── Step 3: Identity ────────────────────────────────────────────── */}
+      {/* ── Step 3: Demographics ────────────────────────────────────────── */}
       {step === 3 && (
         <form onSubmit={handleContinue} noValidate className="space-y-4">
           <Select
@@ -482,6 +621,68 @@ export function ProfileSetupForm() {
               Used to complete university application forms on your behalf.
             </p>
           </div>
+        </form>
+      )}
+
+      {/* ── Step 4: Background ──────────────────────────────────────────── */}
+      {step === 4 && (
+        <form onSubmit={handleContinue} noValidate className="space-y-4">
+          <Select
+            id="religion"
+            label="Religion"
+            placeholder="Select religion"
+            options={RELIGION_OPTIONS}
+            value={religion}
+            onChange={(e) => {
+              setReligion(e.target.value);
+              clearError("religion");
+            }}
+            error={fieldErrors.religion}
+          />
+
+          <Select
+            id="disability"
+            label="Disability"
+            placeholder="Select option"
+            options={DISABILITY_OPTIONS}
+            value={disability}
+            onChange={(e) => {
+              setDisability(e.target.value);
+              clearError("disability");
+            }}
+            error={fieldErrors.disability}
+          />
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Select
+              id="maritalStatus"
+              label="Marital status"
+              placeholder="Select status"
+              options={MARITAL_STATUS_OPTIONS}
+              value={maritalStatus}
+              onChange={(e) => {
+                setMaritalStatus(e.target.value);
+                clearError("maritalStatus");
+              }}
+              error={fieldErrors.maritalStatus}
+            />
+            <Select
+              id="ethnicity"
+              label="Ethnicity"
+              placeholder="Select ethnicity"
+              options={ETHNICITY_OPTIONS}
+              value={ethnicity}
+              onChange={(e) => {
+                setEthnicity(e.target.value);
+                clearError("ethnicity");
+              }}
+              error={fieldErrors.ethnicity}
+            />
+          </div>
+          <p className="text-xs text-muted-foreground">
+            These details are required by South African university application
+            forms.
+          </p>
         </form>
       )}
 

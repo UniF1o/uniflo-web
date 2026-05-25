@@ -27,12 +27,11 @@ import { Input } from "@/components/ui/input";
 import { DotCluster } from "@/components/ui/motifs";
 import { GoogleIcon } from "@/components/auth/google-icon";
 
-// Three short benefit statements rendered as a tick-list above the CTAs.
+// Two short benefit statements rendered as a tick-list above the CTAs.
 // Anchors the form so visitors see what they're signing up for.
 const BENEFITS = [
   "Apply to multiple universities with one profile.",
   "Review every application before we submit.",
-  "Free to start. No card required.",
 ];
 
 function getAuthErrorMessage(error: AuthError): string {
@@ -88,6 +87,17 @@ export function SignUpForm() {
 
     if (error) {
       setFormError(getAuthErrorMessage(error));
+      setLoading(false);
+      return;
+    }
+
+    // Supabase returns a fake success (no error, no session) when email
+    // confirmation is on and the address is already registered — identities
+    // will be empty. Surface a friendly message instead of "check your inbox".
+    if (data.user?.identities?.length === 0) {
+      setFormError(
+        "An account with this email already exists. Try signing in instead.",
+      );
       setLoading(false);
       return;
     }

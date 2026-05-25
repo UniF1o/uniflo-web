@@ -134,7 +134,11 @@ export function ProfileOverview() {
       value: profile.id_number ? maskIdNumber(profile.id_number) : null,
     },
     { label: "Phone", value: profile.phone ?? null },
-    { label: "Address", value: profile.address ?? null },
+    { label: "Street address", value: profile.street_address ?? null },
+    { label: "Suburb", value: profile.suburb ?? null },
+    { label: "City", value: profile.city ?? null },
+    { label: "Province", value: profile.province ?? null },
+    { label: "Postal code", value: profile.postal_code ?? null },
     { label: "Nationality", value: profile.nationality ?? null },
     {
       label: "Gender",
@@ -148,6 +152,10 @@ export function ProfileOverview() {
         ? (HOME_LANGUAGE_LABELS[profile.home_language] ?? profile.home_language)
         : null,
     },
+    { label: "Religion", value: profile.religion ?? null },
+    { label: "Disability", value: profile.disability ?? null },
+    { label: "Marital status", value: profile.marital_status ?? null },
+    { label: "Ethnicity", value: profile.ethnicity ?? null },
   ];
 
   return (
