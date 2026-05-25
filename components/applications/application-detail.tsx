@@ -14,6 +14,26 @@ import type { components } from "@/lib/api/schema";
 type ApplicationRead = components["schemas"]["ApplicationRead"];
 type ApplicationStatus = components["schemas"]["ApplicationStatus"];
 
+// Maps raw worker error codes from application_jobs.last_error to copy a
+// student can actually act on. Unrecognised codes fall through to the raw
+// string so new error types still surface rather than being silently swallowed.
+const JOB_ERROR_MESSAGES: Record<string, string> = {
+  internal_error:
+    "An unexpected error occurred during automation. Please retry — if it keeps failing, contact support.",
+  portal_unavailable:
+    "The university portal was unreachable. Please retry in a few minutes.",
+  login_failed: "The automation couldn't log in to the portal. Please retry.",
+  form_submit_failed:
+    "The application form couldn't be submitted. Please retry.",
+  timeout: "The operation timed out. Please retry.",
+  invalid_credentials:
+    "The portal rejected the login credentials. Please retry.",
+};
+
+function formatJobError(raw: string): string {
+  return JOB_ERROR_MESSAGES[raw] ?? raw;
+}
+
 function DetailRow({
   label,
   children,
@@ -131,7 +151,9 @@ export function ApplicationDetail({
             <DetailRow label="Attempts">{job.attempts}</DetailRow>
             {job.last_error && (
               <DetailRow label="Last error">
-                <span className="text-destructive">{job.last_error}</span>
+                <span className="text-destructive">
+                  {formatJobError(job.last_error)}
+                </span>
               </DetailRow>
             )}
             {/* screenshot_url is Phase 3 — only render when present */}
