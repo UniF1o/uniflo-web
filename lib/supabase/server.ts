@@ -7,6 +7,8 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
+const SESSION_MAX_AGE = 60 * 60 * 24; // 24 hours in seconds
+
 export async function createClient() {
   // cookies() is async in Next.js 15+ — await it to get the request-scoped store.
   const cookieStore = await cookies();
@@ -28,7 +30,13 @@ export async function createClient() {
         setAll(cookiesToSet) {
           try {
             cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options),
+              cookieStore.set(name, value, {
+                ...options,
+                maxAge:
+                  options?.maxAge !== undefined
+                    ? Math.min(options.maxAge, SESSION_MAX_AGE)
+                    : undefined,
+              }),
             );
           } catch {
             // Intentionally swallowed — called from a Server Component.

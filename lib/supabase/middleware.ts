@@ -10,6 +10,9 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+// Auth cookies are capped so sessions don't outlive a day of inactivity.
+const SESSION_MAX_AGE = 60 * 60 * 24; // 24 hours in seconds
+
 export async function updateSession(request: NextRequest) {
   // Start with a pass-through response. Supabase will rewrite this if it
   // needs to set refreshed auth cookies on the outgoing response.
@@ -32,7 +35,13 @@ export async function updateSession(request: NextRequest) {
           );
           supabaseResponse = NextResponse.next({ request });
           cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options),
+            supabaseResponse.cookies.set(name, value, {
+              ...options,
+              maxAge:
+                options?.maxAge !== undefined
+                  ? Math.min(options.maxAge, SESSION_MAX_AGE)
+                  : undefined,
+            }),
           );
         },
       },
