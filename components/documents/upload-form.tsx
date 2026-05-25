@@ -20,6 +20,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { apiClient } from "@/lib/api/client";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, UploadCloud, AlertCircle } from "lucide-react";
 import type { components } from "@/lib/api/schema";
@@ -371,24 +372,13 @@ export function DocumentsUploadForm() {
   // those zones as uploaded. This ensures the page reflects real state on revisit.
   useEffect(() => {
     async function loadExistingDocuments() {
-      const supabase = createClient();
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      const token = session?.access_token;
-
-      // No session or no API URL — zones stay idle. Not an error condition.
-      if (!token || !apiUrl) return;
-
       try {
-        const res = await fetch(`${apiUrl}/documents`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        // Non-OK status (auth failure, server error, etc.) — stay idle.
-        // An empty upload list returns 200 with [], not 404.
-        if (!res.ok) return;
-
-        const docs = (await res.json()) as ExistingDocument[];
+        // Use the same authenticated client the working endpoints use
+        // (profile, academic records). It reads the Supabase JWT at call
+        // time and attaches the Authorization header, so the documents
+        // list can't drift out of sync with the rest of the API auth.
+        // An empty list returns 200 with [], not 404.
+        const docs = await apiClient.get<ExistingDocument[]>("/documents");
 
         setZones((prev) => {
           const next = { ...prev };
@@ -409,14 +399,14 @@ export function DocumentsUploadForm() {
           return next;
         });
       } catch {
-        // Network failure on load is non-fatal — zones stay idle and the
-        // student can still upload. The error is not surfaced to avoid
-        // confusing the student with a problem that doesn't block them.
+        // A load failure (ApiError on non-2xx, or a network error) is
+        // non-fatal — zones stay idle and the student can still upload. Not
+        // surfaced, to avoid flagging a problem that doesn't block them.
       }
     }
 
     loadExistingDocuments();
-  }, [apiUrl]);
+  }, []);
 
   // Merges a partial update into a single zone's state without touching others.
   function updateZone(type: DocumentType, patch: Partial<ZoneState>) {
