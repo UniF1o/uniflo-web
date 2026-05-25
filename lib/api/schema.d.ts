@@ -72,6 +72,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/account": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Delete Account */
+    delete: operations["account_delete"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/profile": {
     parameters: {
       query?: never;
@@ -287,6 +304,8 @@ export interface components {
   schemas: {
     /** AcademicRecordCreate */
     AcademicRecordCreate: {
+      /** @default grade_11_final */
+      record_type: components["schemas"]["RecordType"];
       /** Institution */
       institution: string;
       /** Year */
@@ -315,6 +334,7 @@ export interface components {
        * Format: uuid
        */
       student_id: string;
+      record_type: components["schemas"]["RecordType"];
       /** Institution */
       institution: string;
       /** Year */
@@ -402,6 +422,19 @@ export interface components {
       file: string;
       document_type: components["schemas"]["DocumentType"];
     };
+    /**
+     * DisabilityEnum
+     * @enum {string}
+     */
+    DisabilityEnum:
+      | "None"
+      | "Visual impairment"
+      | "Hearing impairment"
+      | "Physical/mobility impairment"
+      | "Intellectual disability"
+      | "Learning disability"
+      | "Mental health condition"
+      | "Other";
     /** DocumentResponse */
     DocumentResponse: {
       /**
@@ -429,6 +462,17 @@ export interface components {
      */
     DocumentType: "ID_COPY" | "MATRIC_RESULTS" | "TRANSCRIPT" | "GRADE12_APRIL";
     /**
+     * EthnicityEnum
+     * @enum {string}
+     */
+    EthnicityEnum:
+      | "African"
+      | "Coloured"
+      | "Indian"
+      | "Asian"
+      | "White"
+      | "Other";
+    /**
      * GenderEnum
      * @enum {string}
      */
@@ -454,6 +498,29 @@ export interface components {
       | "Xitsonga"
       | "siSwati"
       | "isiNdebele";
+    /**
+     * MaritalStatusEnum
+     * @enum {string}
+     */
+    MaritalStatusEnum: "Single" | "Married" | "Divorced" | "Widowed" | "Other";
+    /**
+     * RecordType
+     * @enum {string}
+     */
+    RecordType: "grade_11_final" | "grade_12_april";
+    /**
+     * ReligionEnum
+     * @enum {string}
+     */
+    ReligionEnum:
+      | "None"
+      | "Christianity"
+      | "Islam"
+      | "Hinduism"
+      | "Judaism"
+      | "African Traditional Religion"
+      | "Buddhism"
+      | "Other";
     /** StudentProfileResponse */
     StudentProfileResponse: {
       /**
@@ -476,24 +543,28 @@ export interface components {
       date_of_birth?: string | null;
       /** Phone */
       phone?: string | null;
-      /** Address */
-      address?: string | null;
+      /** Street Address */
       street_address?: string | null;
+      /** Suburb */
       suburb?: string | null;
+      /** City */
       city?: string | null;
+      /** Province */
       province?: string | null;
+      /** Postal Code */
       postal_code?: string | null;
       /** Nationality */
       nationality?: string | null;
       gender?: components["schemas"]["GenderEnum"] | null;
       home_language?: components["schemas"]["HomeLanguageEnum"] | null;
-      religion?: string | null;
-      disability?: string | null;
-      marital_status?: string | null;
-      /** Ethnicity */
-      ethnicity?: string | null;
+      religion?: components["schemas"]["ReligionEnum"] | null;
+      disability?: components["schemas"]["DisabilityEnum"] | null;
+      marital_status?: components["schemas"]["MaritalStatusEnum"] | null;
+      ethnicity?: components["schemas"]["EthnicityEnum"] | null;
       /** Updated At */
       updated_at?: string | null;
+      /** Is Complete */
+      readonly is_complete: boolean;
     };
     /** StudentProfileWrite */
     StudentProfileWrite: {
@@ -507,22 +578,24 @@ export interface components {
       date_of_birth?: string | null;
       /** Phone */
       phone?: string | null;
-      /** Address */
-      address?: string | null;
+      /** Street Address */
       street_address?: string | null;
+      /** Suburb */
       suburb?: string | null;
+      /** City */
       city?: string | null;
+      /** Province */
       province?: string | null;
+      /** Postal Code */
       postal_code?: string | null;
       /** Nationality */
       nationality?: string | null;
       gender?: components["schemas"]["GenderEnum"] | null;
       home_language?: components["schemas"]["HomeLanguageEnum"] | null;
-      religion?: string | null;
-      disability?: string | null;
-      marital_status?: string | null;
-      /** Ethnicity */
-      ethnicity?: string | null;
+      religion?: components["schemas"]["ReligionEnum"] | null;
+      disability?: components["schemas"]["DisabilityEnum"] | null;
+      marital_status?: components["schemas"]["MaritalStatusEnum"] | null;
+      ethnicity?: components["schemas"]["EthnicityEnum"] | null;
     };
     /** SubjectIn */
     SubjectIn: {
@@ -775,6 +848,26 @@ export interface operations {
       };
     };
   };
+  account_delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": unknown;
+        };
+      };
+    };
+  };
   profiles_get: {
     parameters: {
       query?: never;
@@ -863,7 +956,9 @@ export interface operations {
   };
   academic_records_get: {
     parameters: {
-      query?: never;
+      query?: {
+        record_type?: components["schemas"]["RecordType"];
+      };
       header?: never;
       path?: never;
       cookie?: never;
@@ -879,6 +974,15 @@ export interface operations {
           "application/json":
             | components["schemas"]["AcademicRecordResponse"]
             | null;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
         };
       };
     };
@@ -918,7 +1022,9 @@ export interface operations {
   };
   academic_records_update: {
     parameters: {
-      query?: never;
+      query?: {
+        record_type?: components["schemas"]["RecordType"];
+      };
       header?: never;
       path?: never;
       cookie?: never;

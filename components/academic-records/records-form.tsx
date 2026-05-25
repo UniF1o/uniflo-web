@@ -440,7 +440,7 @@ export function AcademicRecordsForm({
         }
         return { name: row.name, mark };
       }),
-      ...(recordType !== "grade_11_final" && { record_type: recordType }),
+      record_type: recordType,
     };
 
     // Attach the Supabase JWT so the backend can identify the student.
