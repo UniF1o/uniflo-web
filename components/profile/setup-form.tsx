@@ -3,7 +3,7 @@
 // Steps:
 //   1. Personal details — first name, last name, date of birth, SA ID number
 //   2. Contact details  — phone number, residential address, nationality
-//   3. Identity         — gender, home language
+//   3. Demographics     — gender, home language
 //
 // API saves:
 //   After each step the user clicks "Save and continue", which POSTs the
@@ -47,7 +47,7 @@ import {
 const STEPS = [
   "Personal details",
   "Contact details",
-  "Identity",
+  "Demographics",
   "Background",
 ] as const;
 
@@ -245,7 +245,7 @@ export function ProfileSetupForm() {
   const [postalCode, setPostalCode] = useState("");
   const [nationality, setNationality] = useState("");
 
-  // Step 3: identity
+  // Step 3: demographics
   const [gender, setGender] = useState("");
   const [homeLanguage, setHomeLanguage] = useState("");
 
@@ -589,7 +589,7 @@ export function ProfileSetupForm() {
         </form>
       )}
 
-      {/* ── Step 3: Identity ────────────────────────────────────────────── */}
+      {/* ── Step 3: Demographics ────────────────────────────────────────── */}
       {step === 3 && (
         <form onSubmit={handleContinue} noValidate className="space-y-4">
           <Select

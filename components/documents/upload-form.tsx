@@ -493,12 +493,34 @@ export function DocumentsUploadForm() {
     }
   }
 
-  const allUploaded = ZONE_CONFIGS.every(
+  const uploadedCount = ZONE_CONFIGS.filter(
     (c) => zones[c.type].status === "uploaded",
-  );
+  ).length;
+  const total = ZONE_CONFIGS.length;
+  const allUploaded = uploadedCount === total;
 
   return (
     <div className="space-y-4">
+      {/* ── Upload progress summary ─────────────────────────────────────── */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between text-xs">
+          <span className="font-medium text-foreground">
+            {allUploaded
+              ? "All documents uploaded"
+              : `${uploadedCount} of ${total} uploaded`}
+          </span>
+          <span className="tabular-nums text-muted-foreground">
+            {uploadedCount}/{total}
+          </span>
+        </div>
+        <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+          <div
+            className={`h-full rounded-full transition-[width] duration-300 ease-out ${allUploaded ? "bg-success" : "bg-primary"}`}
+            style={{ width: `${(uploadedCount / total) * 100}%` }}
+          />
+        </div>
+      </div>
+
       {ZONE_CONFIGS.map((config) => (
         <DocumentZoneCard
           key={config.type}
