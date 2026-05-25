@@ -427,7 +427,7 @@ export interface components {
      * DocumentType
      * @enum {string}
      */
-    DocumentType: "ID_COPY" | "MATRIC_RESULTS" | "TRANSCRIPT";
+    DocumentType: "ID_COPY" | "MATRIC_RESULTS" | "TRANSCRIPT" | "GRADE12_APRIL";
     /**
      * GenderEnum
      * @enum {string}

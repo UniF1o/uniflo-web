@@ -336,8 +336,53 @@ export function ProfileCompleteness() {
         ? "No documents uploaded yet."
         : `${state.documentsUploaded} of ${REQUIRED_DOC_TYPES.length} documents uploaded.`;
 
+  const HOW_IT_WORKS = [
+    {
+      step: "1",
+      title: "Set up your profile",
+      body: "Fill in your personal details once. We use them across every application you submit.",
+    },
+    {
+      step: "2",
+      title: "Upload your documents",
+      body: "Your certified ID and academic results — ready when any university needs them.",
+    },
+    {
+      step: "3",
+      title: "Browse and apply",
+      body: "Pick universities that match your results. We submit the applications on your behalf.",
+    },
+  ];
+
   return (
     <div className="space-y-8">
+      {/* How Uniflo works — shown until every section is complete */}
+      {!allDone && (
+        <div className="space-y-4">
+          <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+            How Uniflo works
+          </h2>
+          <div className="grid gap-4 sm:grid-cols-3">
+            {HOW_IT_WORKS.map(({ step, title, body }) => (
+              <div
+                key={step}
+                className="flex gap-3 rounded-xl border border-border p-4"
+              >
+                <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-medium text-primary">
+                  {step}
+                </span>
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-foreground">{title}</p>
+                  <p className="text-xs leading-relaxed text-muted-foreground">
+                    {body}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Header — completeness ring + summary copy */}
       <div className="flex flex-col items-start gap-6 md:flex-row md:items-center md:gap-8">
         <CompletenessRing complete={completeCount} total={SECTIONS.length} />

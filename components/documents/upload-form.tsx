@@ -82,6 +82,12 @@ const ZONE_CONFIGS: Array<{
     label: "Grade 11 final results",
     description: "Your official school report for Grade 11.",
   },
+  {
+    type: "GRADE12_APRIL",
+    label: "Grade 12 April results",
+    description:
+      "Your official school progress report for Grade 12 April/mid-year. Required by UCT and some other universities.",
+  },
 ];
 
 // Default state applied to each zone before any uploads or API load.
@@ -413,7 +419,8 @@ export function DocumentsUploadForm() {
   const [zones, setZones] = useState<Record<DocumentType, ZoneState>>({
     ID_COPY: { ...INITIAL_ZONE },
     MATRIC_RESULTS: { ...INITIAL_ZONE },
-    TRANSCRIPT: { ...INITIAL_ZONE }, // kept in state shape so API load handles any type
+    GRADE12_APRIL: { ...INITIAL_ZONE },
+    TRANSCRIPT: { ...INITIAL_ZONE }, // kept so API load handles any legacy type
   });
 
   // Certification date for the ID_COPY zone — stored separately from ZoneState
