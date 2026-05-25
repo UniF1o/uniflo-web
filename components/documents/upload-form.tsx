@@ -19,10 +19,16 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { apiClient } from "@/lib/api/client";
-import { Button } from "@/components/ui/button";
-import { CheckCircle2, UploadCloud, AlertCircle } from "lucide-react";
+import { Button, buttonClasses } from "@/components/ui/button";
+import {
+  CheckCircle2,
+  UploadCloud,
+  AlertCircle,
+  ArrowRight,
+} from "lucide-react";
 import type { components } from "@/lib/api/schema";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -487,6 +493,10 @@ export function DocumentsUploadForm() {
     }
   }
 
+  const allUploaded = ZONE_CONFIGS.every(
+    (c) => zones[c.type].status === "uploaded",
+  );
+
   return (
     <div className="space-y-4">
       {ZONE_CONFIGS.map((config) => (
@@ -497,6 +507,24 @@ export function DocumentsUploadForm() {
           onFileSelect={(file) => handleFileSelect(config.type, file)}
         />
       ))}
+
+      {allUploaded && (
+        <div className="flex flex-col gap-3 pt-2 sm:flex-row">
+          <Link
+            href="/universities"
+            className={buttonClasses({ variant: "accent" })}
+          >
+            Browse universities
+            <ArrowRight size={16} aria-hidden />
+          </Link>
+          <Link
+            href="/dashboard"
+            className={buttonClasses({ variant: "secondary" })}
+          >
+            Go to dashboard
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

@@ -22,6 +22,7 @@ import {
   CheckCircle2,
   FileText,
   GraduationCap,
+  Sparkles,
   UserCircle2,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -29,6 +30,7 @@ import { REQUIRED_DOC_TYPES } from "@/lib/constants/documents";
 import type { AcademicRecordResponse } from "@/lib/api/academic-records";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { buttonClasses } from "@/components/ui/button";
 import { cn } from "@/lib/utils/cn";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -381,6 +383,35 @@ export function ProfileCompleteness() {
           />
         ))}
       </div>
+
+      {/* All-done CTA — only visible once every section is complete. */}
+      {allDone && (
+        <div className="flex flex-col items-start gap-4 rounded-xl border border-success/25 bg-success/8 p-6 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-3">
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-success/15 text-success">
+              <Sparkles size={18} aria-hidden />
+            </span>
+            <p className="text-sm font-medium text-foreground">
+              Your profile is complete — you&rsquo;re ready to apply.
+            </p>
+          </div>
+          <div className="flex gap-3">
+            <Link
+              href="/universities"
+              className={buttonClasses({ variant: "accent" })}
+            >
+              Browse universities
+              <ArrowRight size={16} aria-hidden />
+            </Link>
+            <Link
+              href="/applications"
+              className={buttonClasses({ variant: "secondary" })}
+            >
+              My applications
+            </Link>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
