@@ -27,7 +27,7 @@ import { Input } from "@/components/ui/input";
 import { DotCluster } from "@/components/ui/motifs";
 import { GoogleIcon } from "@/components/auth/google-icon";
 
-// Three short benefit statements rendered as a tick-list above the CTAs.
+// Two short benefit statements rendered as a tick-list above the CTAs.
 // Anchors the form so visitors see what they're signing up for.
 const BENEFITS = [
   "Apply to multiple universities with one profile.",

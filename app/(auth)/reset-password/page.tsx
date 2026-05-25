@@ -10,7 +10,7 @@
 // /forgot-password.
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
@@ -41,6 +41,7 @@ function validate(password: string, confirm: string) {
 
 export default function ResetPasswordPage() {
   const router = useRouter();
+  const redirectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [step, setStep] = useState<Step>("loading");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -49,6 +50,12 @@ export default function ResetPasswordPage() {
     confirm?: string;
   }>({});
   const [formError, setFormError] = useState<string | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (redirectTimer.current) clearTimeout(redirectTimer.current);
+    };
+  }, []);
 
   useEffect(() => {
     const supabase = createClient();
@@ -96,7 +103,7 @@ export default function ResetPasswordPage() {
     }
 
     setStep("done");
-    setTimeout(() => router.push("/dashboard"), 2500);
+    redirectTimer.current = setTimeout(() => router.push("/dashboard"), 2500);
   }
 
   // ── Loading skeleton ─────────────────────────────────────────────────────

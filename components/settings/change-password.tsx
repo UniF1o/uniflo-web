@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { KeyRound } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Alert } from "@/components/ui/alert";
@@ -38,6 +38,20 @@ export function ChangePasswordSection() {
     confirm?: string;
   }>({});
   const [error, setError] = useState<string | null>(null);
+  // null = loading, true = has email+password identity, false = OAuth-only
+  const [hasPassword, setHasPassword] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    async function checkIdentity() {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      const identities = user?.identities ?? [];
+      setHasPassword(identities.some((id) => id.provider === "email"));
+    }
+    checkIdentity();
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -118,7 +132,13 @@ export function ChangePasswordSection() {
         </div>
       </div>
 
-      {step === "done" ? (
+      {hasPassword === false ? (
+        <p className="text-sm text-muted-foreground">
+          Your account uses Google sign-in — there&rsquo;s no password to
+          change. To set a password, sign out and use &ldquo;Forgot
+          password?&rdquo; on the login page.
+        </p>
+      ) : step === "done" ? (
         <div className="space-y-4">
           <Alert tone="success">Password updated successfully.</Alert>
           <button
