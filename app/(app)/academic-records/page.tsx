@@ -1,8 +1,3 @@
-// Academic records page — entry point for the matric results form.
-//
-// Lives under (app) so the auth gate in the route-group layout has already
-// verified the session before this renders. This page is a thin server
-// component: it sets the browser tab title and renders the client form.
 import type { Metadata } from "next";
 import { AcademicRecordsForm } from "@/components/academic-records/records-form";
 
@@ -12,18 +7,41 @@ export const metadata: Metadata = {
 
 export default function AcademicRecordsPage() {
   return (
-    <div className="max-w-2xl">
-      <div className="mb-8 space-y-1">
+    <div className="max-w-2xl space-y-12">
+      <div className="space-y-1">
         <h1 className="font-display text-3xl tracking-tight text-foreground">
           Academic records
         </h1>
         <p className="text-sm text-muted-foreground">
-          Enter your matric results. These are used to match you with eligible
+          Enter your results. These are used to match you with eligible
           university programmes.
         </p>
       </div>
 
-      <AcademicRecordsForm />
+      <section className="space-y-6">
+        <div className="space-y-1">
+          <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+            Grade 11 final results
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Required for all applications.
+          </p>
+        </div>
+        <AcademicRecordsForm recordType="grade_11_final" />
+      </section>
+
+      <section className="space-y-6">
+        <div className="space-y-1">
+          <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+            Grade 12 April results
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Required by UCT and some other universities. Add these once you have
+            your April results.
+          </p>
+        </div>
+        <AcademicRecordsForm recordType="grade_12_april" />
+      </section>
     </div>
   );
 }

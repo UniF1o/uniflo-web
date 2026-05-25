@@ -19,17 +19,22 @@
 //
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Trash2, Plus } from "lucide-react";
+import { CheckCircle2, Trash2, Plus } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 import { NSC_SUBJECTS } from "@/lib/constants/nsc-subjects";
 import { cn } from "@/lib/utils/cn";
-import type { AcademicRecordPayload } from "@/lib/api/academic-records";
+import type {
+  AcademicRecordPayload,
+  AcademicRecordResponse,
+  RecordType,
+} from "@/lib/api/academic-records";
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 // Represents one row in the subject list while the form is being filled in.
@@ -240,7 +245,16 @@ function SubjectRowEditor({
 
 // ─── AcademicRecordsForm ──────────────────────────────────────────────────────
 
-export function AcademicRecordsForm() {
+interface AcademicRecordsFormProps {
+  // Which record type this form manages. Defaults to grade_11_final.
+  // grade_12_april: loads existing data on mount, shows success state after save.
+  // grade_11_final: blank on mount, redirects to /documents after save.
+  recordType?: RecordType;
+}
+
+export function AcademicRecordsForm({
+  recordType = "grade_11_final",
+}: AcademicRecordsFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   // apiError holds network or server error messages shown above the submit button.
@@ -250,6 +264,11 @@ export function AcademicRecordsForm() {
   // rowErrors keys are "${rowId}.${field}" — e.g. "abc123.mark".
   // This flat structure avoids nested objects while still scoping errors to rows.
   const [rowErrors, setRowErrors] = useState<Record<string, string>>({});
+
+  // formReady: false while loading initial data for grade_12_april records.
+  const [formReady, setFormReady] = useState(recordType === "grade_11_final");
+  // saved: true after a successful grade_12_april save (no redirect — show inline success).
+  const [saved, setSaved] = useState(false);
 
   const [institution, setInstitution] = useState("");
   const [year, setYear] = useState("");
@@ -311,6 +330,55 @@ export function AcademicRecordsForm() {
     });
   }
 
+  // Load existing April record on mount so the form pre-populates.
+  // Only runs for grade_12_april — grade_11_final starts with a blank form.
+  useEffect(() => {
+    if (recordType !== "grade_12_april") return;
+
+    async function loadAprilRecord() {
+      const supabase = createClient();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
+      if (!token || !apiUrl) {
+        setFormReady(true);
+        return;
+      }
+
+      try {
+        const res = await fetch(
+          `${apiUrl}/academic-records?record_type=grade_12_april`,
+          { headers: { Authorization: `Bearer ${token}` } },
+        );
+        if (res.ok) {
+          const record = (await res
+            .json()
+            .catch(() => null)) as AcademicRecordResponse | null;
+          if (record) {
+            setInstitution(record.institution);
+            setYear(record.year.toString());
+            setSubjects(
+              record.subjects.map((s) => ({
+                id: newId(),
+                name: s.name,
+                customName: s.custom_name ?? "",
+                mark: s.mark.toString(),
+              })),
+            );
+          }
+        }
+      } catch {
+        // Network failure — fall through and show a blank form.
+      }
+      setFormReady(true);
+    }
+
+    loadAprilRecord();
+  }, [recordType]);
+
   // Validates all fields, builds the payload, and POSTs to the backend.
   // Top-level fields (institution, year) and every subject row are validated
   // together before any network request is made.
@@ -359,6 +427,8 @@ export function AcademicRecordsForm() {
     // Build the payload. `aggregate` is deliberately omitted — the backend
     // computes it server-side from the submitted marks (it's still shown
     // live in the form header for the student's own reference).
+    // `record_type` is only included when non-default so existing callers
+    // are unaffected; the backend defaults to grade_11_final when absent.
     const payload: AcademicRecordPayload = {
       institution,
       year: parseInt(year, 10),
@@ -370,6 +440,7 @@ export function AcademicRecordsForm() {
         }
         return { name: row.name, mark };
       }),
+      ...(recordType !== "grade_11_final" && { record_type: recordType }),
     };
 
     // Attach the Supabase JWT so the backend can identify the student.
@@ -417,8 +488,12 @@ export function AcademicRecordsForm() {
         return;
       }
 
-      // Academic records saved — move on to document upload (Task 6).
-      router.push("/documents");
+      // Grade 11: advance to document upload. April: stay and show success.
+      if (recordType === "grade_12_april") {
+        setSaved(true);
+      } else {
+        router.push("/documents");
+      }
     } catch {
       // Network-level failure (offline, DNS, timeout, etc.).
       setApiError(
@@ -431,6 +506,42 @@ export function AcademicRecordsForm() {
   // Derived from subjects state — recalculates on every render so the header
   // aggregate stat stays in sync as the user types or removes marks.
   const aggregate = calculateAggregate(subjects);
+
+  if (!formReady) {
+    return (
+      <div className="space-y-8">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Skeleton className="h-[62px] w-full" />
+          <Skeleton className="h-[62px] w-full" />
+        </div>
+        <div className="space-y-3">
+          <Skeleton className="h-[120px] w-full" />
+          <Skeleton className="h-[120px] w-full" />
+        </div>
+        <Skeleton className="h-10 w-full" />
+      </div>
+    );
+  }
+
+  if (saved) {
+    return (
+      <div className="space-y-4">
+        <Alert tone="success">
+          <span className="inline-flex items-center gap-2">
+            <CheckCircle2 size={15} aria-hidden />
+            Grade 12 April results saved.
+          </span>
+        </Alert>
+        <button
+          type="button"
+          onClick={() => setSaved(false)}
+          className="text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
+        >
+          Edit
+        </button>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-8">
