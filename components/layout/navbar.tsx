@@ -12,12 +12,13 @@ import { UserMenu } from "./user-menu";
 
 interface NavbarProps {
   user: User;
+  profileName?: string;
   // Fired when the user taps the hamburger button on mobile. The parent
   // AppShell owns the actual open/closed state.
   onToggleSidebar: () => void;
 }
 
-export function Navbar({ user, onToggleSidebar }: NavbarProps) {
+export function Navbar({ user, profileName, onToggleSidebar }: NavbarProps) {
   return (
     <header
       // Sticky so the brand and user menu stay visible while the user scrolls.
@@ -41,7 +42,7 @@ export function Navbar({ user, onToggleSidebar }: NavbarProps) {
       {/* Flex spacer pushes the user menu to the far right. */}
       <div className="flex-1" />
 
-      <UserMenu user={user} />
+      <UserMenu user={user} profileName={profileName} />
     </header>
   );
 }

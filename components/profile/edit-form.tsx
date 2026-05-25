@@ -242,6 +242,7 @@ export function ProfileEditForm() {
 
       setSaved(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
+      router.refresh();
     } catch {
       setSaveError(
         "Unable to connect. Check your internet connection and try again.",

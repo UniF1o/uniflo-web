@@ -15,16 +15,19 @@ import { cn } from "@/lib/utils/cn";
 
 interface UserMenuProps {
   user: User;
+  profileName?: string;
 }
 
-export function UserMenu({ user }: UserMenuProps) {
+export function UserMenu({ user, profileName }: UserMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  // Pull a friendly display name from Supabase user metadata (populated by
-  // Google OAuth) and fall back to the email prefix for email/password users.
+  // profileName (from the backend student_profiles table) takes priority so
+  // edits to first/last name are reflected immediately after router.refresh().
+  // Falls back to the Supabase OAuth metadata name, then email prefix.
   const displayName =
+    profileName ??
     (user.user_metadata?.full_name as string | undefined) ??
     user.email?.split("@")[0] ??
     "Student";
