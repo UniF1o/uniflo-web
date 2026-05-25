@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ChangePasswordSection } from "@/components/settings/change-password";
 import { DeleteAccountSection } from "@/components/settings/delete-account";
 
 export const metadata: Metadata = {
@@ -16,6 +17,13 @@ export default function SettingsPage() {
           Manage your account preferences.
         </p>
       </div>
+
+      <section className="space-y-4">
+        <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+          Security
+        </h2>
+        <ChangePasswordSection />
+      </section>
 
       <section className="space-y-4">
         <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
