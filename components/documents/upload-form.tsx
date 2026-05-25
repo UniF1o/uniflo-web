@@ -62,6 +62,12 @@ type ExistingDocument = components["schemas"]["DocumentResponse"];
 // request is made so the user gets immediate feedback on unsupported files.
 const ALLOWED_MIME_TYPES = ["application/pdf", "image/jpeg", "image/png"];
 
+// Cert date picker bounds — computed once at module load, not per render.
+const CERT_DATE_MAX = new Date().toISOString().split("T")[0];
+const CERT_DATE_MIN = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000)
+  .toISOString()
+  .split("T")[0];
+
 // 10 MB in bytes — warn and reject before uploading if the file exceeds this.
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
@@ -293,8 +299,8 @@ function DocumentZoneCard({
           value={certDate}
           onChange={onCertDateChange}
           error={certDateError}
-          minYear={new Date().getFullYear() - 1}
-          maxYear={new Date().getFullYear()}
+          min={CERT_DATE_MIN}
+          max={CERT_DATE_MAX}
         />
       )}
 
