@@ -73,9 +73,10 @@ export const MARITAL_STATUS_OPTIONS: EnumOption[] = [
 ];
 
 export const ETHNICITY_OPTIONS: EnumOption[] = [
-  { value: "Black African", label: "Black African" },
+  { value: "African", label: "African" },
   { value: "Coloured", label: "Coloured" },
-  { value: "Indian/Asian", label: "Indian / Asian" },
+  { value: "Indian", label: "Indian" },
+  { value: "Asian", label: "Asian" },
   { value: "White", label: "White" },
   { value: "Other", label: "Other" },
 ];

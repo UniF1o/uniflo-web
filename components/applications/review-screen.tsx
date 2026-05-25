@@ -193,7 +193,11 @@ export function ReviewScreen({
         },
         { label: "ID number", value: profile.id_number ?? null },
         { label: "Phone", value: profile.phone ?? null },
-        { label: "Address", value: profile.address ?? null },
+        { label: "Street address", value: profile.street_address ?? null },
+        { label: "Suburb", value: profile.suburb ?? null },
+        { label: "City", value: profile.city ?? null },
+        { label: "Province", value: profile.province ?? null },
+        { label: "Postal code", value: profile.postal_code ?? null },
         { label: "Nationality", value: profile.nationality ?? null },
         {
           label: "Gender",

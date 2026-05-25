@@ -476,12 +476,28 @@ export interface components {
       date_of_birth?: string | null;
       /** Phone */
       phone?: string | null;
-      /** Address */
-      address?: string | null;
+      /** Street Address */
+      street_address?: string | null;
+      /** Suburb */
+      suburb?: string | null;
+      /** City */
+      city?: string | null;
+      /** Province */
+      province?: string | null;
+      /** Postal Code */
+      postal_code?: string | null;
       /** Nationality */
       nationality?: string | null;
       gender?: components["schemas"]["GenderEnum"] | null;
       home_language?: components["schemas"]["HomeLanguageEnum"] | null;
+      /** Religion */
+      religion?: string | null;
+      /** Disability */
+      disability?: string | null;
+      /** Marital Status */
+      marital_status?: string | null;
+      /** Ethnicity */
+      ethnicity?: string | null;
       /** Updated At */
       updated_at?: string | null;
     };
@@ -497,12 +513,28 @@ export interface components {
       date_of_birth?: string | null;
       /** Phone */
       phone?: string | null;
-      /** Address */
-      address?: string | null;
+      /** Street Address */
+      street_address?: string | null;
+      /** Suburb */
+      suburb?: string | null;
+      /** City */
+      city?: string | null;
+      /** Province */
+      province?: string | null;
+      /** Postal Code */
+      postal_code?: string | null;
       /** Nationality */
       nationality?: string | null;
       gender?: components["schemas"]["GenderEnum"] | null;
       home_language?: components["schemas"]["HomeLanguageEnum"] | null;
+      /** Religion */
+      religion?: string | null;
+      /** Disability */
+      disability?: string | null;
+      /** Marital Status */
+      marital_status?: string | null;
+      /** Ethnicity */
+      ethnicity?: string | null;
     };
     /** SubjectIn */
     SubjectIn: {
