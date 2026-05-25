@@ -30,6 +30,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { cn } from "@/lib/utils/cn";
+import { validateSAID } from "@/lib/utils/sa-id";
 import {
   GENDER_OPTIONS,
   HOME_LANGUAGE_OPTIONS,
@@ -74,10 +75,12 @@ function validateStep1(fields: {
   if (!fields.dateOfBirth) errors.dateOfBirth = "Date of birth is required.";
   if (!fields.idNumber) {
     errors.idNumber = "ID number is required.";
-  } else if (!/^\d{13}$/.test(fields.idNumber)) {
-    // Only checks digit count for MVP. Full Luhn checksum validation is
-    // post-MVP — it adds complexity without meaningful UX benefit at this stage.
-    errors.idNumber = "SA ID number must be exactly 13 digits.";
+  } else {
+    const idResult = validateSAID(
+      fields.idNumber,
+      fields.dateOfBirth || undefined,
+    );
+    if (!idResult.valid) errors.idNumber = idResult.reason;
   }
   return errors;
 }
