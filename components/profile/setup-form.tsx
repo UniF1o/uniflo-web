@@ -32,31 +32,51 @@ import { Select } from "@/components/ui/select";
 import { cn } from "@/lib/utils/cn";
 import { validateSAID } from "@/lib/utils/sa-id";
 import {
+  DISABILITY_OPTIONS,
+  ETHNICITY_OPTIONS,
   GENDER_OPTIONS,
   HOME_LANGUAGE_OPTIONS,
+  MARITAL_STATUS_OPTIONS,
   NATIONALITY_OPTIONS,
+  RELIGION_OPTIONS,
   SA_PROVINCE_OPTIONS,
 } from "@/lib/constants/profile-enums";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
-const STEPS = ["Personal details", "Contact details", "Identity"] as const;
+const STEPS = [
+  "Personal details",
+  "Contact details",
+  "Identity",
+  "Background",
+] as const;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 // All fields are optional because each step only sends what's been filled in.
 // The backend must handle partial updates (POST upsert, not a full replace).
 // Replace with the openapi-typescript generated type once the spec is available.
+// TODO: backend needs to add separate address columns + the four new fields
+// below. See the backend request message. Until then, these will be accepted
+// once the migration lands.
 interface ProfilePayload {
   first_name?: string;
   last_name?: string;
   id_number?: string;
   date_of_birth?: string; // ISO 8601 — "YYYY-MM-DD"
   phone?: string;
-  address?: string;
+  street_address?: string;
+  suburb?: string;
+  city?: string;
+  province?: string;
+  postal_code?: string;
   nationality?: string;
   gender?: string;
   home_language?: string;
+  religion?: string;
+  disability?: string;
+  marital_status?: string;
+  ethnicity?: string;
 }
 
 // ─── Validation ───────────────────────────────────────────────────────────────
@@ -116,6 +136,21 @@ function validateStep3(fields: { gender: string; homeLanguage: string }) {
   if (!fields.gender) errors.gender = "Please select a gender.";
   if (!fields.homeLanguage)
     errors.homeLanguage = "Please select a home language.";
+  return errors;
+}
+
+function validateStep4(fields: {
+  religion: string;
+  disability: string;
+  maritalStatus: string;
+  ethnicity: string;
+}) {
+  const errors: Record<string, string> = {};
+  if (!fields.religion) errors.religion = "Please select a religion.";
+  if (!fields.disability) errors.disability = "Please select an option.";
+  if (!fields.maritalStatus)
+    errors.maritalStatus = "Please select a marital status.";
+  if (!fields.ethnicity) errors.ethnicity = "Please select an ethnicity.";
   return errors;
 }
 
@@ -214,6 +249,12 @@ export function ProfileSetupForm() {
   const [gender, setGender] = useState("");
   const [homeLanguage, setHomeLanguage] = useState("");
 
+  // Step 4: background
+  const [religion, setReligion] = useState("");
+  const [disability, setDisability] = useState("");
+  const [maritalStatus, setMaritalStatus] = useState("");
+  const [ethnicity, setEthnicity] = useState("");
+
   // Removes one field's error message the moment the user starts correcting it.
   // The early-return (`if (!prev[key]) return prev`) avoids a re-render when
   // the field has no error to clear — returning the same reference prevents
@@ -304,7 +345,9 @@ export function ProfileSetupForm() {
               postalCode,
               nationality,
             })
-          : validateStep3({ gender, homeLanguage });
+          : step === 3
+            ? validateStep3({ gender, homeLanguage })
+            : validateStep4({ religion, disability, maritalStatus, ethnicity });
 
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
@@ -324,13 +367,20 @@ export function ProfileSetupForm() {
       date_of_birth: dateOfBirth,
       ...(step >= 2 && {
         phone,
-        // Combine sub-fields into the single string the backend expects.
-        address: [streetAddress, suburb, city, province, postalCode]
-          .filter(Boolean)
-          .join(", "),
+        street_address: streetAddress,
+        suburb,
+        city,
+        province,
+        postal_code: postalCode,
         nationality,
       }),
       ...(step >= 3 && { gender, home_language: homeLanguage }),
+      ...(step >= 4 && {
+        religion,
+        disability,
+        marital_status: maritalStatus,
+        ethnicity,
+      }),
     };
 
     const saved = await saveProfile(payload);
@@ -338,10 +388,9 @@ export function ProfileSetupForm() {
 
     if (!saved) return;
 
-    if (step < 3) {
+    if (step < 4) {
       setStep((s) => s + 1);
     } else {
-      // All three steps done — move on to academic records (Task 5 / Phase 1).
       router.push("/academic-records");
     }
   }
@@ -573,6 +622,68 @@ export function ProfileSetupForm() {
               Used to complete university application forms on your behalf.
             </p>
           </div>
+        </form>
+      )}
+
+      {/* ── Step 4: Background ──────────────────────────────────────────── */}
+      {step === 4 && (
+        <form onSubmit={handleContinue} noValidate className="space-y-4">
+          <Select
+            id="religion"
+            label="Religion"
+            placeholder="Select religion"
+            options={RELIGION_OPTIONS}
+            value={religion}
+            onChange={(e) => {
+              setReligion(e.target.value);
+              clearError("religion");
+            }}
+            error={fieldErrors.religion}
+          />
+
+          <Select
+            id="disability"
+            label="Disability"
+            placeholder="Select option"
+            options={DISABILITY_OPTIONS}
+            value={disability}
+            onChange={(e) => {
+              setDisability(e.target.value);
+              clearError("disability");
+            }}
+            error={fieldErrors.disability}
+          />
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Select
+              id="maritalStatus"
+              label="Marital status"
+              placeholder="Select status"
+              options={MARITAL_STATUS_OPTIONS}
+              value={maritalStatus}
+              onChange={(e) => {
+                setMaritalStatus(e.target.value);
+                clearError("maritalStatus");
+              }}
+              error={fieldErrors.maritalStatus}
+            />
+            <Select
+              id="ethnicity"
+              label="Ethnicity"
+              placeholder="Select ethnicity"
+              options={ETHNICITY_OPTIONS}
+              value={ethnicity}
+              onChange={(e) => {
+                setEthnicity(e.target.value);
+                clearError("ethnicity");
+              }}
+              error={fieldErrors.ethnicity}
+            />
+          </div>
+          <p className="text-xs text-muted-foreground">
+            These details are required by South African university application
+            forms.
+          </p>
         </form>
       )}
 

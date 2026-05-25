@@ -33,6 +33,53 @@ export const HOME_LANGUAGE_OPTIONS: EnumOption[] = [
   { value: "isiNdebele", label: "isiNdebele" },
 ];
 
+export const RELIGION_OPTIONS: EnumOption[] = [
+  { value: "None", label: "None / No religion" },
+  { value: "Christianity", label: "Christianity" },
+  { value: "Islam", label: "Islam" },
+  { value: "Hinduism", label: "Hinduism" },
+  { value: "Judaism", label: "Judaism" },
+  {
+    value: "African Traditional Religion",
+    label: "African Traditional Religion",
+  },
+  { value: "Buddhism", label: "Buddhism" },
+  { value: "Other", label: "Other" },
+];
+
+export const DISABILITY_OPTIONS: EnumOption[] = [
+  { value: "None", label: "None" },
+  { value: "Visual impairment", label: "Visual impairment" },
+  { value: "Hearing impairment", label: "Hearing impairment" },
+  {
+    value: "Physical/mobility impairment",
+    label: "Physical / mobility impairment",
+  },
+  { value: "Intellectual disability", label: "Intellectual disability" },
+  {
+    value: "Learning disability",
+    label: "Learning disability (e.g. dyslexia)",
+  },
+  { value: "Mental health condition", label: "Mental health condition" },
+  { value: "Other", label: "Other" },
+];
+
+export const MARITAL_STATUS_OPTIONS: EnumOption[] = [
+  { value: "Single", label: "Single" },
+  { value: "Married", label: "Married" },
+  { value: "Divorced", label: "Divorced" },
+  { value: "Widowed", label: "Widowed" },
+  { value: "Other", label: "Other" },
+];
+
+export const ETHNICITY_OPTIONS: EnumOption[] = [
+  { value: "Black African", label: "Black African" },
+  { value: "Coloured", label: "Coloured" },
+  { value: "Indian/Asian", label: "Indian / Asian" },
+  { value: "White", label: "White" },
+  { value: "Other", label: "Other" },
+];
+
 // South African provinces used in the address form.
 export const SA_PROVINCE_OPTIONS: EnumOption[] = [
   { value: "Eastern Cape", label: "Eastern Cape" },
