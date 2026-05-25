@@ -73,7 +73,7 @@ const SECTIONS: readonly SectionConfig[] = [
   {
     key: "documents",
     label: "Documents",
-    description: "Your ID document, matric certificate, and transcripts.",
+    description: "Your certified ID document and Grade 11 final results.",
     href: "/documents",
     icon: FileText,
   },
@@ -331,10 +331,10 @@ export function ProfileCompleteness() {
   // Documents description varies with partial progress; the others are static.
   const documentsDescription =
     state.documents === "complete"
-      ? "All 3 documents uploaded."
+      ? `All ${REQUIRED_DOC_TYPES.length} documents uploaded.`
       : state.documentsUploaded === 0
         ? "No documents uploaded yet."
-        : `${state.documentsUploaded} of 3 documents uploaded.`;
+        : `${state.documentsUploaded} of ${REQUIRED_DOC_TYPES.length} documents uploaded.`;
 
   return (
     <div className="space-y-8">

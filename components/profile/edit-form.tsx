@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { validateSAID } from "@/lib/utils/sa-id";
+import { DateInput } from "@/components/ui/date-input";
 import {
   DISABILITY_OPTIONS,
   ETHNICITY_OPTIONS,
@@ -306,14 +307,12 @@ export function ProfileEditForm() {
             error={fieldErrors.lastName}
           />
         </div>
-        <Input
+        <DateInput
           id="dateOfBirth"
           label="Date of birth"
-          type="date"
-          autoComplete="bday"
           value={dateOfBirth}
-          onChange={(e) => {
-            setDateOfBirth(e.target.value);
+          onChange={(val) => {
+            setDateOfBirth(val);
             clearError("dateOfBirth");
           }}
           error={fieldErrors.dateOfBirth}
