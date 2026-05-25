@@ -34,6 +34,8 @@ import { validateSAID } from "@/lib/utils/sa-id";
 import {
   GENDER_OPTIONS,
   HOME_LANGUAGE_OPTIONS,
+  NATIONALITY_OPTIONS,
+  SA_PROVINCE_OPTIONS,
 } from "@/lib/constants/profile-enums";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -87,14 +89,25 @@ function validateStep1(fields: {
 
 function validateStep2(fields: {
   phone: string;
-  address: string;
+  streetAddress: string;
+  suburb: string;
+  city: string;
+  province: string;
+  postalCode: string;
   nationality: string;
 }) {
   const errors: Record<string, string> = {};
   if (!fields.phone.trim()) errors.phone = "Phone number is required.";
-  if (!fields.address.trim()) errors.address = "Address is required.";
-  if (!fields.nationality.trim())
-    errors.nationality = "Nationality is required.";
+  if (!fields.streetAddress.trim())
+    errors.streetAddress = "Street address is required.";
+  if (!fields.city.trim()) errors.city = "City is required.";
+  if (!fields.province) errors.province = "Province is required.";
+  if (!fields.postalCode.trim()) {
+    errors.postalCode = "Postal code is required.";
+  } else if (!/^\d{4}$/.test(fields.postalCode)) {
+    errors.postalCode = "SA postal code must be 4 digits.";
+  }
+  if (!fields.nationality) errors.nationality = "Nationality is required.";
   return errors;
 }
 
@@ -190,7 +203,11 @@ export function ProfileSetupForm() {
 
   // Step 2: contact details
   const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
+  const [streetAddress, setStreetAddress] = useState("");
+  const [suburb, setSuburb] = useState("");
+  const [city, setCity] = useState("");
+  const [province, setProvince] = useState("");
+  const [postalCode, setPostalCode] = useState("");
   const [nationality, setNationality] = useState("");
 
   // Step 3: identity
@@ -278,7 +295,15 @@ export function ProfileSetupForm() {
       step === 1
         ? validateStep1({ firstName, lastName, dateOfBirth, idNumber })
         : step === 2
-          ? validateStep2({ phone, address, nationality })
+          ? validateStep2({
+              phone,
+              streetAddress,
+              suburb,
+              city,
+              province,
+              postalCode,
+              nationality,
+            })
           : validateStep3({ gender, homeLanguage });
 
     if (Object.keys(errors).length > 0) {
@@ -297,7 +322,14 @@ export function ProfileSetupForm() {
       last_name: lastName,
       id_number: idNumber,
       date_of_birth: dateOfBirth,
-      ...(step >= 2 && { phone, address, nationality }),
+      ...(step >= 2 && {
+        phone,
+        // Combine sub-fields into the single string the backend expects.
+        address: [streetAddress, suburb, city, province, postalCode]
+          .filter(Boolean)
+          .join(", "),
+        nationality,
+      }),
       ...(step >= 3 && { gender, home_language: homeLanguage }),
     };
 
@@ -423,25 +455,81 @@ export function ProfileSetupForm() {
           />
 
           <Input
-            id="address"
-            label="Residential address"
+            id="streetAddress"
+            label="Street address"
             type="text"
-            autoComplete="street-address"
-            placeholder="123 Main Street, Soweto, Johannesburg"
-            value={address}
+            autoComplete="address-line1"
+            placeholder="12 Vilakazi Street"
+            value={streetAddress}
             onChange={(e) => {
-              setAddress(e.target.value);
-              clearError("address");
+              setStreetAddress(e.target.value);
+              clearError("streetAddress");
             }}
-            error={fieldErrors.address}
+            error={fieldErrors.streetAddress}
           />
 
-          <Input
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Input
+              id="suburb"
+              label="Suburb"
+              type="text"
+              autoComplete="address-line2"
+              placeholder="Orlando West"
+              value={suburb}
+              onChange={(e) => {
+                setSuburb(e.target.value);
+              }}
+            />
+            <Input
+              id="city"
+              label="City / Town"
+              type="text"
+              autoComplete="address-level2"
+              placeholder="Soweto"
+              value={city}
+              onChange={(e) => {
+                setCity(e.target.value);
+                clearError("city");
+              }}
+              error={fieldErrors.city}
+            />
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Select
+              id="province"
+              label="Province"
+              placeholder="Select province"
+              options={SA_PROVINCE_OPTIONS}
+              value={province}
+              onChange={(e) => {
+                setProvince(e.target.value);
+                clearError("province");
+              }}
+              error={fieldErrors.province}
+            />
+            <Input
+              id="postalCode"
+              label="Postal code"
+              type="text"
+              inputMode="numeric"
+              autoComplete="postal-code"
+              maxLength={4}
+              placeholder="1804"
+              value={postalCode}
+              onChange={(e) => {
+                setPostalCode(e.target.value.replace(/\D/g, ""));
+                clearError("postalCode");
+              }}
+              error={fieldErrors.postalCode}
+            />
+          </div>
+
+          <Select
             id="nationality"
             label="Nationality"
-            type="text"
-            autoComplete="country-name"
-            placeholder="South African"
+            placeholder="Select nationality"
+            options={NATIONALITY_OPTIONS}
             value={nationality}
             onChange={(e) => {
               setNationality(e.target.value);

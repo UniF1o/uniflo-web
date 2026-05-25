@@ -33,6 +33,53 @@ export const HOME_LANGUAGE_OPTIONS: EnumOption[] = [
   { value: "isiNdebele", label: "isiNdebele" },
 ];
 
+// South African provinces used in the address form.
+export const SA_PROVINCE_OPTIONS: EnumOption[] = [
+  { value: "Eastern Cape", label: "Eastern Cape" },
+  { value: "Free State", label: "Free State" },
+  { value: "Gauteng", label: "Gauteng" },
+  { value: "KwaZulu-Natal", label: "KwaZulu-Natal" },
+  { value: "Limpopo", label: "Limpopo" },
+  { value: "Mpumalanga", label: "Mpumalanga" },
+  { value: "North West", label: "North West" },
+  { value: "Northern Cape", label: "Northern Cape" },
+  { value: "Western Cape", label: "Western Cape" },
+];
+
+// Nationality options. South African is first; remainder alphabetical.
+// Values are stored in student_profiles.nationality and used by Playwright
+// to fill in nationality fields on university portals.
+export const NATIONALITY_OPTIONS: EnumOption[] = [
+  { value: "South African", label: "South African" },
+  { value: "Angolan", label: "Angolan" },
+  { value: "Batswana", label: "Batswana" },
+  { value: "British", label: "British" },
+  { value: "Cameroonian", label: "Cameroonian" },
+  { value: "Chinese", label: "Chinese" },
+  { value: "Congolese", label: "Congolese (DRC)" },
+  { value: "Ethiopian", label: "Ethiopian" },
+  { value: "French", label: "French" },
+  { value: "German", label: "German" },
+  { value: "Ghanaian", label: "Ghanaian" },
+  { value: "Indian", label: "Indian" },
+  { value: "Kenyan", label: "Kenyan" },
+  { value: "Lesotho", label: "Lesotho" },
+  { value: "Malawian", label: "Malawian" },
+  { value: "Mozambican", label: "Mozambican" },
+  { value: "Namibian", label: "Namibian" },
+  { value: "Nigerian", label: "Nigerian" },
+  { value: "Pakistani", label: "Pakistani" },
+  { value: "Portuguese", label: "Portuguese" },
+  { value: "Rwandan", label: "Rwandan" },
+  { value: "Somali", label: "Somali" },
+  { value: "Swazi", label: "Swazi" },
+  { value: "Tanzanian", label: "Tanzanian" },
+  { value: "Ugandan", label: "Ugandan" },
+  { value: "Zambian", label: "Zambian" },
+  { value: "Zimbabwean", label: "Zimbabwean" },
+  { value: "Other", label: "Other" },
+];
+
 // Convenience lookups so consumers can convert a stored enum value back
 // into its display label without scanning the options array.
 export const GENDER_LABELS: Record<string, string> = Object.fromEntries(
