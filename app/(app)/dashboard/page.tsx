@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { AlertTriangle, ArrowRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { serverApiGet } from "@/lib/api/server";
 import { ProfileCompleteness } from "@/components/dashboard/completeness";
@@ -11,7 +11,11 @@ export const metadata: Metadata = {
   title: "Dashboard",
 };
 
-type ApplicationCounts = { total: number; submitted: number };
+type ApplicationCounts = {
+  total: number;
+  submitted: number;
+  failed: number;
+};
 
 async function fetchApplicationCounts(
   token: string | null,
@@ -24,6 +28,7 @@ async function fetchApplicationCounts(
   return {
     total: result.data.length,
     submitted: result.data.filter((a) => a.status === "submitted").length,
+    failed: result.data.filter((a) => a.status === "failed").length,
   };
 }
 
@@ -83,6 +88,47 @@ export default async function DashboardPage() {
               className="inline-flex items-center gap-1.5 text-sm font-medium text-primary transition-colors hover:text-primary/80"
             >
               View all
+              <ArrowRight size={14} aria-hidden />
+            </Link>
+          </div>
+        </Card>
+      )}
+
+      {/* Failures-needing-action card — Phase 3. Tinted with the destructive
+       * tone so it reads as "look here next". Only renders when there's at
+       * least one failed application so the surface stays calm otherwise. */}
+      {appCounts !== null && appCounts.failed > 0 && (
+        <Card
+          variant="paper"
+          className="border-destructive/25 bg-destructive/8 p-5 md:p-6"
+        >
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <AlertTriangle
+                size={18}
+                className="mt-0.5 shrink-0 text-destructive"
+                aria-hidden
+              />
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-foreground">
+                  {appCounts.failed}{" "}
+                  {appCounts.failed === 1
+                    ? "application needs"
+                    : "applications need"}{" "}
+                  your attention
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  We hit a snag submitting{" "}
+                  {appCounts.failed === 1 ? "one of yours" : "some of yours"}.
+                  Open the row to see what happened and retry.
+                </p>
+              </div>
+            </div>
+            <Link
+              href="/applications"
+              className="inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-destructive transition-colors hover:text-destructive/80"
+            >
+              Review now
               <ArrowRight size={14} aria-hidden />
             </Link>
           </div>

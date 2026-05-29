@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, CheckCircle2, XCircle } from "lucide-react";
-import { useSelection } from "@/lib/state/selection";
+import { ChevronLeft, CheckCircle2, XCircle, RefreshCw } from "lucide-react";
+import { useSelection, type SelectionEntry } from "@/lib/state/selection";
 import { apiClient, ApiError } from "@/lib/api/client";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,9 @@ import {
 } from "@/lib/constants/profile-enums";
 import { formatDate } from "@/lib/utils/format";
 import { REQUIRED_DOC_TYPES, DOC_LABELS } from "@/lib/constants/documents";
+import { previewFieldMappings, isPortalUnavailable } from "@/lib/api/phase-3";
+import { isLowConfidence } from "@/lib/constants/confidence";
+import { FieldMappingReview, type MappingState } from "./field-mapping-review";
 import type { components } from "@/lib/api/schema";
 import type { AcademicRecordResponse } from "@/lib/api/academic-records";
 
@@ -32,7 +35,12 @@ const REQUIRED_PROFILE_FIELDS = [
   "home_language",
 ] as const;
 
-type SubmitStatus = "idle" | "submitting" | "success" | "error";
+// Per-row status during and after the submit loop.
+//   submitting        — POST in flight
+//   success           — application created
+//   error             — backend rejected for an unrecognised reason
+//   portal_unavailable — backend returned 503 + code:"portal_unavailable"
+type SubmitStatus = "submitting" | "success" | "error" | "portal_unavailable";
 
 export interface ReviewScreenProps {
   profile: StudentProfileResponse | null;
@@ -108,6 +116,164 @@ export function ReviewScreen({
   const [submitErrors, setSubmitErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Per-university field-mapping state. Fetched client-side after hydration
+  // because the selection lives in client context (not URL params).
+  const [mappings, setMappings] = useState<Record<string, MappingState>>({});
+  // Per-university "I've reviewed flagged fields" gate.
+  const [confirmedFlags, setConfirmedFlags] = useState<Record<string, boolean>>(
+    {},
+  );
+
+  // De-dupe the kick-off effect so re-renders don't refetch every cycle.
+  const fetchedRef = useRef<Set<string>>(new Set());
+
+  const loadMapping = useCallback(async (entry: SelectionEntry) => {
+    setMappings((prev) => ({
+      ...prev,
+      [entry.universityId]: { kind: "loading" },
+    }));
+    try {
+      const data = await previewFieldMappings({
+        university_id: entry.universityId,
+        programme: entry.programme!,
+        application_year: entry.applicationYear!,
+      });
+      setMappings((prev) => ({
+        ...prev,
+        [entry.universityId]: { kind: "ready", entries: data.entries },
+      }));
+    } catch (err) {
+      // 404 or 202 = the mapping job hasn't produced output yet. Treat as
+      // "mapping in progress" so the student gets the refresh affordance.
+      if (
+        err instanceof ApiError &&
+        (err.status === 404 || err.status === 202)
+      ) {
+        setMappings((prev) => ({
+          ...prev,
+          [entry.universityId]: { kind: "unavailable" },
+        }));
+        return;
+      }
+      setMappings((prev) => ({
+        ...prev,
+        [entry.universityId]: { kind: "error" },
+      }));
+    }
+  }, []);
+
+  useEffect(() => {
+    for (const entry of entries) {
+      if (fetchedRef.current.has(entry.universityId)) continue;
+      if (!entry.programme || !entry.applicationYear) continue;
+      fetchedRef.current.add(entry.universityId);
+      // queueMicrotask defers the first setState inside loadMapping out of
+      // the effect body — keeps lint happy and avoids a cascading render.
+      queueMicrotask(() => {
+        void loadMapping(entry);
+      });
+    }
+  }, [entries, loadMapping]);
+
+  const refreshMapping = useCallback(
+    (universityId: string) => {
+      const entry = entries.find((e) => e.universityId === universityId);
+      if (!entry) return;
+      // Clear the de-dupe marker so a manual refresh always re-fires.
+      fetchedRef.current.delete(universityId);
+      fetchedRef.current.add(universityId);
+      void loadMapping(entry);
+    },
+    [entries, loadMapping],
+  );
+
+  // Posts one entry and returns the status it landed on. Failures update
+  // statuses + submitErrors in place; the caller threads the returned value
+  // back into its local mirror so the "all done" check sees fresh values
+  // (setState hasn't flushed yet inside an async loop).
+  const postOne = useCallback(
+    async (
+      entry: SelectionEntry,
+    ): Promise<"success" | "error" | "portal_unavailable"> => {
+      setStatuses((prev) => ({
+        ...prev,
+        [entry.universityId]: "submitting",
+      }));
+      setSubmitErrors((prev) => {
+        const next = { ...prev };
+        delete next[entry.universityId];
+        return next;
+      });
+      try {
+        await apiClient.post("/applications", {
+          university_id: entry.universityId,
+          programme: entry.programme!,
+          application_year: entry.applicationYear!,
+        });
+        setStatuses((prev) => ({
+          ...prev,
+          [entry.universityId]: "success",
+        }));
+        return "success";
+      } catch (err) {
+        if (err instanceof ApiError) {
+          // 503 + portal_unavailable — mark this row distinctly so the UI
+          // can show "Retry just this one" and continue the loop.
+          if (err.status === 503 && isPortalUnavailable(err.body)) {
+            setStatuses((prev) => ({
+              ...prev,
+              [entry.universityId]: "portal_unavailable",
+            }));
+            return "portal_unavailable";
+          }
+          const body = err.body;
+          const message =
+            body && typeof body === "object" && "detail" in body
+              ? String((body as { detail: string }).detail)
+              : "Submission failed. Please try again.";
+          setStatuses((prev) => ({
+            ...prev,
+            [entry.universityId]: "error",
+          }));
+          setSubmitErrors((prev) => ({
+            ...prev,
+            [entry.universityId]: message,
+          }));
+          return "error";
+        }
+        setStatuses((prev) => ({
+          ...prev,
+          [entry.universityId]: "error",
+        }));
+        setSubmitErrors((prev) => ({
+          ...prev,
+          [entry.universityId]: "Submission failed. Please try again.",
+        }));
+        return "error";
+      }
+    },
+    [],
+  );
+
+  // After any submit attempt — full loop or single-row retry — check whether
+  // every entry is now success and, if so, clear + redirect to the dashboard
+  // with the celebration flag set.
+  const finishIfAllDone = useCallback(
+    (nextStatuses: Record<string, SubmitStatus>) => {
+      const allDone = entries.every(
+        (e) => nextStatuses[e.universityId] === "success",
+      );
+      if (!allDone) return;
+      clear();
+      router.push("/applications?just_submitted=true");
+    },
+    [entries, clear, router],
+  );
+
+  // Guard for direct deep-link to /applications/review with no selection or
+  // an incomplete row. The redirect itself happens in the effect above; this
+  // bails out of rendering anything until the navigation lands. All hooks
+  // must run before this early return — keep new hooks above this line.
   const guardInvalid =
     entries.length === 0 ||
     entries.some((e) => !e.programme || !e.applicationYear);
@@ -127,54 +293,63 @@ export function ReviewScreen({
   const docsOk =
     documents !== null && REQUIRED_DOC_TYPES.every((t) => uploadedTypes.has(t));
 
+  // ── Confidence gate ──────────────────────────────────────────────────────────
+
+  // A university needs an "I've reviewed flagged fields" check only if its
+  // mapping payload includes at least one low-confidence entry. Universities
+  // whose mappings are loading / unavailable / errored don't block submit
+  // (the student can still go — the worker will do the right thing at run
+  // time and a failure surfaces on the detail page).
+  function hasFlaggedFields(universityId: string): boolean {
+    const m = mappings[universityId];
+    if (!m || m.kind !== "ready") return false;
+    return m.entries.some((e) => isLowConfidence(e.confidence));
+  }
+
+  const allFlagsConfirmed = entries.every((e) =>
+    hasFlaggedFields(e.universityId) ? !!confirmedFlags[e.universityId] : true,
+  );
+
   // ── Submit state ─────────────────────────────────────────────────────────────
 
   const hasAttempted = Object.keys(statuses).length > 0;
-  const hasPartialFailure = entries.some(
-    (e) => statuses[e.universityId] === "error",
+  const hasUnresolved = entries.some(
+    (e) =>
+      statuses[e.universityId] === "error" ||
+      statuses[e.universityId] === "portal_unavailable",
   );
   const canSubmit =
-    profileComplete && recordsOk && docsOk && consent && !isSubmitting;
+    profileComplete &&
+    recordsOk &&
+    docsOk &&
+    consent &&
+    allFlagsConfirmed &&
+    !isSubmitting;
 
   async function handleSubmit() {
+    if (!canSubmit) return;
     setIsSubmitting(true);
-
+    // postOne updates React state asynchronously; we also mirror the result
+    // locally so finishIfAllDone sees the freshest values without waiting
+    // for a render flush.
+    const nextStatuses: Record<string, SubmitStatus> = { ...statuses };
     for (const entry of entries) {
-      if (statuses[entry.universityId] === "success") continue;
-
-      setStatuses((prev) => ({
-        ...prev,
-        [entry.universityId]: "submitting",
-      }));
-
-      try {
-        await apiClient.post("/applications", {
-          university_id: entry.universityId,
-          programme: entry.programme!,
-          application_year: entry.applicationYear!,
-        });
-        setStatuses((prev) => ({
-          ...prev,
-          [entry.universityId]: "success",
-        }));
-      } catch (err) {
-        const body = err instanceof ApiError ? err.body : null;
-        const message =
-          body && typeof body === "object" && "detail" in body
-            ? String((body as { detail: string }).detail)
-            : "Submission failed. Please try again.";
-        setStatuses((prev) => ({ ...prev, [entry.universityId]: "error" }));
-        setSubmitErrors((prev) => ({
-          ...prev,
-          [entry.universityId]: message,
-        }));
-        setIsSubmitting(false);
-        return;
-      }
+      if (nextStatuses[entry.universityId] === "success") continue;
+      nextStatuses[entry.universityId] = await postOne(entry);
     }
+    setIsSubmitting(false);
+    finishIfAllDone(nextStatuses);
+  }
 
-    clear();
-    router.push("/applications");
+  // Single-row retry — used for both "error" and "portal_unavailable" rows.
+  async function handleRetryOne(entry: SelectionEntry) {
+    const result = await postOne(entry);
+    if (result !== "success") return;
+    const nextStatuses: Record<string, SubmitStatus> = {
+      ...statuses,
+      [entry.universityId]: "success",
+    };
+    finishIfAllDone(nextStatuses);
   }
 
   // ── Profile rows ─────────────────────────────────────────────────────────────
@@ -360,6 +535,32 @@ export function ReviewScreen({
         )}
       </ReviewSection>
 
+      {/* Field-mapping confidence — Phase 3 */}
+      <ReviewSection title="Field mappings">
+        <p className="-mt-1 text-xs text-muted-foreground">
+          We&apos;ll flag anything Claude was unsure about. Review each flagged
+          field before submitting.
+        </p>
+        <div className="flex flex-col gap-3">
+          {entries.map((entry) => (
+            <FieldMappingReview
+              key={entry.universityId}
+              universityId={entry.universityId}
+              universityName={entry.universityName}
+              state={mappings[entry.universityId] ?? { kind: "loading" }}
+              confirmed={!!confirmedFlags[entry.universityId]}
+              onConfirmToggle={(next) =>
+                setConfirmedFlags((prev) => ({
+                  ...prev,
+                  [entry.universityId]: next,
+                }))
+              }
+              onRefresh={() => refreshMapping(entry.universityId)}
+            />
+          ))}
+        </div>
+      </ReviewSection>
+
       {/* Applications list */}
       <ReviewSection title="Your applications">
         <div className="divide-y divide-border rounded-lg border border-border">
@@ -382,6 +583,12 @@ export function ReviewScreen({
                       {submitErrors[entry.universityId]}
                     </p>
                   )}
+                  {status === "portal_unavailable" && (
+                    <p role="alert" className="text-xs text-warning">
+                      Applications to {entry.universityName} are temporarily
+                      unavailable — please try again later.
+                    </p>
+                  )}
                 </div>
                 <div className="flex shrink-0 items-center gap-3">
                   {status === "success" && (
@@ -395,6 +602,18 @@ export function ReviewScreen({
                       Submitting…
                     </span>
                   )}
+                  {(status === "error" || status === "portal_unavailable") &&
+                    !isSubmitting && (
+                      <button
+                        type="button"
+                        onClick={() => void handleRetryOne(entry)}
+                        className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+                        aria-label={`Retry submitting to ${entry.universityName}`}
+                      >
+                        <RefreshCw size={12} aria-hidden />
+                        Retry just this one
+                      </button>
+                    )}
                   {status !== "success" && !isSubmitting && (
                     <Link
                       href="/applications/new"
@@ -434,8 +653,8 @@ export function ReviewScreen({
       >
         {isSubmitting
           ? "Submitting…"
-          : hasAttempted && hasPartialFailure
-            ? "Retry"
+          : hasAttempted && hasUnresolved
+            ? "Retry remaining"
             : "Submit applications"}
       </Button>
     </div>

@@ -5,6 +5,8 @@ import { createClient } from "@/lib/supabase/server";
 import { serverApiGet } from "@/lib/api/server";
 import { Alert } from "@/components/ui/alert";
 import { ApplicationList } from "@/components/applications/application-list";
+import { CelebrationBanner } from "@/components/applications/celebration-banner";
+import { Suspense } from "react";
 import type { components } from "@/lib/api/schema";
 
 export const metadata: Metadata = { title: "Applications" };
@@ -38,6 +40,12 @@ export default async function ApplicationsPage() {
 
   return (
     <div className="max-w-2xl space-y-8">
+      {/* Suspense boundary because CelebrationBanner uses useSearchParams,
+       * which Next.js requires to be wrapped during SSR. */}
+      <Suspense fallback={null}>
+        <CelebrationBanner />
+      </Suspense>
+
       <div className="space-y-1">
         <h1 className="font-display text-3xl tracking-tight text-foreground">
           Applications

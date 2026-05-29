@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, RefreshCw } from "lucide-react";
+import { ArrowRight, ImageIcon, RefreshCw } from "lucide-react";
 import { apiClient } from "@/lib/api/client";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -10,9 +10,29 @@ import { Card } from "@/components/ui/card";
 import { StatusBadge } from "./status-badge";
 import { cn } from "@/lib/utils/cn";
 import { formatRelativeTime } from "@/lib/utils/format";
+import { parseJobError } from "@/lib/api/phase-3";
+import { getFailureCopy } from "@/lib/applications/failure-copy";
 import type { components } from "@/lib/api/schema";
 
 type ApplicationRead = components["schemas"]["ApplicationRead"];
+
+// Build the tooltip text for a row's status badge. For failures we surface
+// the friendly copy from the shared map so the list and detail page never
+// diverge.
+function buildBadgeTitle(
+  app: ApplicationRead,
+  universityName: string,
+): string | undefined {
+  if (app.status !== "failed") return undefined;
+  const job = app.latest_job;
+  if (!job) return undefined;
+  const error = parseJobError(job.last_error);
+  if (!error) return undefined;
+  return getFailureCopy(error.code, {
+    message: error.message,
+    universityName,
+  }).headline;
+}
 
 interface ApplicationListProps {
   initialItems: ApplicationRead[];
@@ -75,6 +95,8 @@ export function ApplicationList({
         {items.map((app) => {
           const uniName =
             universityNames[app.university_id] ?? app.university_id;
+          const hasScreenshot = !!app.latest_job?.screenshot_url;
+          const badgeTitle = buildBadgeTitle(app, uniName);
           return (
             <li key={app.id}>
               <Link
@@ -91,7 +113,20 @@ export function ApplicationList({
                       <p className="text-sm font-medium text-foreground">
                         {uniName}
                       </p>
-                      {app.status && <StatusBadge status={app.status} />}
+                      {app.status && (
+                        <span title={badgeTitle}>
+                          <StatusBadge status={app.status} />
+                        </span>
+                      )}
+                      {hasScreenshot && (
+                        <span
+                          title="Confirmation screenshot available"
+                          aria-label="Confirmation screenshot available"
+                          className="inline-flex items-center gap-1 text-xs text-muted-foreground"
+                        >
+                          <ImageIcon size={12} aria-hidden />
+                        </span>
+                      )}
                     </div>
                     <p className="text-xs text-muted-foreground">
                       {app.programme} · {app.application_year}
