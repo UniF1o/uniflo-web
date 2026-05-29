@@ -1,38 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
-import { ChevronLeft } from "lucide-react";
-import { apiClient, ApiError } from "@/lib/api/client";
+import { ChevronLeft, Mail, RefreshCw } from "lucide-react";
+import { ApiError } from "@/lib/api/client";
+import {
+  parseJobError,
+  retryApplication,
+  type AugmentedApplicationJobRead,
+  type JobError,
+} from "@/lib/api/phase-3";
+import { getFailureCopy, isRetryable } from "@/lib/applications/failure-copy";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { StatusBadge } from "./status-badge";
+import { CelebrationBanner } from "./celebration-banner";
+import { SubmissionConfirmation } from "./submission-confirmation";
 import { formatDate } from "@/lib/utils/format";
 import type { components } from "@/lib/api/schema";
 
 type ApplicationRead = components["schemas"]["ApplicationRead"];
 type ApplicationStatus = components["schemas"]["ApplicationStatus"];
-
-// Maps raw worker error codes from application_jobs.last_error to copy a
-// student can actually act on. Unrecognised codes fall through to the raw
-// string so new error types still surface rather than being silently swallowed.
-const JOB_ERROR_MESSAGES: Record<string, string> = {
-  internal_error:
-    "An unexpected error occurred during automation. Please retry — if it keeps failing, contact support.",
-  portal_unavailable:
-    "The university portal was unreachable. Please retry in a few minutes.",
-  login_failed: "The automation couldn't log in to the portal. Please retry.",
-  form_submit_failed:
-    "The application form couldn't be submitted. Please retry.",
-  timeout: "The operation timed out. Please retry.",
-  invalid_credentials:
-    "The portal rejected the login credentials. Please retry.",
-};
-
-function formatJobError(raw: string): string {
-  return JOB_ERROR_MESSAGES[raw] ?? raw;
-}
 
 function DetailRow({
   label,
@@ -53,7 +42,6 @@ function DetailRow({
   );
 }
 
-// Tiny helper kept inline so DetailRow stays a one-shot component.
 function cnRow(isLast?: boolean): string {
   const base =
     "flex flex-col gap-1 px-5 py-3.5 sm:flex-row sm:items-center sm:gap-6";
@@ -63,39 +51,93 @@ function cnRow(isLast?: boolean): string {
 export interface ApplicationDetailProps {
   application: ApplicationRead;
   universityName: string;
+  // Email address rendered on the "Contact support" link for non-retryable
+  // failures. Resolved on the server side so the component doesn't reach
+  // for the env var directly.
+  supportEmail: string;
 }
+
+// Outcome of a retry POST. Drives the toast / alert below the button.
+type RetryFeedback =
+  | { kind: "queued"; message: string }
+  | { kind: "conflict"; message: string }
+  | { kind: "error"; message: string };
 
 export function ApplicationDetail({
   application,
   universityName,
+  supportEmail,
 }: ApplicationDetailProps) {
   const [currentStatus, setCurrentStatus] = useState<ApplicationStatus | null>(
     application.status,
   );
   const [isRetrying, setIsRetrying] = useState(false);
-  const [retryError, setRetryError] = useState<string | null>(null);
+  // After a successful retry we lock the button briefly so a double-tap
+  // doesn't fire a second request before the optimistic status update lands
+  // and the row would otherwise re-enable.
+  const [retryDisabled, setRetryDisabled] = useState(false);
+  const [feedback, setFeedback] = useState<RetryFeedback | null>(null);
+
+  // Treat latest_job as the augmented shape — Phase 3 adds optional
+  // portal_reference / verified_at fields. Existing readers like the
+  // `attempts` and `screenshot_url` fields continue to work.
+  const job = application.latest_job as
+    | AugmentedApplicationJobRead
+    | null
+    | undefined;
+  const structuredError: JobError | null = parseJobError(job?.last_error);
+  const failureCopy = structuredError
+    ? getFailureCopy(structuredError.code, {
+        message: structuredError.message,
+        universityName,
+      })
+    : null;
+  const canRetry =
+    currentStatus === "failed" &&
+    structuredError != null &&
+    isRetryable(structuredError.code, structuredError.retryable);
 
   async function handleRetry() {
     setIsRetrying(true);
-    setRetryError(null);
+    setFeedback(null);
     try {
-      const updated = await apiClient.post<ApplicationRead>(
-        `/applications/${application.id}/retry`,
-      );
-      setCurrentStatus(updated.status);
+      const updated = await retryApplication(application.id);
+      // Optimistically reflect "queued" — the backend returns the refreshed
+      // row from POST /applications/{id}/retry, but on 202 the status often
+      // hasn't moved off `pending` yet.
+      setCurrentStatus(updated.status ?? "pending");
+      setFeedback({
+        kind: "queued",
+        message: "Retrying — we'll update the status shortly.",
+      });
+      // Brief lockout to prevent double-tap retries.
+      setRetryDisabled(true);
+      window.setTimeout(() => setRetryDisabled(false), 5000);
     } catch (err) {
-      const body = err instanceof ApiError ? err.body : null;
-      const message =
-        body && typeof body === "object" && "detail" in body
-          ? String((body as { detail: string }).detail)
-          : "Retry failed. Please try again.";
-      setRetryError(message);
+      if (err instanceof ApiError) {
+        if (err.status === 409) {
+          setFeedback({
+            kind: "conflict",
+            message: "Already retrying — please refresh shortly.",
+          });
+          // Lock out subsequent attempts — refresh is the recovery path.
+          setRetryDisabled(true);
+        } else {
+          setFeedback({
+            kind: "error",
+            message: "Retry failed. Refresh the page and try again.",
+          });
+        }
+      } else {
+        setFeedback({
+          kind: "error",
+          message: "Retry failed. Refresh the page and try again.",
+        });
+      }
     } finally {
       setIsRetrying(false);
     }
   }
-
-  const job = application.latest_job;
 
   return (
     <div className="max-w-2xl space-y-10">
@@ -119,6 +161,81 @@ export function ApplicationDetail({
         </p>
       </div>
 
+      {/* Suspense wraps useSearchParams — required by Next.js even though
+       * this subtree renders client-side. */}
+      <Suspense fallback={null}>
+        <CelebrationBanner />
+      </Suspense>
+
+      {/* Submission proof — Phase 3. Renders when the latest job has
+       * landed at status "submitted". `latest_job.status` is the source of
+       * truth (not `application.status`) because the application row may
+       * still be in `pending` for a beat before the job catches up. */}
+      {job?.status === "submitted" && (
+        <SubmissionConfirmation job={job} universityName={universityName} />
+      )}
+
+      {/* Failure surface — Phase 3. Friendly headline up top, a `<details>`
+       * with the raw message tucked away for support, and the retry /
+       * contact-support affordance based on the taxonomy. */}
+      {currentStatus === "failed" && structuredError && failureCopy && (
+        <div className="space-y-3">
+          <Alert tone="destructive">{failureCopy.headline}</Alert>
+
+          {structuredError.message && (
+            <details className="rounded-lg border border-border bg-muted/30 px-4 py-3 text-xs">
+              <summary className="cursor-pointer font-medium text-muted-foreground hover:text-foreground">
+                Show technical details (for support)
+              </summary>
+              <p className="mt-2 break-all font-mono text-foreground">
+                {structuredError.message}
+              </p>
+            </details>
+          )}
+
+          {feedback && (
+            <Alert
+              tone={
+                feedback.kind === "queued"
+                  ? "info"
+                  : feedback.kind === "conflict"
+                    ? "warning"
+                    : "destructive"
+              }
+            >
+              {feedback.message}
+            </Alert>
+          )}
+
+          <div className="flex flex-col gap-2 sm:flex-row">
+            {canRetry ? (
+              <Button
+                variant="primary"
+                loading={isRetrying}
+                disabled={retryDisabled}
+                onClick={handleRetry}
+                aria-label={
+                  isRetrying ? "Retrying application" : "Retry application"
+                }
+              >
+                <RefreshCw size={14} aria-hidden />
+                Retry application
+              </Button>
+            ) : (
+              <a
+                href={`mailto:${supportEmail}?subject=${encodeURIComponent(
+                  `Help with my ${universityName} application`,
+                )}`}
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-foreground/15 bg-background px-6 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+              >
+                <Mail size={14} aria-hidden />
+                Contact support
+              </a>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Application details */}
       <div className="space-y-3">
         <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
@@ -136,7 +253,9 @@ export function ApplicationDetail({
         </Card>
       </div>
 
-      {/* Latest automation job */}
+      {/* Latest automation job — keep the structured view so support can see
+       * attempts and update times at a glance. The failure summary above
+       * surfaces the friendly version; this card is the raw data. */}
       {job && (
         <div className="space-y-3">
           <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
@@ -149,44 +268,10 @@ export function ApplicationDetail({
               </DetailRow>
             )}
             <DetailRow label="Attempts">{job.attempts}</DetailRow>
-            {job.last_error && (
-              <DetailRow label="Last error">
-                <span className="text-destructive">
-                  {formatJobError(job.last_error)}
-                </span>
-              </DetailRow>
-            )}
-            {/* screenshot_url is Phase 3 — only render when present */}
-            {job.screenshot_url && (
-              <DetailRow label="Screenshot" isLast>
-                <a
-                  href={job.screenshot_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary underline-offset-4 hover:underline"
-                >
-                  View screenshot
-                </a>
-              </DetailRow>
-            )}
-            {/* Render an isLast marker on whichever row ended up last so the
-             * Card doesn't show a hairline below the final item. */}
-            {!job.screenshot_url && !job.last_error && (
-              <DetailRow label="Updated" isLast>
-                {formatDate(job.updated_at) ?? "—"}
-              </DetailRow>
-            )}
+            <DetailRow label="Updated" isLast>
+              {formatDate(job.updated_at) ?? "—"}
+            </DetailRow>
           </Card>
-        </div>
-      )}
-
-      {/* Retry affordance for failed applications */}
-      {currentStatus === "failed" && (
-        <div className="space-y-3">
-          {retryError && <Alert tone="destructive">{retryError}</Alert>}
-          <Button variant="primary" loading={isRetrying} onClick={handleRetry}>
-            Retry application
-          </Button>
         </div>
       )}
     </div>

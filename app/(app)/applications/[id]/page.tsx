@@ -71,10 +71,14 @@ export default async function ApplicationPage({
     ? universityResult.data.name
     : application.university_id;
 
+  const supportEmail =
+    process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? "support@uniflo.co.za";
+
   return (
     <ApplicationDetail
       application={application}
       universityName={universityName}
+      supportEmail={supportEmail}
     />
   );
 }
