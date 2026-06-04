@@ -173,7 +173,12 @@ function validateSubject(row: SubjectRow): Record<string, string> {
 interface SubjectRowEditorProps {
   row: SubjectRow;
   // Validation errors for this row's fields.
-  errors: { name?: string; customName?: string; mark?: string; nscLevel?: string };
+  errors: {
+    name?: string;
+    customName?: string;
+    mark?: string;
+    nscLevel?: string;
+  };
   // Called whenever the user edits any field in this row.
   onChange: (patch: Partial<SubjectRow>) => void;
   onRemove: () => void;

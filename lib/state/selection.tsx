@@ -25,11 +25,11 @@ type Action =
       type: "UPDATE";
       universityId: string;
       patch: Partial<
-      Pick<
-        SelectionEntry,
-        "programme" | "additionalProgrammes" | "applicationYear"
-      >
-    >;
+        Pick<
+          SelectionEntry,
+          "programme" | "additionalProgrammes" | "applicationYear"
+        >
+      >;
     }
   | { type: "CLEAR" };
 
@@ -90,11 +90,11 @@ export function SelectionProvider({ children }: { children: React.ReactNode }) {
     (
       universityId: string,
       patch: Partial<
-      Pick<
-        SelectionEntry,
-        "programme" | "additionalProgrammes" | "applicationYear"
-      >
-    >,
+        Pick<
+          SelectionEntry,
+          "programme" | "additionalProgrammes" | "applicationYear"
+        >
+      >,
     ) => dispatch({ type: "UPDATE", universityId, patch }),
     [],
   );

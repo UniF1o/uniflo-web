@@ -2,7 +2,13 @@
 
 import { Suspense, useState } from "react";
 import Link from "next/link";
-import { ChevronLeft, Mail, RefreshCw, CheckCircle2, XCircle } from "lucide-react";
+import {
+  ChevronLeft,
+  Mail,
+  RefreshCw,
+  CheckCircle2,
+  XCircle,
+} from "lucide-react";
 import { ApiError } from "@/lib/api/client";
 import {
   parseJobError,

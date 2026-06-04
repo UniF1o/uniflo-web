@@ -400,13 +400,13 @@ export function ProfileEditForm() {
   }
 
   function addRedressRow() {
-    setRedressRows((prev) => [
-      ...prev,
-      { id: newRowId(), key: "", value: "" },
-    ]);
+    setRedressRows((prev) => [...prev, { id: newRowId(), key: "", value: "" }]);
   }
 
-  function updateRedressRow(id: string, patch: Partial<Omit<RedressRow, "id">>) {
+  function updateRedressRow(
+    id: string,
+    patch: Partial<Omit<RedressRow, "id">>,
+  ) {
     setRedressRows((prev) =>
       prev.map((row) => (row.id === id ? { ...row, ...patch } : row)),
     );
@@ -874,9 +874,7 @@ export function ProfileEditForm() {
           id="applyingInstitutionalFunding"
           label="I am applying for institutional funding / bursaries"
           checked={applyingInstitutionalFunding}
-          onChange={(e) =>
-            setApplyingInstitutionalFunding(e.target.checked)
-          }
+          onChange={(e) => setApplyingInstitutionalFunding(e.target.checked)}
         />
       </div>
 

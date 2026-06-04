@@ -4,1622 +4,1668 @@
  */
 
 export interface paths {
-    "/webhooks/user-created": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** User Created */
-        post: operations["webhooks_user_created"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+  "/webhooks/user-created": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/webhooks/user-updated": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** User Updated */
-        post: operations["webhooks_user_updated"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /** User Created */
+    post: operations["webhooks_user_created"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/webhooks/user-updated": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/webhooks/user-deleted": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** User Deleted */
-        post: operations["webhooks_user_deleted"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /** User Updated */
+    post: operations["webhooks_user_updated"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/webhooks/user-deleted": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/auth/me": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get Me */
-        get: operations["auth_me"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /** User Deleted */
+    post: operations["webhooks_user_deleted"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/auth/me": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/account": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /** Delete Account */
-        delete: operations["account_delete"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Get Me */
+    get: operations["auth_me"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/profile": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get Profile */
-        get: operations["profiles_get"];
-        put?: never;
-        /** Create Profile */
-        post: operations["profiles_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        /** Update Profile */
-        patch: operations["profiles_update"];
-        trace?: never;
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Delete Account */
+    delete: operations["account_delete"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/profile": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/academic-records": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get Academic Record */
-        get: operations["academic_records_get"];
-        put?: never;
-        /** Create Academic Record */
-        post: operations["academic_records_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        /** Update Academic Record */
-        patch: operations["academic_records_update"];
-        trace?: never;
+    /** Get Profile */
+    get: operations["profiles_get"];
+    put?: never;
+    /** Create Profile */
+    post: operations["profiles_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Update Profile */
+    patch: operations["profiles_update"];
+    trace?: never;
+  };
+  "/academic-records": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/contacts": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List Contacts */
-        get: operations["contacts_list"];
-        put?: never;
-        /** Upsert Contact */
-        post: operations["contacts_upsert"];
-        /** Delete Contact */
-        delete: operations["contacts_delete"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Get Academic Record */
+    get: operations["academic_records_get"];
+    put?: never;
+    /** Create Academic Record */
+    post: operations["academic_records_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Update Academic Record */
+    patch: operations["academic_records_update"];
+    trace?: never;
+  };
+  "/contacts": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/documents/upload": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Upload Document */
-        post: operations["documents_upload"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** List Contacts */
+    get: operations["contacts_list"];
+    put?: never;
+    /** Upsert Contact */
+    post: operations["contacts_upsert"];
+    /** Delete Contact */
+    delete: operations["contacts_delete"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/documents/upload": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/documents": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get Documents */
-        get: operations["documents_list"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /** Upload Document */
+    post: operations["documents_upload"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/documents": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/documents/{document_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /** Delete Document */
-        delete: operations["documents_delete"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Get Documents */
+    get: operations["documents_list"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/documents/{document_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/universities": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List Universities */
-        get: operations["universities_list"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Delete Document */
+    delete: operations["documents_delete"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/universities": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/universities/{university_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get University */
-        get: operations["universities_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** List Universities */
+    get: operations["universities_list"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/universities/{university_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/applications": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List Applications */
-        get: operations["applications_list"];
-        put?: never;
-        /** Create Application */
-        post: operations["applications_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Get University */
+    get: operations["universities_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/applications": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/applications/{application_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get Application */
-        get: operations["applications_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** List Applications */
+    get: operations["applications_list"];
+    put?: never;
+    /** Create Application */
+    post: operations["applications_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/applications/{application_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/applications/{application_id}/retry": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Retry Application */
-        post: operations["applications_retry"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Get Application */
+    get: operations["applications_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/applications/{application_id}/retry": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/health": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Health Check */
-        get: operations["health_check_health_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /** Retry Application */
+    post: operations["applications_retry"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/health": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/ping": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        /** Service Ping */
-        head: operations["service_ping_ping_head"];
-        patch?: never;
-        trace?: never;
+    /** Health Check */
+    get: operations["health_check_health_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/ping": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    /** Service Ping */
+    head: operations["service_ping_ping_head"];
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: {
-        /** AcademicRecordCreate */
-        AcademicRecordCreate: {
-            /** @default grade_11_final */
-            record_type: components["schemas"]["RecordType"];
-            /** Institution */
-            institution: string;
-            /** Year */
-            year: number;
-            /** Subjects */
-            subjects: components["schemas"]["SubjectIn"][];
-        };
-        /** AcademicRecordPatch */
-        AcademicRecordPatch: {
-            /** Institution */
-            institution?: string | null;
-            /** Year */
-            year?: number | null;
-            /** Subjects */
-            subjects?: components["schemas"]["SubjectIn"][] | null;
-        };
-        /** AcademicRecordResponse */
-        AcademicRecordResponse: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /**
-             * Student Id
-             * Format: uuid
-             */
-            student_id: string;
-            record_type: components["schemas"]["RecordType"];
-            /** Institution */
-            institution: string;
-            /** Year */
-            year: number;
-            /** Subjects */
-            subjects: components["schemas"]["SubjectOut"][];
-            /** Aggregate */
-            aggregate?: number | null;
-        };
-        /** ApplicationChoiceRead */
-        ApplicationChoiceRead: {
-            /** Choice Number */
-            choice_number: number;
-            /** Programme */
-            programme: string;
-            /** Eligible */
-            eligible?: boolean | null;
-        };
-        /** ApplicationCreate */
-        ApplicationCreate: {
-            /**
-             * University Id
-             * Format: uuid
-             */
-            university_id: string;
-            /** Programme */
-            programme: string;
-            /** Additional Programmes */
-            additional_programmes?: string[] | null;
-            /** Application Year */
-            application_year: number;
-        };
-        /** ApplicationJobRead */
-        ApplicationJobRead: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            status: components["schemas"]["ApplicationStatus"] | null;
-            /** Attempts */
-            attempts: number;
-            /** Last Error */
-            last_error: string | null;
-            /** Screenshot Url */
-            screenshot_url: string | null;
-            /** Updated At */
-            updated_at: string | null;
-            /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
-        };
-        /** ApplicationRead */
-        ApplicationRead: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /**
-             * Student Id
-             * Format: uuid
-             */
-            student_id: string;
-            /**
-             * University Id
-             * Format: uuid
-             */
-            university_id: string;
-            /** Programme */
-            programme: string;
-            /** Application Year */
-            application_year: number;
-            status: components["schemas"]["ApplicationStatus"] | null;
-            /** Submitted At */
-            submitted_at: string | null;
-            /** Updated At */
-            updated_at: string | null;
-            /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
-            latest_job?: components["schemas"]["ApplicationJobRead"] | null;
-            /**
-             * Choices
-             * @default []
-             */
-            choices: components["schemas"]["ApplicationChoiceRead"][];
-        };
-        /**
-         * ApplicationStatus
-         * @enum {string}
-         */
-        ApplicationStatus: "pending" | "processing" | "submitted" | "failed";
-        /** Body_documents_upload */
-        Body_documents_upload: {
-            /** File */
-            file: string;
-            document_type: components["schemas"]["DocumentType"];
-        };
-        /** ContactResponse */
-        ContactResponse: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /**
-             * Student Id
-             * Format: uuid
-             */
-            student_id: string;
-            contact_type: components["schemas"]["ContactType"];
-            /** Title */
-            title?: string | null;
-            /** First Name */
-            first_name?: string | null;
-            /** Last Name */
-            last_name?: string | null;
-            /** Relationship */
-            relationship?: string | null;
-            /** Id Number */
-            id_number?: string | null;
-            /** Email */
-            email?: string | null;
-            /** Phone */
-            phone?: string | null;
-            /** Street Address */
-            street_address?: string | null;
-            /** Suburb */
-            suburb?: string | null;
-            /** City */
-            city?: string | null;
-            /** Province */
-            province?: string | null;
-            /** Postal Code */
-            postal_code?: string | null;
-            /** Updated At */
-            updated_at?: string | null;
-        };
-        /**
-         * ContactType
-         * @enum {string}
-         */
-        ContactType: "next_of_kin" | "fee_payer" | "guardian" | "emergency";
-        /** ContactWrite */
-        ContactWrite: {
-            contact_type: components["schemas"]["ContactType"];
-            /** Title */
-            title?: string | null;
-            /** First Name */
-            first_name?: string | null;
-            /** Last Name */
-            last_name?: string | null;
-            /** Relationship */
-            relationship?: string | null;
-            /** Id Number */
-            id_number?: string | null;
-            /** Email */
-            email?: string | null;
-            /** Phone */
-            phone?: string | null;
-            /** Street Address */
-            street_address?: string | null;
-            /** Suburb */
-            suburb?: string | null;
-            /** City */
-            city?: string | null;
-            /** Province */
-            province?: string | null;
-            /** Postal Code */
-            postal_code?: string | null;
-        };
-        /**
-         * CurrentActivityEnum
-         * @enum {string}
-         */
-        CurrentActivityEnum: "Currently in Grade 12" | "Upgrading matric" | "Gap year" | "Employed" | "At university" | "Other";
-        /**
-         * DisabilityEnum
-         * @enum {string}
-         */
-        DisabilityEnum: "None" | "Visual impairment" | "Hearing impairment" | "Physical/mobility impairment" | "Intellectual disability" | "Learning disability" | "Mental health condition" | "Other";
-        /** DocumentResponse */
-        DocumentResponse: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /**
-             * Student Id
-             * Format: uuid
-             */
-            student_id: string;
-            type: components["schemas"]["DocumentType"];
-            /** Storage Url */
-            storage_url: string;
-            /**
-             * Uploaded At
-             * Format: date-time
-             */
-            uploaded_at: string;
-        };
-        /**
-         * DocumentType
-         * @enum {string}
-         */
-        DocumentType: "ID_COPY" | "MATRIC_RESULTS" | "TRANSCRIPT" | "GRADE12_APRIL" | "GRADE11_RESULTS";
-        /**
-         * EthnicityEnum
-         * @enum {string}
-         */
-        EthnicityEnum: "African" | "Coloured" | "Indian" | "Asian" | "White" | "Other";
-        /**
-         * GenderEnum
-         * @enum {string}
-         */
-        GenderEnum: "Male" | "Female";
-        /** HTTPValidationError */
-        HTTPValidationError: {
-            /** Detail */
-            detail?: components["schemas"]["ValidationError"][];
-        };
-        /**
-         * HomeLanguageEnum
-         * @enum {string}
-         */
-        HomeLanguageEnum: "English" | "Afrikaans" | "isiZulu" | "isiXhosa" | "Sesotho" | "Setswana" | "Sepedi" | "Tshivenda" | "Xitsonga" | "siSwati" | "isiNdebele";
-        /**
-         * MaritalStatusEnum
-         * @enum {string}
-         */
-        MaritalStatusEnum: "Single" | "Married" | "Divorced" | "Widowed" | "Other";
-        /**
-         * RecordType
-         * @enum {string}
-         */
-        RecordType: "grade_11_final" | "grade_12_april";
-        /**
-         * ReligionEnum
-         * @enum {string}
-         */
-        ReligionEnum: "None" | "Christianity" | "Islam" | "Hinduism" | "Judaism" | "African Traditional Religion" | "Buddhism" | "Other";
-        /** StudentProfileResponse */
-        StudentProfileResponse: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /**
-             * User Id
-             * Format: uuid
-             */
-            user_id: string;
-            title?: components["schemas"]["TitleEnum"] | null;
-            /** First Name */
-            first_name?: string | null;
-            /** Middle Names */
-            middle_names?: string | null;
-            /** Last Name */
-            last_name?: string | null;
-            /** Maiden Name */
-            maiden_name?: string | null;
-            /** Preferred Name */
-            preferred_name?: string | null;
-            /** Id Number */
-            id_number?: string | null;
-            /** Date Of Birth */
-            date_of_birth?: string | null;
-            /** Phone */
-            phone?: string | null;
-            /** Street Address */
-            street_address?: string | null;
-            /** Suburb */
-            suburb?: string | null;
-            /** City */
-            city?: string | null;
-            /** Province */
-            province?: string | null;
-            /** Postal Code */
-            postal_code?: string | null;
-            /** Mailing Same As Residential */
-            mailing_same_as_residential?: boolean | null;
-            /** Mailing Street Address */
-            mailing_street_address?: string | null;
-            /** Mailing Suburb */
-            mailing_suburb?: string | null;
-            /** Mailing City */
-            mailing_city?: string | null;
-            /** Mailing Province */
-            mailing_province?: string | null;
-            /** Mailing Postal Code */
-            mailing_postal_code?: string | null;
-            /** Nationality */
-            nationality?: string | null;
-            /** Is Sa Citizen */
-            is_sa_citizen?: boolean | null;
-            gender?: components["schemas"]["GenderEnum"] | null;
-            home_language?: components["schemas"]["HomeLanguageEnum"] | null;
-            religion?: components["schemas"]["ReligionEnum"] | null;
-            disability?: components["schemas"]["DisabilityEnum"] | null;
-            /** Disability Detail */
-            disability_detail?: string | null;
-            /** Disability Assistance */
-            disability_assistance?: string | null;
-            marital_status?: components["schemas"]["MaritalStatusEnum"] | null;
-            ethnicity?: components["schemas"]["EthnicityEnum"] | null;
-            current_activity?: components["schemas"]["CurrentActivityEnum"] | null;
-            /** Exam Number */
-            exam_number?: string | null;
-            /** Sport */
-            sport?: string | null;
-            /** Wants Residence */
-            wants_residence?: boolean | null;
-            /** Preferred Residence */
-            preferred_residence?: string | null;
-            /** Applying Nsfas */
-            applying_nsfas?: boolean | null;
-            /** Applying Institutional Funding */
-            applying_institutional_funding?: boolean | null;
-            /** Nbt Reference */
-            nbt_reference?: string | null;
-            /** Nbt Year */
-            nbt_year?: number | null;
-            /** Nbt Date */
-            nbt_date?: string | null;
-            /** Redress Factors */
-            redress_factors?: {
-                [key: string]: unknown;
-            } | null;
-            /** Updated At */
-            updated_at?: string | null;
-            /** Is Complete */
-            readonly is_complete: boolean;
-        };
-        /** StudentProfileWrite */
-        StudentProfileWrite: {
-            title?: components["schemas"]["TitleEnum"] | null;
-            /** First Name */
-            first_name?: string | null;
-            /** Middle Names */
-            middle_names?: string | null;
-            /** Last Name */
-            last_name?: string | null;
-            /** Maiden Name */
-            maiden_name?: string | null;
-            /** Preferred Name */
-            preferred_name?: string | null;
-            /** Id Number */
-            id_number?: string | null;
-            /** Date Of Birth */
-            date_of_birth?: string | null;
-            /** Phone */
-            phone?: string | null;
-            /** Street Address */
-            street_address?: string | null;
-            /** Suburb */
-            suburb?: string | null;
-            /** City */
-            city?: string | null;
-            /** Province */
-            province?: string | null;
-            /** Postal Code */
-            postal_code?: string | null;
-            /** Mailing Same As Residential */
-            mailing_same_as_residential?: boolean | null;
-            /** Mailing Street Address */
-            mailing_street_address?: string | null;
-            /** Mailing Suburb */
-            mailing_suburb?: string | null;
-            /** Mailing City */
-            mailing_city?: string | null;
-            /** Mailing Province */
-            mailing_province?: string | null;
-            /** Mailing Postal Code */
-            mailing_postal_code?: string | null;
-            /** Nationality */
-            nationality?: string | null;
-            /** Is Sa Citizen */
-            is_sa_citizen?: boolean | null;
-            gender?: components["schemas"]["GenderEnum"] | null;
-            home_language?: components["schemas"]["HomeLanguageEnum"] | null;
-            religion?: components["schemas"]["ReligionEnum"] | null;
-            disability?: components["schemas"]["DisabilityEnum"] | null;
-            /** Disability Detail */
-            disability_detail?: string | null;
-            /** Disability Assistance */
-            disability_assistance?: string | null;
-            marital_status?: components["schemas"]["MaritalStatusEnum"] | null;
-            ethnicity?: components["schemas"]["EthnicityEnum"] | null;
-            current_activity?: components["schemas"]["CurrentActivityEnum"] | null;
-            /** Exam Number */
-            exam_number?: string | null;
-            /** Sport */
-            sport?: string | null;
-            /** Wants Residence */
-            wants_residence?: boolean | null;
-            /** Preferred Residence */
-            preferred_residence?: string | null;
-            /** Applying Nsfas */
-            applying_nsfas?: boolean | null;
-            /** Applying Institutional Funding */
-            applying_institutional_funding?: boolean | null;
-            /** Nbt Reference */
-            nbt_reference?: string | null;
-            /** Nbt Year */
-            nbt_year?: number | null;
-            /** Nbt Date */
-            nbt_date?: string | null;
-            /** Redress Factors */
-            redress_factors?: {
-                [key: string]: unknown;
-            } | null;
-        };
-        /** SubjectIn */
-        SubjectIn: {
-            /** Name */
-            name: string;
-            /** Mark */
-            mark: number;
-            /** Nsc Level */
-            nsc_level?: number | null;
-            /** Custom Name */
-            custom_name?: string | null;
-        };
-        /** SubjectOut */
-        SubjectOut: {
-            /** Name */
-            name: string;
-            /** Mark */
-            mark: number;
-            /** Nsc Level */
-            nsc_level?: number | null;
-            /** Custom Name */
-            custom_name?: string | null;
-        };
-        /**
-         * TitleEnum
-         * @enum {string}
-         */
-        TitleEnum: "Mr" | "Mrs" | "Ms" | "Miss" | "Dr" | "Prof" | "Mx" | "Other";
-        /** UniversitiesListResponse */
-        UniversitiesListResponse: {
-            /** Items */
-            items: components["schemas"]["UniversityRead"][];
-        };
-        /** UniversityRead */
-        UniversityRead: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /** Name */
-            name: string;
-            /** Website */
-            website: string;
-            /** Portal Url */
-            portal_url: string;
-            /** Open Date */
-            open_date?: string | null;
-            /** Close Date */
-            close_date?: string | null;
-            /** Is Active */
-            is_active: boolean;
-        };
-        /** UserCreatedPayload */
-        UserCreatedPayload: {
-            record: components["schemas"]["UserCreatedRecord"];
-        };
-        /** UserCreatedRecord */
-        UserCreatedRecord: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /**
-             * Email
-             * Format: email
-             */
-            email: string;
-        };
-        /** UserDeletedPayload */
-        UserDeletedPayload: {
-            record: components["schemas"]["UserDeletedRecord"];
-        };
-        /** UserDeletedRecord */
-        UserDeletedRecord: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-        };
-        /** UserResponse */
-        UserResponse: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /**
-             * Email
-             * Format: email
-             */
-            email: string;
-            /** Role */
-            role: string;
-        };
-        /** UserUpdatedPayload */
-        UserUpdatedPayload: {
-            record: components["schemas"]["UserUpdatedRecord"];
-        };
-        /** UserUpdatedRecord */
-        UserUpdatedRecord: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /**
-             * Email
-             * Format: email
-             */
-            email: string;
-        };
-        /** ValidationError */
-        ValidationError: {
-            /** Location */
-            loc: (string | number)[];
-            /** Message */
-            msg: string;
-            /** Error Type */
-            type: string;
-            /** Input */
-            input?: unknown;
-            /** Context */
-            ctx?: Record<string, never>;
-        };
+  schemas: {
+    /** AcademicRecordCreate */
+    AcademicRecordCreate: {
+      /** @default grade_11_final */
+      record_type: components["schemas"]["RecordType"];
+      /** Institution */
+      institution: string;
+      /** Year */
+      year: number;
+      /** Subjects */
+      subjects: components["schemas"]["SubjectIn"][];
     };
-    responses: never;
-    parameters: never;
-    requestBodies: never;
-    headers: never;
-    pathItems: never;
+    /** AcademicRecordPatch */
+    AcademicRecordPatch: {
+      /** Institution */
+      institution?: string | null;
+      /** Year */
+      year?: number | null;
+      /** Subjects */
+      subjects?: components["schemas"]["SubjectIn"][] | null;
+    };
+    /** AcademicRecordResponse */
+    AcademicRecordResponse: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Student Id
+       * Format: uuid
+       */
+      student_id: string;
+      record_type: components["schemas"]["RecordType"];
+      /** Institution */
+      institution: string;
+      /** Year */
+      year: number;
+      /** Subjects */
+      subjects: components["schemas"]["SubjectOut"][];
+      /** Aggregate */
+      aggregate?: number | null;
+    };
+    /** ApplicationChoiceRead */
+    ApplicationChoiceRead: {
+      /** Choice Number */
+      choice_number: number;
+      /** Programme */
+      programme: string;
+      /** Eligible */
+      eligible?: boolean | null;
+    };
+    /** ApplicationCreate */
+    ApplicationCreate: {
+      /**
+       * University Id
+       * Format: uuid
+       */
+      university_id: string;
+      /** Programme */
+      programme: string;
+      /** Additional Programmes */
+      additional_programmes?: string[] | null;
+      /** Application Year */
+      application_year: number;
+    };
+    /** ApplicationJobRead */
+    ApplicationJobRead: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      status: components["schemas"]["ApplicationStatus"] | null;
+      /** Attempts */
+      attempts: number;
+      /** Last Error */
+      last_error: string | null;
+      /** Screenshot Url */
+      screenshot_url: string | null;
+      /** Updated At */
+      updated_at: string | null;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+    };
+    /** ApplicationRead */
+    ApplicationRead: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Student Id
+       * Format: uuid
+       */
+      student_id: string;
+      /**
+       * University Id
+       * Format: uuid
+       */
+      university_id: string;
+      /** Programme */
+      programme: string;
+      /** Application Year */
+      application_year: number;
+      status: components["schemas"]["ApplicationStatus"] | null;
+      /** Submitted At */
+      submitted_at: string | null;
+      /** Updated At */
+      updated_at: string | null;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      latest_job?: components["schemas"]["ApplicationJobRead"] | null;
+      /**
+       * Choices
+       * @default []
+       */
+      choices: components["schemas"]["ApplicationChoiceRead"][];
+    };
+    /**
+     * ApplicationStatus
+     * @enum {string}
+     */
+    ApplicationStatus: "pending" | "processing" | "submitted" | "failed";
+    /** Body_documents_upload */
+    Body_documents_upload: {
+      /** File */
+      file: string;
+      document_type: components["schemas"]["DocumentType"];
+    };
+    /** ContactResponse */
+    ContactResponse: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Student Id
+       * Format: uuid
+       */
+      student_id: string;
+      contact_type: components["schemas"]["ContactType"];
+      /** Title */
+      title?: string | null;
+      /** First Name */
+      first_name?: string | null;
+      /** Last Name */
+      last_name?: string | null;
+      /** Relationship */
+      relationship?: string | null;
+      /** Id Number */
+      id_number?: string | null;
+      /** Email */
+      email?: string | null;
+      /** Phone */
+      phone?: string | null;
+      /** Street Address */
+      street_address?: string | null;
+      /** Suburb */
+      suburb?: string | null;
+      /** City */
+      city?: string | null;
+      /** Province */
+      province?: string | null;
+      /** Postal Code */
+      postal_code?: string | null;
+      /** Updated At */
+      updated_at?: string | null;
+    };
+    /**
+     * ContactType
+     * @enum {string}
+     */
+    ContactType: "next_of_kin" | "fee_payer" | "guardian" | "emergency";
+    /** ContactWrite */
+    ContactWrite: {
+      contact_type: components["schemas"]["ContactType"];
+      /** Title */
+      title?: string | null;
+      /** First Name */
+      first_name?: string | null;
+      /** Last Name */
+      last_name?: string | null;
+      /** Relationship */
+      relationship?: string | null;
+      /** Id Number */
+      id_number?: string | null;
+      /** Email */
+      email?: string | null;
+      /** Phone */
+      phone?: string | null;
+      /** Street Address */
+      street_address?: string | null;
+      /** Suburb */
+      suburb?: string | null;
+      /** City */
+      city?: string | null;
+      /** Province */
+      province?: string | null;
+      /** Postal Code */
+      postal_code?: string | null;
+    };
+    /**
+     * CurrentActivityEnum
+     * @enum {string}
+     */
+    CurrentActivityEnum:
+      | "Currently in Grade 12"
+      | "Upgrading matric"
+      | "Gap year"
+      | "Employed"
+      | "At university"
+      | "Other";
+    /**
+     * DisabilityEnum
+     * @enum {string}
+     */
+    DisabilityEnum:
+      | "None"
+      | "Visual impairment"
+      | "Hearing impairment"
+      | "Physical/mobility impairment"
+      | "Intellectual disability"
+      | "Learning disability"
+      | "Mental health condition"
+      | "Other";
+    /** DocumentResponse */
+    DocumentResponse: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Student Id
+       * Format: uuid
+       */
+      student_id: string;
+      type: components["schemas"]["DocumentType"];
+      /** Storage Url */
+      storage_url: string;
+      /**
+       * Uploaded At
+       * Format: date-time
+       */
+      uploaded_at: string;
+    };
+    /**
+     * DocumentType
+     * @enum {string}
+     */
+    DocumentType:
+      | "ID_COPY"
+      | "MATRIC_RESULTS"
+      | "TRANSCRIPT"
+      | "GRADE12_APRIL"
+      | "GRADE11_RESULTS";
+    /**
+     * EthnicityEnum
+     * @enum {string}
+     */
+    EthnicityEnum:
+      | "African"
+      | "Coloured"
+      | "Indian"
+      | "Asian"
+      | "White"
+      | "Other";
+    /**
+     * GenderEnum
+     * @enum {string}
+     */
+    GenderEnum: "Male" | "Female";
+    /** HTTPValidationError */
+    HTTPValidationError: {
+      /** Detail */
+      detail?: components["schemas"]["ValidationError"][];
+    };
+    /**
+     * HomeLanguageEnum
+     * @enum {string}
+     */
+    HomeLanguageEnum:
+      | "English"
+      | "Afrikaans"
+      | "isiZulu"
+      | "isiXhosa"
+      | "Sesotho"
+      | "Setswana"
+      | "Sepedi"
+      | "Tshivenda"
+      | "Xitsonga"
+      | "siSwati"
+      | "isiNdebele";
+    /**
+     * MaritalStatusEnum
+     * @enum {string}
+     */
+    MaritalStatusEnum: "Single" | "Married" | "Divorced" | "Widowed" | "Other";
+    /**
+     * RecordType
+     * @enum {string}
+     */
+    RecordType: "grade_11_final" | "grade_12_april";
+    /**
+     * ReligionEnum
+     * @enum {string}
+     */
+    ReligionEnum:
+      | "None"
+      | "Christianity"
+      | "Islam"
+      | "Hinduism"
+      | "Judaism"
+      | "African Traditional Religion"
+      | "Buddhism"
+      | "Other";
+    /** StudentProfileResponse */
+    StudentProfileResponse: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * User Id
+       * Format: uuid
+       */
+      user_id: string;
+      title?: components["schemas"]["TitleEnum"] | null;
+      /** First Name */
+      first_name?: string | null;
+      /** Middle Names */
+      middle_names?: string | null;
+      /** Last Name */
+      last_name?: string | null;
+      /** Maiden Name */
+      maiden_name?: string | null;
+      /** Preferred Name */
+      preferred_name?: string | null;
+      /** Id Number */
+      id_number?: string | null;
+      /** Date Of Birth */
+      date_of_birth?: string | null;
+      /** Phone */
+      phone?: string | null;
+      /** Street Address */
+      street_address?: string | null;
+      /** Suburb */
+      suburb?: string | null;
+      /** City */
+      city?: string | null;
+      /** Province */
+      province?: string | null;
+      /** Postal Code */
+      postal_code?: string | null;
+      /** Mailing Same As Residential */
+      mailing_same_as_residential?: boolean | null;
+      /** Mailing Street Address */
+      mailing_street_address?: string | null;
+      /** Mailing Suburb */
+      mailing_suburb?: string | null;
+      /** Mailing City */
+      mailing_city?: string | null;
+      /** Mailing Province */
+      mailing_province?: string | null;
+      /** Mailing Postal Code */
+      mailing_postal_code?: string | null;
+      /** Nationality */
+      nationality?: string | null;
+      /** Is Sa Citizen */
+      is_sa_citizen?: boolean | null;
+      gender?: components["schemas"]["GenderEnum"] | null;
+      home_language?: components["schemas"]["HomeLanguageEnum"] | null;
+      religion?: components["schemas"]["ReligionEnum"] | null;
+      disability?: components["schemas"]["DisabilityEnum"] | null;
+      /** Disability Detail */
+      disability_detail?: string | null;
+      /** Disability Assistance */
+      disability_assistance?: string | null;
+      marital_status?: components["schemas"]["MaritalStatusEnum"] | null;
+      ethnicity?: components["schemas"]["EthnicityEnum"] | null;
+      current_activity?: components["schemas"]["CurrentActivityEnum"] | null;
+      /** Exam Number */
+      exam_number?: string | null;
+      /** Sport */
+      sport?: string | null;
+      /** Wants Residence */
+      wants_residence?: boolean | null;
+      /** Preferred Residence */
+      preferred_residence?: string | null;
+      /** Applying Nsfas */
+      applying_nsfas?: boolean | null;
+      /** Applying Institutional Funding */
+      applying_institutional_funding?: boolean | null;
+      /** Nbt Reference */
+      nbt_reference?: string | null;
+      /** Nbt Year */
+      nbt_year?: number | null;
+      /** Nbt Date */
+      nbt_date?: string | null;
+      /** Redress Factors */
+      redress_factors?: {
+        [key: string]: unknown;
+      } | null;
+      /** Updated At */
+      updated_at?: string | null;
+      /** Is Complete */
+      readonly is_complete: boolean;
+    };
+    /** StudentProfileWrite */
+    StudentProfileWrite: {
+      title?: components["schemas"]["TitleEnum"] | null;
+      /** First Name */
+      first_name?: string | null;
+      /** Middle Names */
+      middle_names?: string | null;
+      /** Last Name */
+      last_name?: string | null;
+      /** Maiden Name */
+      maiden_name?: string | null;
+      /** Preferred Name */
+      preferred_name?: string | null;
+      /** Id Number */
+      id_number?: string | null;
+      /** Date Of Birth */
+      date_of_birth?: string | null;
+      /** Phone */
+      phone?: string | null;
+      /** Street Address */
+      street_address?: string | null;
+      /** Suburb */
+      suburb?: string | null;
+      /** City */
+      city?: string | null;
+      /** Province */
+      province?: string | null;
+      /** Postal Code */
+      postal_code?: string | null;
+      /** Mailing Same As Residential */
+      mailing_same_as_residential?: boolean | null;
+      /** Mailing Street Address */
+      mailing_street_address?: string | null;
+      /** Mailing Suburb */
+      mailing_suburb?: string | null;
+      /** Mailing City */
+      mailing_city?: string | null;
+      /** Mailing Province */
+      mailing_province?: string | null;
+      /** Mailing Postal Code */
+      mailing_postal_code?: string | null;
+      /** Nationality */
+      nationality?: string | null;
+      /** Is Sa Citizen */
+      is_sa_citizen?: boolean | null;
+      gender?: components["schemas"]["GenderEnum"] | null;
+      home_language?: components["schemas"]["HomeLanguageEnum"] | null;
+      religion?: components["schemas"]["ReligionEnum"] | null;
+      disability?: components["schemas"]["DisabilityEnum"] | null;
+      /** Disability Detail */
+      disability_detail?: string | null;
+      /** Disability Assistance */
+      disability_assistance?: string | null;
+      marital_status?: components["schemas"]["MaritalStatusEnum"] | null;
+      ethnicity?: components["schemas"]["EthnicityEnum"] | null;
+      current_activity?: components["schemas"]["CurrentActivityEnum"] | null;
+      /** Exam Number */
+      exam_number?: string | null;
+      /** Sport */
+      sport?: string | null;
+      /** Wants Residence */
+      wants_residence?: boolean | null;
+      /** Preferred Residence */
+      preferred_residence?: string | null;
+      /** Applying Nsfas */
+      applying_nsfas?: boolean | null;
+      /** Applying Institutional Funding */
+      applying_institutional_funding?: boolean | null;
+      /** Nbt Reference */
+      nbt_reference?: string | null;
+      /** Nbt Year */
+      nbt_year?: number | null;
+      /** Nbt Date */
+      nbt_date?: string | null;
+      /** Redress Factors */
+      redress_factors?: {
+        [key: string]: unknown;
+      } | null;
+    };
+    /** SubjectIn */
+    SubjectIn: {
+      /** Name */
+      name: string;
+      /** Mark */
+      mark: number;
+      /** Nsc Level */
+      nsc_level?: number | null;
+      /** Custom Name */
+      custom_name?: string | null;
+    };
+    /** SubjectOut */
+    SubjectOut: {
+      /** Name */
+      name: string;
+      /** Mark */
+      mark: number;
+      /** Nsc Level */
+      nsc_level?: number | null;
+      /** Custom Name */
+      custom_name?: string | null;
+    };
+    /**
+     * TitleEnum
+     * @enum {string}
+     */
+    TitleEnum: "Mr" | "Mrs" | "Ms" | "Miss" | "Dr" | "Prof" | "Mx" | "Other";
+    /** UniversitiesListResponse */
+    UniversitiesListResponse: {
+      /** Items */
+      items: components["schemas"]["UniversityRead"][];
+    };
+    /** UniversityRead */
+    UniversityRead: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Name */
+      name: string;
+      /** Website */
+      website: string;
+      /** Portal Url */
+      portal_url: string;
+      /** Open Date */
+      open_date?: string | null;
+      /** Close Date */
+      close_date?: string | null;
+      /** Is Active */
+      is_active: boolean;
+    };
+    /** UserCreatedPayload */
+    UserCreatedPayload: {
+      record: components["schemas"]["UserCreatedRecord"];
+    };
+    /** UserCreatedRecord */
+    UserCreatedRecord: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Email
+       * Format: email
+       */
+      email: string;
+    };
+    /** UserDeletedPayload */
+    UserDeletedPayload: {
+      record: components["schemas"]["UserDeletedRecord"];
+    };
+    /** UserDeletedRecord */
+    UserDeletedRecord: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+    };
+    /** UserResponse */
+    UserResponse: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Email
+       * Format: email
+       */
+      email: string;
+      /** Role */
+      role: string;
+    };
+    /** UserUpdatedPayload */
+    UserUpdatedPayload: {
+      record: components["schemas"]["UserUpdatedRecord"];
+    };
+    /** UserUpdatedRecord */
+    UserUpdatedRecord: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Email
+       * Format: email
+       */
+      email: string;
+    };
+    /** ValidationError */
+    ValidationError: {
+      /** Location */
+      loc: (string | number)[];
+      /** Message */
+      msg: string;
+      /** Error Type */
+      type: string;
+      /** Input */
+      input?: unknown;
+      /** Context */
+      ctx?: Record<string, never>;
+    };
+  };
+  responses: never;
+  parameters: never;
+  requestBodies: never;
+  headers: never;
+  pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    webhooks_user_created: {
-        parameters: {
-            query?: never;
-            header?: {
-                "x-webhook-secret"?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UserCreatedPayload"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
+  webhooks_user_created: {
+    parameters: {
+      query?: never;
+      header?: {
+        "x-webhook-secret"?: string | null;
+      };
+      path?: never;
+      cookie?: never;
     };
-    webhooks_user_updated: {
-        parameters: {
-            query?: never;
-            header?: {
-                "x-webhook-secret"?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UserUpdatedPayload"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UserCreatedPayload"];
+      };
     };
-    webhooks_user_deleted: {
-        parameters: {
-            query?: never;
-            header?: {
-                "x-webhook-secret"?: string | null;
-            };
-            path?: never;
-            cookie?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UserDeletedPayload"];
-            };
+        content: {
+          "application/json": unknown;
         };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
         };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
     };
-    auth_me: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UserResponse"];
-                };
-            };
-        };
+  };
+  webhooks_user_updated: {
+    parameters: {
+      query?: never;
+      header?: {
+        "x-webhook-secret"?: string | null;
+      };
+      path?: never;
+      cookie?: never;
     };
-    account_delete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-        };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UserUpdatedPayload"];
+      };
     };
-    profiles_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StudentProfileResponse"];
-                };
-            };
+        content: {
+          "application/json": unknown;
         };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
     };
-    profiles_create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["StudentProfileWrite"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StudentProfileResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
+  };
+  webhooks_user_deleted: {
+    parameters: {
+      query?: never;
+      header?: {
+        "x-webhook-secret"?: string | null;
+      };
+      path?: never;
+      cookie?: never;
     };
-    profiles_update: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["StudentProfileWrite"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StudentProfileResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UserDeletedPayload"];
+      };
     };
-    academic_records_get: {
-        parameters: {
-            query?: {
-                record_type?: components["schemas"]["RecordType"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AcademicRecordResponse"] | null;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
+        content: {
+          "application/json": unknown;
         };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
     };
-    academic_records_create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["AcademicRecordCreate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AcademicRecordResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
+  };
+  auth_me: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    academic_records_update: {
-        parameters: {
-            query?: {
-                record_type?: components["schemas"]["RecordType"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["AcademicRecordPatch"];
-            };
+        content: {
+          "application/json": components["schemas"]["UserResponse"];
         };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AcademicRecordResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
+      };
     };
-    contacts_list: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ContactResponse"][];
-                };
-            };
-        };
+  };
+  account_delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    contacts_upsert: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ContactWrite"];
-            };
+        content: {
+          "application/json": unknown;
         };
-        responses: {
-            /** @description Successful Response */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ContactResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
+      };
     };
-    contacts_delete: {
-        parameters: {
-            query: {
-                contact_type: components["schemas"]["ContactType"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
+  };
+  profiles_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    documents_upload: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "multipart/form-data": components["schemas"]["Body_documents_upload"];
-            };
+        content: {
+          "application/json": components["schemas"]["StudentProfileResponse"];
         };
-        responses: {
-            /** @description Successful Response */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DocumentResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
+      };
     };
-    documents_list: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DocumentResponse"][];
-                };
-            };
-        };
+  };
+  profiles_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    documents_delete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                document_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["StudentProfileWrite"];
+      };
     };
-    universities_list: {
-        parameters: {
-            query?: {
-                q?: string | null;
-                is_active?: boolean | null;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UniversitiesListResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
+        content: {
+          "application/json": components["schemas"]["StudentProfileResponse"];
         };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
     };
-    universities_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                university_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UniversityRead"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
+  };
+  profiles_update: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    applications_list: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApplicationRead"][];
-                };
-            };
-        };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["StudentProfileWrite"];
+      };
     };
-    applications_create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ApplicationCreate"];
-            };
+        content: {
+          "application/json": components["schemas"]["StudentProfileResponse"];
         };
-        responses: {
-            /** @description Successful Response */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApplicationRead"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
         };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
     };
-    applications_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                application_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApplicationRead"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
+  };
+  academic_records_get: {
+    parameters: {
+      query?: {
+        record_type?: components["schemas"]["RecordType"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    applications_retry: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                application_id: string;
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
+        content: {
+          "application/json":
+            | components["schemas"]["AcademicRecordResponse"]
+            | null;
         };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
     };
-    health_check_health_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-        };
+  };
+  academic_records_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    service_ping_ping_head: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-        };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AcademicRecordCreate"];
+      };
     };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AcademicRecordResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  academic_records_update: {
+    parameters: {
+      query?: {
+        record_type?: components["schemas"]["RecordType"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AcademicRecordPatch"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AcademicRecordResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  contacts_list: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ContactResponse"][];
+        };
+      };
+    };
+  };
+  contacts_upsert: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ContactWrite"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ContactResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  contacts_delete: {
+    parameters: {
+      query: {
+        contact_type: components["schemas"]["ContactType"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  documents_upload: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "multipart/form-data": components["schemas"]["Body_documents_upload"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DocumentResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  documents_list: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DocumentResponse"][];
+        };
+      };
+    };
+  };
+  documents_delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        document_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  universities_list: {
+    parameters: {
+      query?: {
+        q?: string | null;
+        is_active?: boolean | null;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["UniversitiesListResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  universities_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        university_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["UniversityRead"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  applications_list: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApplicationRead"][];
+        };
+      };
+    };
+  };
+  applications_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ApplicationCreate"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApplicationRead"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  applications_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        application_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApplicationRead"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  applications_retry: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        application_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  health_check_health_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": unknown;
+        };
+      };
+    };
+  };
+  service_ping_ping_head: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": unknown;
+        };
+      };
+    };
+  };
 }

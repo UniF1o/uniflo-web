@@ -102,7 +102,8 @@ export function NewApplicationsForm() {
     setErrors((prev) => {
       const uErrors = prev[universityId];
       if (!uErrors?.[field]) return prev;
-      const { [field]: _removed, ...remaining } = uErrors;
+      const remaining = { ...uErrors };
+      delete remaining[field];
       return { ...prev, [universityId]: remaining };
     });
   }

@@ -16,6 +16,7 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   UserCircle2,
+  Users,
   FileText,
   GraduationCap,
   ClipboardList,
@@ -44,6 +45,7 @@ interface NavItem {
 const NAV_ITEMS: readonly NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/profile", label: "Profile", icon: UserCircle2 },
+  { href: "/contacts", label: "Contacts", icon: Users },
   { href: "/documents", label: "Documents", icon: FileText },
   { href: "/universities", label: "Universities", icon: GraduationCap },
   { href: "/applications", label: "Applications", icon: ClipboardList },

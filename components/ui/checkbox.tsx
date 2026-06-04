@@ -5,8 +5,10 @@
 // An optional `description` line sits beneath the label for context.
 import { forwardRef } from "react";
 
-interface CheckboxProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "type"> {
+interface CheckboxProps extends Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  "type"
+> {
   label: string;
   description?: string;
 }

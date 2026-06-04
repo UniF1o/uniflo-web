@@ -24,6 +24,34 @@ import type { components } from "@/lib/api/schema";
 
 type ProfileResponse = components["schemas"]["StudentProfileResponse"];
 
+// ─── Row list ─────────────────────────────────────────────────────────────────
+
+// A label/value table. Shared by the core profile rows and the optional
+// "additional details" rows so both render identically.
+function RowList({
+  rows,
+}: {
+  rows: Array<{ label: string; value: string | null }>;
+}) {
+  return (
+    <dl className="divide-y divide-border rounded-lg border border-border">
+      {rows.map((row) => (
+        <div
+          key={row.label}
+          className="flex flex-col gap-1 px-5 py-4 sm:flex-row sm:items-center sm:gap-6"
+        >
+          <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground sm:w-40">
+            {row.label}
+          </dt>
+          <dd className="text-sm text-foreground sm:flex-1">
+            {row.value ?? <span className="text-muted-foreground">—</span>}
+          </dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 // Masks a 13-digit SA ID number to show only the first 6 digits (date of
@@ -197,7 +225,10 @@ export function ProfileOverview() {
     { label: "Exam number", value: profile.exam_number ?? null },
     { label: "Sport", value: profile.sport ?? null },
     { label: "Wants residence", value: yesNo(profile.wants_residence) },
-    { label: "Preferred residence", value: profile.preferred_residence ?? null },
+    {
+      label: "Preferred residence",
+      value: profile.preferred_residence ?? null,
+    },
     { label: "Applying for NSFAS", value: yesNo(profile.applying_nsfas) },
     {
       label: "Institutional funding",
@@ -214,30 +245,6 @@ export function ProfileOverview() {
       value: redressCount > 0 ? `${redressCount} recorded` : null,
     },
   ].filter((row) => row.value != null);
-
-  function RowList({
-    rows: list,
-  }: {
-    rows: Array<{ label: string; value: string | null }>;
-  }) {
-    return (
-      <dl className="divide-y divide-border rounded-lg border border-border">
-        {list.map((row) => (
-          <div
-            key={row.label}
-            className="flex flex-col gap-1 px-5 py-4 sm:flex-row sm:items-center sm:gap-6"
-          >
-            <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground sm:w-40">
-              {row.label}
-            </dt>
-            <dd className="text-sm text-foreground sm:flex-1">
-              {row.value ?? <span className="text-muted-foreground">—</span>}
-            </dd>
-          </div>
-        ))}
-      </dl>
-    );
-  }
 
   return (
     <div className="space-y-8">
