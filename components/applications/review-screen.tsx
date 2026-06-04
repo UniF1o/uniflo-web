@@ -208,6 +208,10 @@ export function ReviewScreen({
         await apiClient.post("/applications", {
           university_id: entry.universityId,
           programme: entry.programme!,
+          // Only send additional choices when the student added any.
+          ...(entry.additionalProgrammes?.length
+            ? { additional_programmes: entry.additionalProgrammes }
+            : {}),
           application_year: entry.applicationYear!,
         });
         setStatuses((prev) => ({
@@ -579,6 +583,18 @@ export function ReviewScreen({
                   <p className="text-xs text-muted-foreground">
                     {entry.programme} · {entry.applicationYear}
                   </p>
+                  {entry.additionalProgrammes &&
+                    entry.additionalProgrammes.length > 0 && (
+                      <p className="text-xs text-muted-foreground">
+                        Also:{" "}
+                        {entry.additionalProgrammes.map((p, i) => (
+                          <span key={i}>
+                            {i > 0 && ", "}
+                            {p}
+                          </span>
+                        ))}
+                      </p>
+                    )}
                   {status === "error" && (
                     <p role="alert" className="text-xs text-destructive">
                       {submitErrors[entry.universityId]}

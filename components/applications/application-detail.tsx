@@ -2,7 +2,7 @@
 
 import { Suspense, useState } from "react";
 import Link from "next/link";
-import { ChevronLeft, Mail, RefreshCw } from "lucide-react";
+import { ChevronLeft, Mail, RefreshCw, CheckCircle2, XCircle } from "lucide-react";
 import { ApiError } from "@/lib/api/client";
 import {
   parseJobError,
@@ -22,6 +22,26 @@ import type { components } from "@/lib/api/schema";
 
 type ApplicationRead = components["schemas"]["ApplicationRead"];
 type ApplicationStatus = components["schemas"]["ApplicationStatus"];
+type ApplicationChoice = components["schemas"]["ApplicationChoiceRead"];
+
+// Eligibility is filled in by the automation later — null means "not yet
+// assessed". Render a quiet pending state until the worker reports back.
+function EligibilityTag({ eligible }: { eligible?: boolean | null }) {
+  if (eligible == null) {
+    return <span className="text-xs text-muted-foreground">Pending</span>;
+  }
+  return eligible ? (
+    <span className="inline-flex items-center gap-1 text-xs font-medium text-success">
+      <CheckCircle2 size={12} aria-hidden />
+      Eligible
+    </span>
+  ) : (
+    <span className="inline-flex items-center gap-1 text-xs font-medium text-destructive">
+      <XCircle size={12} aria-hidden />
+      Not eligible
+    </span>
+  );
+}
 
 function DetailRow({
   label,
@@ -68,6 +88,10 @@ export function ApplicationDetail({
   universityName,
   supportEmail,
 }: ApplicationDetailProps) {
+  // Ordered programme choices (primary first). Defaults to [] on older rows
+  // that predate the multi-choice contract.
+  const choices: ApplicationChoice[] = application.choices ?? [];
+
   const [currentStatus, setCurrentStatus] = useState<ApplicationStatus | null>(
     application.status,
   );
@@ -252,6 +276,35 @@ export function ApplicationDetail({
           </DetailRow>
         </Card>
       </div>
+
+      {/* Programme choices — rendered when the student listed more than the
+       * primary. Each choice carries its own eligibility once the automation
+       * assesses it. */}
+      {choices.length > 1 && (
+        <div className="space-y-3">
+          <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+            Programme choices
+          </h2>
+          <Card variant="paper" as="ul" className="overflow-hidden">
+            {choices.map((choice, i) => (
+              <li
+                key={choice.choice_number}
+                className={cnRow(i === choices.length - 1)}
+              >
+                <span className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground sm:w-40">
+                  Choice {choice.choice_number}
+                </span>
+                <span className="flex flex-1 items-center justify-between gap-3">
+                  <span className="text-sm text-foreground">
+                    {choice.programme}
+                  </span>
+                  <EligibilityTag eligible={choice.eligible} />
+                </span>
+              </li>
+            ))}
+          </Card>
+        </div>
+      )}
 
       {/* Latest automation job — keep the structured view so support can see
        * attempts and update times at a glance. The failure summary above

@@ -6,10 +6,21 @@ import { useRouter } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { useSelection } from "@/lib/state/selection";
 import { Button } from "@/components/ui/button";
-import { ApplicationFieldset } from "@/components/applications/application-fieldset";
+import {
+  ApplicationFieldset,
+  MAX_ADDITIONAL_PROGRAMMES,
+} from "@/components/applications/application-fieldset";
 
-type FieldValues = { programme: string; year: string };
-type FieldErrors = { programme?: string; year?: string };
+type FieldValues = {
+  programme: string;
+  additionalProgrammes: string[];
+  year: string;
+};
+type FieldErrors = {
+  programme?: string;
+  year?: string;
+  additionalProgrammes?: (string | undefined)[];
+};
 
 function validateProgramme(value: string): string | null {
   const trimmed = value.trim();
@@ -24,6 +35,14 @@ function validateYear(value: string): string | null {
   return null;
 }
 
+// A single FieldValues passes when the primary programme + year are valid and
+// every additional slot the student added is itself a valid programme.
+function isEntryValid(f: FieldValues): boolean {
+  if (validateProgramme(f.programme) !== null) return false;
+  if (!f.year) return false;
+  return f.additionalProgrammes.every((p) => validateProgramme(p) === null);
+}
+
 export function NewApplicationsForm() {
   const router = useRouter();
   const { entries, update } = useSelection();
@@ -35,6 +54,7 @@ export function NewApplicationsForm() {
         e.universityId,
         {
           programme: e.programme ?? "",
+          additionalProgrammes: e.additionalProgrammes ?? [],
           year: e.applicationYear ? String(e.applicationYear) : "",
         },
       ]),
@@ -45,37 +65,93 @@ export function NewApplicationsForm() {
   // Review button is enabled only when every visible fieldset passes validation.
   const isAllValid =
     entries.length > 0 &&
-    entries.every((e) => {
-      const f = fields[e.universityId] ?? { programme: "", year: "" };
-      const prog = f.programme.trim();
-      return prog.length >= 3 && prog.length <= 120 && !!f.year;
-    });
+    entries.every((e) =>
+      isEntryValid(
+        fields[e.universityId] ?? {
+          programme: "",
+          additionalProgrammes: [],
+          year: "",
+        },
+      ),
+    );
 
-  function setFieldValue(
-    universityId: string,
-    field: keyof FieldValues,
-    value: string,
-  ) {
+  function getField(universityId: string): FieldValues {
+    return (
+      fields[universityId] ?? {
+        programme: "",
+        additionalProgrammes: [],
+        year: "",
+      }
+    );
+  }
+
+  function patchField(universityId: string, patch: Partial<FieldValues>) {
     setFields((prev) => ({
       ...prev,
-      [universityId]: {
-        ...(prev[universityId] ?? { programme: "", year: "" }),
-        [field]: value,
-      },
+      [universityId]: { ...getField(universityId), ...patch },
     }));
+  }
+
+  function setPrimaryField(
+    universityId: string,
+    field: "programme" | "year",
+    value: string,
+  ) {
+    patchField(universityId, { [field]: value });
     // Clear only the changed field's error, leaving other errors intact.
     setErrors((prev) => {
       const uErrors = prev[universityId];
       if (!uErrors?.[field]) return prev;
-      const remaining = { ...uErrors };
-      delete remaining[field];
-      const next = { ...prev };
-      if (Object.keys(remaining).length === 0) {
-        delete next[universityId];
-      } else {
-        next[universityId] = remaining;
-      }
-      return next;
+      const { [field]: _removed, ...remaining } = uErrors;
+      return { ...prev, [universityId]: remaining };
+    });
+  }
+
+  function handleAdditionalChange(
+    universityId: string,
+    index: number,
+    value: string,
+  ) {
+    const current = getField(universityId).additionalProgrammes;
+    const next = current.map((p, i) => (i === index ? value : p));
+    patchField(universityId, { additionalProgrammes: next });
+    // Clear the inline error for just this slot.
+    setErrors((prev) => {
+      const slotErrors = prev[universityId]?.additionalProgrammes;
+      if (!slotErrors?.[index]) return prev;
+      const nextSlots = slotErrors.map((e, i) => (i === index ? undefined : e));
+      return {
+        ...prev,
+        [universityId]: {
+          ...prev[universityId],
+          additionalProgrammes: nextSlots,
+        },
+      };
+    });
+  }
+
+  function handleAddProgramme(universityId: string) {
+    const current = getField(universityId).additionalProgrammes;
+    if (current.length >= MAX_ADDITIONAL_PROGRAMMES) return;
+    patchField(universityId, { additionalProgrammes: [...current, ""] });
+  }
+
+  function handleRemoveProgramme(universityId: string, index: number) {
+    const current = getField(universityId).additionalProgrammes;
+    patchField(universityId, {
+      additionalProgrammes: current.filter((_, i) => i !== index),
+    });
+    // Drop the matching error slot so indices stay aligned.
+    setErrors((prev) => {
+      const slotErrors = prev[universityId]?.additionalProgrammes;
+      if (!slotErrors) return prev;
+      return {
+        ...prev,
+        [universityId]: {
+          ...prev[universityId],
+          additionalProgrammes: slotErrors.filter((_, i) => i !== index),
+        },
+      };
     });
   }
 
@@ -84,7 +160,7 @@ export function NewApplicationsForm() {
     let hasErrors = false;
 
     for (const e of entries) {
-      const f = fields[e.universityId] ?? { programme: "", year: "" };
+      const f = getField(e.universityId);
       const errs: FieldErrors = {};
       const progErr = validateProgramme(f.programme);
       const yearErr = validateYear(f.year);
@@ -96,6 +172,13 @@ export function NewApplicationsForm() {
         errs.year = yearErr;
         hasErrors = true;
       }
+      const additionalErrs = f.additionalProgrammes.map((p) =>
+        validateProgramme(p),
+      );
+      if (additionalErrs.some((x) => x !== null)) {
+        errs.additionalProgrammes = additionalErrs.map((x) => x ?? undefined);
+        hasErrors = true;
+      }
       if (Object.keys(errs).length > 0) nextErrors[e.universityId] = errs;
     }
 
@@ -105,9 +188,14 @@ export function NewApplicationsForm() {
     }
 
     for (const e of entries) {
-      const f = fields[e.universityId]!;
+      const f = getField(e.universityId);
       update(e.universityId, {
         programme: f.programme.trim(),
+        // Trim each additional choice; drop empties defensively (validation
+        // already guarantees non-empty, but this keeps the payload clean).
+        additionalProgrammes: f.additionalProgrammes
+          .map((p) => p.trim())
+          .filter(Boolean),
         applicationYear: Number(f.year),
       });
     }
@@ -130,25 +218,36 @@ export function NewApplicationsForm() {
           Apply
         </h1>
         <p className="text-sm text-muted-foreground">
-          Add programme details for each selected university.
+          Add programme details for each selected university. You can list up to
+          three programme choices per university.
         </p>
       </div>
 
       <div className="space-y-6">
         {entries.map((entry) => {
-          const f = fields[entry.universityId] ?? { programme: "", year: "" };
+          const f = getField(entry.universityId);
           const errs = errors[entry.universityId] ?? {};
           return (
             <ApplicationFieldset
               key={entry.universityId}
               entry={entry}
               programme={f.programme}
+              additionalProgrammes={f.additionalProgrammes}
               year={f.year}
               errors={errs}
               onProgrammeChange={(v) =>
-                setFieldValue(entry.universityId, "programme", v)
+                setPrimaryField(entry.universityId, "programme", v)
               }
-              onYearChange={(v) => setFieldValue(entry.universityId, "year", v)}
+              onAdditionalChange={(i, v) =>
+                handleAdditionalChange(entry.universityId, i, v)
+              }
+              onAddProgramme={() => handleAddProgramme(entry.universityId)}
+              onRemoveProgramme={(i) =>
+                handleRemoveProgramme(entry.universityId, i)
+              }
+              onYearChange={(v) =>
+                setPrimaryField(entry.universityId, "year", v)
+              }
             />
           );
         })}

@@ -130,6 +130,12 @@ export function ApplicationList({
                     </div>
                     <p className="text-xs text-muted-foreground">
                       {app.programme} · {app.application_year}
+                      {app.choices && app.choices.length > 1 && (
+                        <span className="ml-1">
+                          · +{app.choices.length - 1} more{" "}
+                          {app.choices.length - 1 === 1 ? "choice" : "choices"}
+                        </span>
+                      )}
                     </p>
                   </div>
                   <div className="flex shrink-0 items-center gap-4">
