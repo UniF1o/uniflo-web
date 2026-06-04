@@ -483,6 +483,7 @@ export function ReviewScreen({
                       className="rounded-md bg-muted px-2 py-1 text-xs text-foreground"
                     >
                       {name}: {subject.mark}%
+                      {subject.nsc_level != null && ` · L${subject.nsc_level}`}
                     </li>
                   );
                 })}
