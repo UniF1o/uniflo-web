@@ -92,8 +92,82 @@ required-only so the flow doesn't regress.
 - **Contacts cleaned to `null` on save** (empty string → null) so the backend
   stores blanks consistently.
 
+## Cross-portal review follow-up (uniflo-api PR #49)
+
+After Partner B live-verified all four portals, a second batch of changes
+landed on this same branch:
+
+### Contacts collapsed to one section
+
+UP asks for no contact person; UCT, UJ and Wits each derive next-of-kin /
+emergency / fee-payer roles from one person, and the backend now resolves all
+portal roles from any captured contact via fallback chains. So the four-card
+contacts page became:
+
+- One **"Parent / Guardian"** card, saved as `contact_type: "guardian"`.
+- A **"Someone different pays the fees"** toggle that reveals a `fee_payer`
+  card only when on. Switching it off deletes a saved fee_payer server-side
+  (with revert-on-failure so the error stays visible).
+- Next-of-kin and emergency forms are gone. Legacy rows of those types are
+  ignored on load — the backend reuses the guardian for those roles.
+- The Wits must-differ rules (email + mobile vs the applicant's) moved to the
+  guardian. The guardian's SA ID number is now required to save the card at
+  all, because UCT demands it once any guardian detail is given (13-digit
+  format enforced). Relationship became a select (Mother/Father/Guardian/…).
+- Guardian address is optional — the backend falls back to the student's
+  address where a portal demands one. The UJ full-address need stays a hint
+  on the fee-payer card.
+
+### Programme choices 2–3 are live
+
+The extra choices now genuinely reach the portals (UP and UCT fill two, Wits
+up to three; UJ's second choice is backend-pending). The apply form labels
+them **"Second choice (recommended)"** and **"Third choice (Wits only)"**,
+and the add button names the slot it would add.
+
+### Automation gate on current activity
+
+The automation refuses to run for students who aren't currently in Grade 12
+(the run fails with `form_submit_failed`), so the apply flow blocks them up
+front: `/applications/new` server-fetches the profile and shows an "apply
+directly on the portal" notice instead of the form when `current_activity`
+is Upgrading matric / Gap year / Employed / At university. The review screen
+mirrors the check and disables submit (belt and braces — the selection
+context makes review unreachable without passing the form, but it's the
+component that POSTs). Unset and "Other" activities fail open, as does a
+failed profile fetch. The list lives in `lib/constants/profile-enums.ts`
+(`AUTOMATION_BLOCKED_ACTIVITIES`).
+
+### Records page made config-driven
+
+The Grade 11 / Grade 12 April sections now render from a `SECTIONS` array,
+and the form treats every non-baseline type uniformly (load-on-mount, inline
+success). Adding **Grade 12 June** is one `SECTIONS` entry plus a
+`RECORD_TYPE_LABELS` entry once the backend deploys the enum value — see the
+lag note below.
+
+### Regenerated schema brought unrelated surface
+
+`npm run types:api` also pulled in backend PR #29's surface: an
+`action_required` application status, `pending_challenge` on applications,
+and `/applications/{id}/consent`, `/challenge`, `/field-mappings` detail
+endpoints. The status badge now renders `action_required` ("Action needed",
+warning tone); **no challenge/consent UI has been built yet** — that's its
+own task.
+
+Profile fields the review flagged (religion, the mailing-address toggle,
+`applying_institutional_funding`, `preferred_residence` behind
+`wants_residence`) were all already captured — no change needed.
+
 ## Deviations / notes for the next person
 
+- **The deployed spec lags uniflo-api PR #49 in two places** (as of
+  2026-06-12): `RecordType` has no `grade_12_june`, and `CurrentActivityEnum`
+  has no "Completed matric" value (which the partner message lists as
+  blocked). When the backend deploys: regenerate types, add the June section
+  + label, and add "Completed matric" to `AUTOMATION_BLOCKED_ACTIVITIES`.
+- The contacts upsert is `POST /contacts` per the deployed spec (the partner
+  message said PUT — the spec wins).
 - `MATRIC_RESULTS` is still labelled "Grade 11 final results" in the existing
   copy, and the backend additionally has `GRADE11_RESULTS`. The naming overlap
   is a backend artefact — `GRADE11_RESULTS` is treated purely as the optional UP
