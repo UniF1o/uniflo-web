@@ -69,6 +69,11 @@ export function UniversityCard({
 
   const isClosed = status === "closed";
 
+  // Closing countdown — urgency cue once a portal is open. Warning-toned
+  // inside three weeks, muted otherwise.
+  const daysToClose = status === "open" ? daysUntil(university.close_date) : 0;
+  const closingSoon = status === "open" && daysToClose <= 21;
+
   return (
     <Card
       variant="paper"
@@ -84,7 +89,7 @@ export function UniversityCard({
       )}
     >
       <div className="flex items-start justify-between gap-3">
-        <h3 className="text-sm font-medium leading-snug text-foreground">
+        <h3 className="font-display text-lg leading-snug tracking-tight text-foreground">
           {university.name}
         </h3>
         <Badge tone={statusTone} dot={status === "open"}>
@@ -92,10 +97,24 @@ export function UniversityCard({
         </Badge>
       </div>
 
-      <p className="text-xs text-muted-foreground">
-        Applications open{" "}
-        {formatDateRange(university.open_date, university.close_date)}
-      </p>
+      <div className="space-y-1">
+        <p className="text-xs text-muted-foreground">
+          Applications open{" "}
+          {formatDateRange(university.open_date, university.close_date)}
+        </p>
+        {status === "open" && daysToClose > 0 && (
+          <p
+            className={cn(
+              "text-xs tabular-nums",
+              closingSoon
+                ? "font-medium text-warning"
+                : "text-muted-foreground",
+            )}
+          >
+            {daysToClose} {daysToClose === 1 ? "day" : "days"} left to apply
+          </p>
+        )}
+      </div>
 
       <Button
         variant={isSelected ? "primary" : "secondary"}

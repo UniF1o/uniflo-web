@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { serverApiGet } from "@/lib/api/server";
 import type { components } from "@/lib/api/schema";
 import { SEED_UNIVERSITIES } from "@/lib/constants/seed-universities";
+import { PageHeader } from "@/components/layout/page-header";
 import { UniversityList } from "@/components/universities/university-list";
 
 export const metadata: Metadata = {
@@ -32,15 +33,15 @@ export default async function UniversitiesPage() {
 
   return (
     <div className="max-w-5xl space-y-8">
-      <div className="space-y-1">
-        <h1 className="font-display text-3xl tracking-tight text-foreground">
-          Universities
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Browse universities UniFlo supports and select the ones you want to
-          apply to.
-        </p>
-      </div>
+      <PageHeader
+        kicker="Applying"
+        title={
+          <>
+            Choose your <span className="text-primary">universities.</span>
+          </>
+        }
+        description="Browse universities UniFlo supports and select the ones you want to apply to."
+      />
 
       <UniversityList initialUniversities={universities} />
     </div>
