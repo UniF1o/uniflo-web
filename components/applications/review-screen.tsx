@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import {
   GENDER_LABELS,
   HOME_LANGUAGE_LABELS,
+  isAutomationBlocked,
 } from "@/lib/constants/profile-enums";
 import { formatDate } from "@/lib/utils/format";
 import { REQUIRED_DOC_TYPES, DOC_LABELS } from "@/lib/constants/documents";
@@ -293,6 +294,10 @@ export function ReviewScreen({
 
   const recordsOk = academicRecords != null;
 
+  // Mirrors the gate on /applications/new — the automation refuses to run for
+  // non-Grade-12 activities, so don't let the POST happen here either.
+  const automationBlocked = isAutomationBlocked(profile?.current_activity);
+
   const uploadedTypes = new Set(documents?.map((d) => d.type) ?? []);
   const docsOk =
     documents !== null && REQUIRED_DOC_TYPES.every((t) => uploadedTypes.has(t));
@@ -326,6 +331,7 @@ export function ReviewScreen({
     profileComplete &&
     recordsOk &&
     docsOk &&
+    !automationBlocked &&
     consent &&
     allFlagsConfirmed &&
     !isSubmitting;
@@ -414,6 +420,24 @@ export function ReviewScreen({
           Confirm your details before Uniflo submits on your behalf.
         </p>
       </div>
+
+      {automationBlocked && (
+        <Alert
+          tone="warning"
+          title="Automated applications aren't available for your situation yet"
+        >
+          Uniflo currently only submits on behalf of students in Grade 12, and
+          your profile says you&apos;re &ldquo;{profile?.current_activity}
+          &rdquo;. Please apply directly on each university&apos;s portal, or{" "}
+          <Link
+            href="/profile/edit"
+            className="font-medium underline underline-offset-2"
+          >
+            update your profile
+          </Link>{" "}
+          if this has changed.
+        </Alert>
+      )}
 
       {/* Personal details */}
       <ReviewSection title="Personal details">

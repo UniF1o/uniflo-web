@@ -33,6 +33,23 @@ export const CURRENT_ACTIVITY_OPTIONS: EnumOption[] = [
   { value: "Other", label: "Other" },
 ];
 
+// Activities the portal automation refuses to run for — the portal forms
+// would misreport these students, so the backend fails the run with
+// "form_submit_failed". The apply flow blocks them up front instead.
+// (Unset and "Other" are allowed; "Currently in Grade 12" is the happy path.)
+export const AUTOMATION_BLOCKED_ACTIVITIES: readonly string[] = [
+  "Upgrading matric",
+  "Gap year",
+  "Employed",
+  "At university",
+];
+
+export function isAutomationBlocked(
+  activity: string | null | undefined,
+): boolean {
+  return !!activity && AUTOMATION_BLOCKED_ACTIVITIES.includes(activity);
+}
+
 // Gender options accepted by the backend GenderEnum.
 export const GENDER_OPTIONS: EnumOption[] = [
   { value: "Male", label: "Male" },
