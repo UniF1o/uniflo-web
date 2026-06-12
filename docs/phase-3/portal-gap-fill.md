@@ -164,9 +164,47 @@ endpoints. All of it now has UI:
   show as timestamped check rows; missing ones as checkboxes (button needs
   ≥1 new tick — the backend rejects an all-false POST). Hidden on
   already-submitted rows that never recorded anything.
-- The detail `/field-mappings` GET still has no surface of its own — the
-  review-screen preview covers the pre-submit flow; a post-submit "what we
-  filled in" view is a possible future addition.
+- The detail page gained a read-only "What we filled in" section backed by
+  the `/applications/{id}/field-mappings` GET — see the next section for
+  why it moved off the review screen.
+
+## Fixes surfaced by the authenticated browser pass
+
+A full Playwright walkthrough as a fresh test student (desktop 1280 /
+tablet 768 / mobile 390) caught four real bugs, all fixed on this branch:
+
+- **The review screen could never pass its profile check.**
+  `REQUIRED_PROFILE_FIELDS` still listed `address`, which the schema split
+  into `street_address`/`suburb`/`city`/`province`/`postal_code` long ago —
+  the `as keyof` cast hid the dead key from tsc, so `profileComplete` was
+  permanently false and Submit permanently disabled. The list now carries
+  the split fields and is typed with
+  `satisfies readonly (keyof StudentProfileResponse)[]` so the next schema
+  drift is a compile error.
+- **The field-mappings preview called an endpoint that no longer exists.**
+  The deployed contract only has per-application
+  `/applications/{id}/field-mappings`; the speculative
+  `/applications/preview/field-mappings` URL now matches the parameterised
+  route and 422s on `"preview"` as a UUID. The preview section and helper
+  are gone; `FieldMappingReview` gained a `readOnly` variant and renders on
+  the detail page once mappings exist (hidden until then). The pre-submit
+  "I've reviewed flagged fields" gate went with the preview — flagging now
+  happens post-create, which matches the backend's consent/challenge flow.
+- **Every profile edit 422'd while the mailing section was hidden.** The
+  edit form sent `""` for untouched optional fields and the backend's
+  4-digit `mailing_postal_code` validator rejects empty strings. Blank
+  optional fields are now cleaned to `null` (same convention as contacts).
+- **Two records forms on one page shared input ids.** `institution`/`year`
+  ids are now scoped by record type — the duplicate ids broke label
+  association for the second section (its fields fell back to placeholder
+  accessible names). Also: every record type now loads its existing record
+  on mount; previously a returning student saw a blank Grade 11 form
+  despite saved marks. The onboarding redirect to `/documents` only fires
+  on a first-time baseline save.
+
+The same session also renamed the brand to **UniFlo** (capital F)
+everywhere user-visible copy and docs spell it out; lowercase repo/package
+identifiers (`uniflo-web`, `uniflo-api`) are unchanged.
 
 Profile fields the review flagged (religion, the mailing-address toggle,
 `applying_institutional_funding`, `preferred_residence` behind
@@ -188,13 +226,21 @@ Profile fields the review flagged (religion, the mailing-address toggle,
 - `redress_factors` is modelled as free-form key/value rows folded into an
   object on save. If UCT's redress questions get a fixed schema later, this
   should become a structured form.
-- **Browser verification is partial.** Public pages render with zero console
-  errors and the production build compiles every route (incl. `/contacts`), but
-  the new UI is auth-gated and a full Playwright walkthrough at desktop/tablet/
-  mobile needs a test-student login + the live backend. That pass is still
-  outstanding.
+- The post-submit "What we filled in" section hides on any fetch failure
+  (including "mapping not ready yet") rather than showing an error — it's
+  informational, and a permanent error card on every fresh application
+  would be noise. Revisit if Partner B adds a "mapping ready" signal.
 
 ## Verification
 
-`tsc --noEmit`, `eslint`, `prettier --check`, `vitest` (33 passing), and
-`next build` all green locally.
+`tsc --noEmit`, `eslint`, `prettier --check`, `vitest` (34 passing), and
+`next build` all green locally. Authenticated Playwright walkthrough as
+`jane.doe.test26` against the live dev backend at desktop (1280×900),
+tablet (768×1024) and mobile (390×844): profile setup wizard end-to-end,
+Grade 11 record save + redirect + reload-prefill, 3 document uploads +
+optional zone, contacts (guardian save incl. all three validation rules,
+fee-payer toggle save/untoggle-delete, persistence across reload), apply
+form choice labels 1–3, review screen completeness + consent + submit
+enablement (POST itself not fired — it would hand test data to the live
+Wits automation), activity gate on Gap year + revert, applications empty
+state. Zero console errors on every page visited.
