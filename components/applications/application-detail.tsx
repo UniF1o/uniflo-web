@@ -23,6 +23,8 @@ import { Card } from "@/components/ui/card";
 import { StatusBadge } from "./status-badge";
 import { CelebrationBanner } from "./celebration-banner";
 import { SubmissionConfirmation } from "./submission-confirmation";
+import { ChallengePrompt } from "./challenge-prompt";
+import { ConsentCard } from "./consent-card";
 import { formatDate } from "@/lib/utils/format";
 import type { components } from "@/lib/api/schema";
 
@@ -101,6 +103,20 @@ export function ApplicationDetail({
   const [currentStatus, setCurrentStatus] = useState<ApplicationStatus | null>(
     application.status,
   );
+  // Live mirrors of the row fields that change while the student is on the
+  // page (challenge answered, consent recorded). Seeded from the server-
+  // rendered prop and refreshed from each POST's returned row.
+  const [challenge, setChallenge] = useState(
+    application.pending_challenge ?? null,
+  );
+  const [popiConsentAt, setPopiConsentAt] = useState(
+    application.popi_consent_at ?? null,
+  );
+  const [agreementConsentAt, setAgreementConsentAt] = useState(
+    application.agreement_consent_at ?? null,
+  );
+  // Shows a one-off "we've passed that on" confirmation after a challenge.
+  const [challengeResolved, setChallengeResolved] = useState(false);
   const [isRetrying, setIsRetrying] = useState(false);
   // After a successful retry we lock the button briefly so a double-tap
   // doesn't fire a second request before the optimistic status update lands
@@ -126,6 +142,22 @@ export function ApplicationDetail({
     currentStatus === "failed" &&
     structuredError != null &&
     isRetryable(structuredError.code, structuredError.retryable);
+
+  // Folds a refreshed row (from the challenge / consent POSTs) back into the
+  // pieces of state this page tracks.
+  function applyServerUpdate(updated: ApplicationRead) {
+    setCurrentStatus(updated.status ?? null);
+    setChallenge(updated.pending_challenge ?? null);
+    setPopiConsentAt(updated.popi_consent_at ?? null);
+    setAgreementConsentAt(updated.agreement_consent_at ?? null);
+  }
+
+  // Hide the consent card on already-submitted rows that never recorded
+  // anything (pre-consent history) — there's nothing useful to do there.
+  const showConsentCard =
+    currentStatus !== "submitted" ||
+    popiConsentAt != null ||
+    agreementConsentAt != null;
 
   async function handleRetry() {
     setIsRetrying(true);
@@ -196,6 +228,27 @@ export function ApplicationDetail({
       <Suspense fallback={null}>
         <CelebrationBanner />
       </Suspense>
+
+      {/* Email challenge — the run is paused waiting on the student (e.g. a
+       * portal OTP). Highest-priority surface, so it sits above everything
+       * else on the page. */}
+      {currentStatus === "action_required" && challenge && (
+        <ChallengePrompt
+          applicationId={application.id}
+          universityName={universityName}
+          challenge={challenge}
+          onResolved={(updated) => {
+            applyServerUpdate(updated);
+            setChallengeResolved(true);
+          }}
+        />
+      )}
+      {challengeResolved && !challenge && (
+        <Alert tone="success" role="status">
+          Thanks — we&apos;ve passed that on and your application is continuing.
+          Check back shortly for the updated status.
+        </Alert>
+      )}
 
       {/* Submission proof — Phase 3. Renders when the latest job has
        * landed at status "submitted". `latest_job.status` is the source of
@@ -282,6 +335,16 @@ export function ApplicationDetail({
           </DetailRow>
         </Card>
       </div>
+
+      {showConsentCard && (
+        <ConsentCard
+          applicationId={application.id}
+          universityName={universityName}
+          popiConsentAt={popiConsentAt}
+          agreementConsentAt={agreementConsentAt}
+          onUpdated={applyServerUpdate}
+        />
+      )}
 
       {/* Programme choices — rendered when the student listed more than the
        * primary. Each choice carries its own eligibility once the automation

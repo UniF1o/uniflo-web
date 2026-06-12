@@ -185,3 +185,35 @@ export function retryApplication(
     `/applications/${applicationId}/retry`,
   );
 }
+
+// ─── Email challenges + consent (status: action_required) ────────────────────
+
+// Non-null on ApplicationRead while the run is paused waiting on the student
+// (e.g. the OTP the portal emailed them).
+export type PendingChallengeRead =
+  components["schemas"]["PendingChallengeRead"];
+
+// Answer the pending challenge: one value per requested field name. The
+// backend 422s on missing keys and ignores extras; returns the refreshed row.
+export function supplyChallenge(
+  applicationId: string,
+  values: Record<string, string>,
+): Promise<components["schemas"]["ApplicationRead"]> {
+  return apiClient.post<components["schemas"]["ApplicationRead"]>(
+    `/applications/${applicationId}/challenge`,
+    { values },
+  );
+}
+
+// Record the student's POPI / application-agreement acceptance for one
+// application. At least one flag must be true; returns the refreshed row
+// with the consent timestamps set.
+export function recordConsent(
+  applicationId: string,
+  consent: { popi: boolean; agreement: boolean },
+): Promise<components["schemas"]["ApplicationRead"]> {
+  return apiClient.post<components["schemas"]["ApplicationRead"]>(
+    `/applications/${applicationId}/consent`,
+    consent,
+  );
+}

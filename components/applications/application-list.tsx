@@ -137,6 +137,11 @@ export function ApplicationList({
                         </span>
                       )}
                     </p>
+                    {app.status === "action_required" && (
+                      <p className="text-xs font-medium text-warning">
+                        Needs your input — open to continue.
+                      </p>
+                    )}
                   </div>
                   <div className="flex shrink-0 items-center gap-4">
                     <span className="text-xs text-muted-foreground">
