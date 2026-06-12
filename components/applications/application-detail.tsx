@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import {
   ChevronLeft,
@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { ApiError } from "@/lib/api/client";
 import {
+  getFieldMappings,
   parseJobError,
   retryApplication,
   type AugmentedApplicationJobRead,
@@ -25,6 +26,7 @@ import { CelebrationBanner } from "./celebration-banner";
 import { SubmissionConfirmation } from "./submission-confirmation";
 import { ChallengePrompt } from "./challenge-prompt";
 import { ConsentCard } from "./consent-card";
+import { FieldMappingReview, type MappingState } from "./field-mapping-review";
 import { formatDate } from "@/lib/utils/format";
 import type { components } from "@/lib/api/schema";
 
@@ -123,6 +125,27 @@ export function ApplicationDetail({
   // and the row would otherwise re-enable.
   const [retryDisabled, setRetryDisabled] = useState(false);
   const [feedback, setFeedback] = useState<RetryFeedback | null>(null);
+
+  // What the automation filled in on the portal. The endpoint 404s until the
+  // mapping job has produced output — treated as "unavailable" and the
+  // section stays hidden rather than showing a misleading error.
+  const [mappingState, setMappingState] = useState<MappingState>({
+    kind: "loading",
+  });
+
+  const loadMappings = useCallback(async () => {
+    setMappingState({ kind: "loading" });
+    try {
+      const data = await getFieldMappings(application.id);
+      setMappingState({ kind: "ready", entries: data.entries });
+    } catch {
+      setMappingState({ kind: "unavailable" });
+    }
+  }, [application.id]);
+
+  useEffect(() => {
+    void loadMappings();
+  }, [loadMappings]);
 
   // Treat latest_job as the augmented shape — Phase 3 adds optional
   // portal_reference / verified_at fields. Existing readers like the
@@ -372,6 +395,24 @@ export function ApplicationDetail({
               </li>
             ))}
           </Card>
+        </div>
+      )}
+
+      {/* What the automation filled in — read-only mapping summary. Rendered
+       * only once the mapping exists; rows the AI was unsure about are
+       * listed with their confidence so the student can spot-check. */}
+      {mappingState.kind === "ready" && mappingState.entries.length > 0 && (
+        <div className="space-y-3">
+          <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+            What we filled in
+          </h2>
+          <FieldMappingReview
+            universityId={application.id}
+            universityName={universityName}
+            state={mappingState}
+            readOnly
+            onRefresh={() => void loadMappings()}
+          />
         </div>
       )}
 

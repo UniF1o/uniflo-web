@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, CheckCircle2, XCircle, RefreshCw } from "lucide-react";
@@ -15,26 +15,30 @@ import {
 } from "@/lib/constants/profile-enums";
 import { formatDate } from "@/lib/utils/format";
 import { REQUIRED_DOC_TYPES, DOC_LABELS } from "@/lib/constants/documents";
-import { previewFieldMappings, isPortalUnavailable } from "@/lib/api/phase-3";
-import { isLowConfidence } from "@/lib/constants/confidence";
-import { FieldMappingReview, type MappingState } from "./field-mapping-review";
+import { isPortalUnavailable } from "@/lib/api/phase-3";
 import type { components } from "@/lib/api/schema";
 import type { AcademicRecordResponse } from "@/lib/api/academic-records";
 
 type StudentProfileResponse = components["schemas"]["StudentProfileResponse"];
 type DocumentResponse = components["schemas"]["DocumentResponse"];
 
+// `satisfies` keeps this list honest against the generated schema — a renamed
+// or removed field becomes a compile error instead of a silently-false check.
 const REQUIRED_PROFILE_FIELDS = [
   "first_name",
   "last_name",
   "id_number",
   "date_of_birth",
   "phone",
-  "address",
+  "street_address",
+  "suburb",
+  "city",
+  "province",
+  "postal_code",
   "nationality",
   "gender",
   "home_language",
-] as const;
+] as const satisfies readonly (keyof StudentProfileResponse)[];
 
 // Per-row status during and after the submit loop.
 //   submitting        — POST in flight
@@ -116,77 +120,6 @@ export function ReviewScreen({
   const [statuses, setStatuses] = useState<Record<string, SubmitStatus>>({});
   const [submitErrors, setSubmitErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Per-university field-mapping state. Fetched client-side after hydration
-  // because the selection lives in client context (not URL params).
-  const [mappings, setMappings] = useState<Record<string, MappingState>>({});
-  // Per-university "I've reviewed flagged fields" gate.
-  const [confirmedFlags, setConfirmedFlags] = useState<Record<string, boolean>>(
-    {},
-  );
-
-  // De-dupe the kick-off effect so re-renders don't refetch every cycle.
-  const fetchedRef = useRef<Set<string>>(new Set());
-
-  const loadMapping = useCallback(async (entry: SelectionEntry) => {
-    setMappings((prev) => ({
-      ...prev,
-      [entry.universityId]: { kind: "loading" },
-    }));
-    try {
-      const data = await previewFieldMappings({
-        university_id: entry.universityId,
-        programme: entry.programme!,
-        application_year: entry.applicationYear!,
-      });
-      setMappings((prev) => ({
-        ...prev,
-        [entry.universityId]: { kind: "ready", entries: data.entries },
-      }));
-    } catch (err) {
-      // 404 or 202 = the mapping job hasn't produced output yet. Treat as
-      // "mapping in progress" so the student gets the refresh affordance.
-      if (
-        err instanceof ApiError &&
-        (err.status === 404 || err.status === 202)
-      ) {
-        setMappings((prev) => ({
-          ...prev,
-          [entry.universityId]: { kind: "unavailable" },
-        }));
-        return;
-      }
-      setMappings((prev) => ({
-        ...prev,
-        [entry.universityId]: { kind: "error" },
-      }));
-    }
-  }, []);
-
-  useEffect(() => {
-    for (const entry of entries) {
-      if (fetchedRef.current.has(entry.universityId)) continue;
-      if (!entry.programme || !entry.applicationYear) continue;
-      fetchedRef.current.add(entry.universityId);
-      // queueMicrotask defers the first setState inside loadMapping out of
-      // the effect body — keeps lint happy and avoids a cascading render.
-      queueMicrotask(() => {
-        void loadMapping(entry);
-      });
-    }
-  }, [entries, loadMapping]);
-
-  const refreshMapping = useCallback(
-    (universityId: string) => {
-      const entry = entries.find((e) => e.universityId === universityId);
-      if (!entry) return;
-      // Clear the de-dupe marker so a manual refresh always re-fires.
-      fetchedRef.current.delete(universityId);
-      fetchedRef.current.add(universityId);
-      void loadMapping(entry);
-    },
-    [entries, loadMapping],
-  );
 
   // Posts one entry and returns the status it landed on. Failures update
   // statuses + submitErrors in place; the caller threads the returned value
@@ -302,23 +235,6 @@ export function ReviewScreen({
   const docsOk =
     documents !== null && REQUIRED_DOC_TYPES.every((t) => uploadedTypes.has(t));
 
-  // ── Confidence gate ──────────────────────────────────────────────────────────
-
-  // A university needs an "I've reviewed flagged fields" check only if its
-  // mapping payload includes at least one low-confidence entry. Universities
-  // whose mappings are loading / unavailable / errored don't block submit
-  // (the student can still go — the worker will do the right thing at run
-  // time and a failure surfaces on the detail page).
-  function hasFlaggedFields(universityId: string): boolean {
-    const m = mappings[universityId];
-    if (!m || m.kind !== "ready") return false;
-    return m.entries.some((e) => isLowConfidence(e.confidence));
-  }
-
-  const allFlagsConfirmed = entries.every((e) =>
-    hasFlaggedFields(e.universityId) ? !!confirmedFlags[e.universityId] : true,
-  );
-
   // ── Submit state ─────────────────────────────────────────────────────────────
 
   const hasAttempted = Object.keys(statuses).length > 0;
@@ -333,7 +249,6 @@ export function ReviewScreen({
     docsOk &&
     !automationBlocked &&
     consent &&
-    allFlagsConfirmed &&
     !isSubmitting;
 
   async function handleSubmit() {
@@ -562,32 +477,6 @@ export function ReviewScreen({
             )}
           </div>
         )}
-      </ReviewSection>
-
-      {/* Field-mapping confidence — Phase 3 */}
-      <ReviewSection title="Field mappings">
-        <p className="-mt-1 text-xs text-muted-foreground">
-          We&apos;ll flag anything Claude was unsure about. Review each flagged
-          field before submitting.
-        </p>
-        <div className="flex flex-col gap-3">
-          {entries.map((entry) => (
-            <FieldMappingReview
-              key={entry.universityId}
-              universityId={entry.universityId}
-              universityName={entry.universityName}
-              state={mappings[entry.universityId] ?? { kind: "loading" }}
-              confirmed={!!confirmedFlags[entry.universityId]}
-              onConfirmToggle={(next) =>
-                setConfirmedFlags((prev) => ({
-                  ...prev,
-                  [entry.universityId]: next,
-                }))
-              }
-              onRefresh={() => refreshMapping(entry.universityId)}
-            />
-          ))}
-        </div>
       </ReviewSection>
 
       {/* Applications list */}

@@ -133,6 +133,29 @@ describe("FieldMappingReview", () => {
     expect(onRefresh).toHaveBeenCalledTimes(1);
   });
 
+  it("hides the confirm checkbox in readOnly mode", () => {
+    render(
+      <FieldMappingReview
+        {...defaultProps}
+        readOnly
+        state={{
+          kind: "ready",
+          entries: [
+            entry({
+              field_id: "f",
+              label: "Flagged field",
+              confidence: 0.5,
+            }),
+          ],
+        }}
+      />,
+    );
+
+    // The flagged row still renders, but there is nothing to confirm.
+    expect(screen.getByText("Flagged field")).toBeInTheDocument();
+    expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
+  });
+
   it("toggles the confirm checkbox via the parent callback", () => {
     const onConfirmToggle = vi.fn();
     render(

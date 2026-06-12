@@ -1,12 +1,14 @@
 "use client";
 
-// Phase 3 — confidence-flagging UI for one university on the review screen.
+// Phase 3 — confidence-flagging UI for one application's field mappings.
 //
-// Renders an expandable section showing the fields the AI was unsure about,
-// summarises the high-confidence ones, and exposes a per-university
-// "I've reviewed flagged fields" checkbox that gates the parent Submit
-// button. Two non-happy states render here too: "mapping in progress"
-// (the AI hasn't run yet) and "mapping failed to load" (transient error).
+// Renders an expandable section showing the fields the AI was unsure about
+// and summarises the high-confidence ones. Lives on the application detail
+// page (the backend computes mappings per application — there is no
+// pre-submit preview endpoint). `readOnly` hides the "I've reviewed flagged
+// fields" checkbox; without it the checkbox gates a parent action. Two
+// non-happy states render here too: "mapping in progress" (the AI hasn't
+// run yet) and "mapping failed to load" (transient error).
 //
 // Edit-pivot: rows link to wherever the source profile field lives so the
 // student can fix the data and come back. No edit-in-place — consistent
@@ -42,9 +44,12 @@ interface FieldMappingReviewProps {
   universityId: string;
   universityName: string;
   state: MappingState;
-  confirmed: boolean;
-  onConfirmToggle: (next: boolean) => void;
-  onRefresh: () => void;
+  // Hides the confirm checkbox — used on the detail page where the mappings
+  // are informational rather than a submit gate.
+  readOnly?: boolean;
+  confirmed?: boolean;
+  onConfirmToggle?: (next: boolean) => void;
+  onRefresh?: () => void;
 }
 
 // Map a profile-field path back to the page the student edits it on. Keys
@@ -66,7 +71,8 @@ export function FieldMappingReview({
   universityId,
   universityName,
   state,
-  confirmed,
+  readOnly = false,
+  confirmed = false,
   onConfirmToggle,
   onRefresh,
 }: FieldMappingReviewProps) {
@@ -192,19 +198,21 @@ export function FieldMappingReview({
           </p>
         )}
 
-        <label className="flex cursor-pointer items-start gap-3 pt-1">
-          <input
-            type="checkbox"
-            checked={confirmed}
-            onChange={(e) => onConfirmToggle(e.target.checked)}
-            className="mt-0.5 h-4 w-4 shrink-0 rounded border-border accent-primary"
-            aria-label={`I've reviewed the flagged fields for ${universityName}`}
-          />
-          <span className="text-sm text-foreground">
-            I&apos;ve reviewed the flagged fields for{" "}
-            <span className="font-medium">{universityName}</span>.
-          </span>
-        </label>
+        {!readOnly && (
+          <label className="flex cursor-pointer items-start gap-3 pt-1">
+            <input
+              type="checkbox"
+              checked={confirmed}
+              onChange={(e) => onConfirmToggle?.(e.target.checked)}
+              className="mt-0.5 h-4 w-4 shrink-0 rounded border-border accent-primary"
+              aria-label={`I've reviewed the flagged fields for ${universityName}`}
+            />
+            <span className="text-sm text-foreground">
+              I&apos;ve reviewed the flagged fields for{" "}
+              <span className="font-medium">{universityName}</span>.
+            </span>
+          </label>
+        )}
       </div>
     </SectionShell>
   );

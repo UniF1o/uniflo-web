@@ -598,8 +598,10 @@ export function AcademicRecordsForm({
     <form onSubmit={handleSubmit} noValidate className="space-y-8">
       {/* ── Institution and year ───────────────────────────────────────────── */}
       <div className="grid gap-4 sm:grid-cols-2">
+        {/* Ids are scoped by record type — multiple form instances share the
+            records page, and duplicate ids would break label association. */}
         <Input
-          id="institution"
+          id={`${recordType}-institution`}
           label="School / institution"
           type="text"
           autoComplete="organization"
@@ -612,7 +614,7 @@ export function AcademicRecordsForm({
           error={fieldErrors.institution}
         />
         <Input
-          id="year"
+          id={`${recordType}-year`}
           label="Year"
           type="number"
           inputMode="numeric"
