@@ -316,6 +316,10 @@ export function ProfileEditForm() {
       {},
     );
 
+    // Blank optional fields go up as null — the backend's field validators
+    // (e.g. the 4-digit mailing postal code) reject empty strings.
+    const clean = (value: string) => value.trim() || null;
+
     setSaving(true);
     try {
       const res = await fetch(`${apiUrl}/profile`, {
@@ -344,32 +348,36 @@ export function ProfileEditForm() {
           ethnicity,
           // ── Optional Phase-3 fields ──
           title: title || null,
-          middle_names: middleNames,
-          maiden_name: maidenName,
-          preferred_name: preferredName,
+          middle_names: clean(middleNames),
+          maiden_name: clean(maidenName),
+          preferred_name: clean(preferredName),
           is_sa_citizen: isSaCitizen,
           mailing_same_as_residential: mailingSameAsResidential,
           // When the mailing address matches the residential one, don't persist
-          // stale mailing values — send empty so the backend mirrors residential.
+          // stale mailing values — send null so the backend mirrors residential.
           mailing_street_address: mailingSameAsResidential
-            ? ""
-            : mailingStreetAddress,
-          mailing_suburb: mailingSameAsResidential ? "" : mailingSuburb,
-          mailing_city: mailingSameAsResidential ? "" : mailingCity,
-          mailing_province: mailingSameAsResidential ? "" : mailingProvince,
+            ? null
+            : clean(mailingStreetAddress),
+          mailing_suburb: mailingSameAsResidential
+            ? null
+            : clean(mailingSuburb),
+          mailing_city: mailingSameAsResidential ? null : clean(mailingCity),
+          mailing_province: mailingSameAsResidential
+            ? null
+            : clean(mailingProvince),
           mailing_postal_code: mailingSameAsResidential
-            ? ""
-            : mailingPostalCode,
-          disability_detail: disabilityDetail,
-          disability_assistance: disabilityAssistance,
+            ? null
+            : clean(mailingPostalCode),
+          disability_detail: clean(disabilityDetail),
+          disability_assistance: clean(disabilityAssistance),
           current_activity: currentActivity || null,
-          exam_number: examNumber,
-          sport,
+          exam_number: clean(examNumber),
+          sport: clean(sport),
           wants_residence: wantsResidence,
-          preferred_residence: preferredResidence,
+          preferred_residence: clean(preferredResidence),
           applying_nsfas: applyingNsfas,
           applying_institutional_funding: applyingInstitutionalFunding,
-          nbt_reference: nbtReference,
+          nbt_reference: clean(nbtReference),
           nbt_year: nbtYear ? parseInt(nbtYear, 10) : null,
           nbt_date: nbtDate || null,
           redress_factors:
