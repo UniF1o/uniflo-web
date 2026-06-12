@@ -1,9 +1,12 @@
-// ProfileSetupForm — three-step form that collects a student's full profile.
+// ProfileSetupForm — five-step wizard that collects a student's full profile.
 //
 // Steps:
-//   1. Personal details — first name, last name, date of birth, SA ID number
-//   2. Contact details  — phone number, residential address, nationality
-//   3. Demographics     — gender, home language
+//   1. Personal details  — first name, last name, date of birth, SA ID number
+//   2. Contact details   — phone number, residential address, nationality
+//   3. Demographics      — gender, home language
+//   4. Background        — religion, disability, marital status, ethnicity
+//   5. Studies & funding — optional (skippable): current activity, residence
+//                          and funding intentions
 //
 // API saves:
 //   After each step the user clicks "Save and continue", which POSTs the
