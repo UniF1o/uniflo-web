@@ -51,12 +51,8 @@ export default async function ApplicationsPage() {
 
       <PageHeader
         kicker="Applying"
-        title={
-          <>
-            Track every <span className="text-primary">application.</span>
-          </>
-        }
-        description="Every application UniFlo sends on your behalf, with its live status. We'll flag anything that needs you."
+        title="Applications"
+        description="Every application UniFlo sends on your behalf, with its live status. We flag anything that needs your attention."
       />
 
       {applications === null ? (

@@ -120,7 +120,7 @@ export function ChallengePrompt({
         />
         <div className="space-y-1">
           <h2 className="text-sm font-semibold text-foreground">
-            Check your email — the portal needs something from you
+            Check your email. The portal needs something from you.
           </h2>
           <p className="text-sm text-muted-foreground">
             The {universityName} portal emailed you{" "}

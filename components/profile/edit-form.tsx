@@ -891,8 +891,8 @@ export function ProfileEditForm() {
       <div className="space-y-4 rounded-xl border border-border bg-card p-5 shadow-[var(--shadow-paper)] sm:p-6">
         <SectionLabel>National Benchmark Test (NBT)</SectionLabel>
         <p className="-mt-2 text-xs text-muted-foreground">
-          You write the NBT yourself — we just record your reference so UCT can
-          match it. Leave blank if you haven&rsquo;t written it.
+          You write the NBT yourself. We record your reference so UCT can match
+          it. Leave blank if you haven&rsquo;t written it.
         </p>
         <Input
           id="nbtReference"

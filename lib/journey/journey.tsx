@@ -92,7 +92,7 @@ const NEXT_STEP_COPY: Record<
 > = {
   profile: {
     title: "Set up your profile",
-    body: "Tell us about yourself once — we reuse it on every application you send.",
+    body: "Tell us about yourself once. We reuse it on every application you send.",
     href: "/profile/setup",
     cta: "Start your profile",
   },
@@ -104,7 +104,7 @@ const NEXT_STEP_COPY: Record<
   },
   documents: {
     title: "Upload your documents",
-    body: "Your certified ID and results — ready the moment any university asks.",
+    body: "Your certified ID and results, ready the moment any university asks.",
     href: "/documents",
     cta: "Upload documents",
   },

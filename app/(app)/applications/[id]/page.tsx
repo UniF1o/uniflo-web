@@ -31,7 +31,7 @@ export async function generateMetadata({
   const { id } = await params;
   const result = await getApplicationById(id);
   if (!result.ok) return { title: "Application" };
-  return { title: `${result.data.programme} — Application` };
+  return { title: `${result.data.programme} application` };
 }
 
 export default async function ApplicationPage({

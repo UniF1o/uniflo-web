@@ -13,11 +13,7 @@ export default function SettingsPage() {
     <div className="max-w-2xl space-y-10">
       <PageHeader
         kicker="Account"
-        title={
-          <>
-            Your <span className="text-primary">settings.</span>
-          </>
-        }
+        title="Settings"
         description="Manage your account preferences."
       />
 

@@ -55,7 +55,7 @@ export function CelebrationBanner() {
         </p>
       </div>
       <p className="mt-1 text-sm text-muted-foreground">
-        Track each application below — we&apos;ll update the status as the
+        Track each application below. We&apos;ll update the status as the
         portals confirm.
       </p>
       <button

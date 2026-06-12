@@ -20,11 +20,7 @@ export default function ProfilePage() {
     <div className="max-w-2xl space-y-8">
       <PageHeader
         kicker="Your story"
-        title={
-          <>
-            Everything about <span className="text-primary">you.</span>
-          </>
-        }
+        title="Profile"
         description="Your personal details on file. Keep these up to date so we can apply on your behalf."
         action={
           <Link

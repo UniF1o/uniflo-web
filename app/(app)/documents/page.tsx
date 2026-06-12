@@ -18,11 +18,7 @@ export default function DocumentsPage() {
       <PageHeader
         className="mb-8"
         kicker="Your story"
-        title={
-          <>
-            Your <span className="text-primary">documents.</span>
-          </>
-        }
+        title="Documents"
         description="Upload your supporting documents. Accepted formats: PDF, JPG, PNG. Maximum file size: 10 MB per document."
       />
 

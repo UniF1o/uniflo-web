@@ -70,28 +70,16 @@ function GreetingHero({ inSetup }: { inSetup: boolean }) {
           <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-primary" />
           {today}
         </p>
-        <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-          <h1 className="font-display text-3xl leading-tight tracking-tight text-foreground md:text-4xl">
-            {timeOfDayGreeting()}
-            {firstName ? (
-              <>
-                , <span className="text-primary">{firstName}</span>.
-              </>
-            ) : (
-              "."
-            )}
-          </h1>
-          {/* Handwritten margin note — only during setup, where a little
-           * encouragement earns its place. */}
-          {inSetup && (
-            <span
-              aria-hidden
-              className="font-script -rotate-3 text-xl text-primary/80"
-            >
-              you&rsquo;ve got this
-            </span>
+        <h1 className="font-display text-3xl leading-tight tracking-tight text-foreground md:text-4xl">
+          {timeOfDayGreeting()}
+          {firstName ? (
+            <>
+              , <span className="text-primary">{firstName}</span>.
+            </>
+          ) : (
+            "."
           )}
-        </div>
+        </h1>
       </div>
     </header>
   );
@@ -199,7 +187,7 @@ const HOW_IT_WORKS = [
   {
     step: "1",
     title: "Tell your story once",
-    body: "Profile, marks, documents — captured one time, reused everywhere.",
+    body: "Profile, marks and documents, captured once and reused everywhere.",
   },
   {
     step: "2",
@@ -255,7 +243,7 @@ function ActivityNudge() {
         </span>
         <div className="space-y-0.5">
           <p className="text-sm font-medium text-foreground">
-            Quick one — what are you doing this year?
+            What are you doing this year?
           </p>
           <p className="text-xs leading-relaxed text-muted-foreground">
             Whether you&rsquo;re in Grade 12, upgrading, or working changes how
@@ -292,7 +280,7 @@ function ApplicationsOverview({
         >
           <Sprout aria-hidden className="h-10 w-10 text-primary/40" />
           <p className="text-sm font-medium text-foreground">
-            Nothing in flight yet
+            No applications yet
           </p>
           <p className="max-w-xs text-xs leading-relaxed text-muted-foreground">
             Pick your universities and your first applications will appear here.

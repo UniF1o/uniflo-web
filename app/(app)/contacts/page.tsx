@@ -12,12 +12,8 @@ export default function ContactsPage() {
     <div className="max-w-2xl space-y-8">
       <PageHeader
         kicker="Your story"
-        title={
-          <>
-            Your <span className="text-primary">people.</span>
-          </>
-        }
-        description="Add a parent or guardian once — universities reuse them wherever they ask for a next of kin, emergency contact, or account holder."
+        title="Contacts"
+        description="Add a parent or guardian once. Universities reuse their details wherever they ask for a next of kin, emergency contact, or account holder."
       />
       <ContactsManager />
       <PrivacyNote />

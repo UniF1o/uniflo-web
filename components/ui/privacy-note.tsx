@@ -21,7 +21,7 @@ export function PrivacyNote({ className }: { className?: string }) {
       />
       <span>
         Your information is encrypted and stored securely. We only use it to
-        complete your university applications — it is never sold or shared.
+        complete your university applications. It is never sold or shared.
       </span>
     </p>
   );

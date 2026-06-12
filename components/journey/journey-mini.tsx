@@ -69,7 +69,7 @@ export function JourneyMini() {
           Next: {nextStep.title}
         </Link>
       ) : (
-        <p className="text-xs text-muted-foreground">All done — well earned.</p>
+        <p className="text-xs text-muted-foreground">All steps complete.</p>
       )}
     </div>
   );

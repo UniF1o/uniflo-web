@@ -520,7 +520,7 @@ export function ReviewScreen({
                   {status === "portal_unavailable" && (
                     <p role="alert" className="text-xs text-warning">
                       Applications to {entry.universityName} are temporarily
-                      unavailable — please try again later.
+                      unavailable. Please try again later.
                     </p>
                   )}
                 </div>

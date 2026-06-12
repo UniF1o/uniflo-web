@@ -23,7 +23,7 @@ const SECTIONS: { type: RecordType; heading: string; description: string }[] = [
     type: "grade_12_april",
     heading: "Grade 12 April results",
     description:
-      "Add these once you have them — universities use your most recent marks.",
+      "Add these once you have them. Universities use your most recent marks.",
   },
 ];
 
@@ -32,12 +32,8 @@ export default function AcademicRecordsPage() {
     <div className="max-w-2xl space-y-8">
       <PageHeader
         kicker="Your story"
-        title={
-          <>
-            Your <span className="text-primary">marks.</span>
-          </>
-        }
-        description="Enter your results once — they decide which programmes universities match you with."
+        title="Academic records"
+        description="Enter your results once. They decide which programmes universities match you with."
       />
 
       {SECTIONS.map((section) => (

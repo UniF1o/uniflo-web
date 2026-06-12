@@ -474,7 +474,7 @@ export function ContactsManager() {
       // UCT requires the guardian's ID number once any guardian detail is
       // given — saving the card at all counts, so it's required here.
       if (!f.id_number.trim()) {
-        next.id_number = "Required — UCT needs the guardian's SA ID number.";
+        next.id_number = "Required. UCT needs the guardian's SA ID number.";
       }
       // Wits hard-rejects a guardian whose email or mobile matches the
       // applicant's own.
@@ -600,7 +600,7 @@ export function ContactsManager() {
         status={status.guardian}
         apiError={apiErrors.guardian}
         present={present.guardian}
-        addressHint="Optional — if left blank, your own address is used where a portal needs one."
+        addressHint="Optional. If left blank, your own address is used where a portal needs one."
         onFieldChange={(field, value) => setField("guardian", field, value)}
         onSave={() => void handleSave("guardian")}
         onRemove={() => void handleDelete("guardian")}
@@ -609,7 +609,7 @@ export function ContactsManager() {
       <Checkbox
         id="different-fee-payer"
         label="Someone different pays the fees"
-        description="Leave off if the parent/guardian above (or you) pays — universities reuse their details."
+        description="Leave this off if the parent or guardian above pays. Universities reuse their details."
         checked={showFeePayer}
         onChange={(ev) => void handleFeePayerToggle(ev.target.checked)}
         disabled={status.fee_payer === "deleting"}
@@ -623,7 +623,7 @@ export function ContactsManager() {
           status={status.fee_payer}
           apiError={apiErrors.fee_payer}
           present={present.fee_payer}
-          addressHint="UJ asks for the fee payer's full postal address — fill it in if you can."
+          addressHint="UJ asks for the fee payer's full postal address. Fill it in if you can."
           onFieldChange={(field, value) => setField("fee_payer", field, value)}
           onSave={() => void handleSave("fee_payer")}
           onRemove={() => void handleDelete("fee_payer")}

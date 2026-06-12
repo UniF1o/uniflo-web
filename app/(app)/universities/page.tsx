@@ -35,12 +35,8 @@ export default async function UniversitiesPage() {
     <div className="max-w-5xl space-y-8">
       <PageHeader
         kicker="Applying"
-        title={
-          <>
-            Choose your <span className="text-primary">universities.</span>
-          </>
-        }
-        description="Browse universities UniFlo supports and select the ones you want to apply to."
+        title="Universities"
+        description="Browse the universities UniFlo supports and select the ones you want to apply to."
       />
 
       <UniversityList initialUniversities={universities} />

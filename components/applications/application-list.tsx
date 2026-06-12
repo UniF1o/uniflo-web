@@ -152,7 +152,7 @@ export function ApplicationList({
                     </p>
                     {app.status === "action_required" && (
                       <p className="text-xs font-medium text-warning">
-                        Needs your input — open to continue.
+                        Needs your input. Open to continue.
                       </p>
                     )}
                   </div>

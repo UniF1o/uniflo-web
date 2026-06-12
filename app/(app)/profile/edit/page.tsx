@@ -12,11 +12,7 @@ export default function ProfileEditPage() {
     <div className="max-w-2xl space-y-8">
       <PageHeader
         kicker="Your story"
-        title={
-          <>
-            Edit your <span className="text-primary">details.</span>
-          </>
-        }
+        title="Edit profile"
         description="Update any of your details below. Only fields you change will be saved."
       />
       <ProfileEditForm />

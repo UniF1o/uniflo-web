@@ -134,9 +134,9 @@ export function ChangePasswordSection() {
 
       {hasPassword === false ? (
         <p className="text-sm text-muted-foreground">
-          Your account uses Google sign-in — there&rsquo;s no password to
-          change. To set a password, sign out and use &ldquo;Forgot
-          password?&rdquo; on the login page.
+          Your account uses Google sign-in, so there is no password to change.
+          To set a password, sign out and use &ldquo;Forgot password?&rdquo; on
+          the login page.
         </p>
       ) : step === "done" ? (
         <div className="space-y-4">

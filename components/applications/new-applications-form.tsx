@@ -220,7 +220,7 @@ export function NewApplicationsForm() {
           Applying
         </p>
         <h1 className="font-display text-3xl tracking-tight text-foreground">
-          Your programme <span className="text-primary">choices.</span>
+          Programme choices
         </h1>
         <p className="text-sm text-muted-foreground">
           Add programme details for each selected university. You can list up to

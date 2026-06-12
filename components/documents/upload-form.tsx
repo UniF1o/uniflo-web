@@ -84,7 +84,7 @@ const REQUIRED_ZONE_CONFIGS: ZoneConfig[] = [
     type: "ID_COPY",
     label: "Certified copy of SA ID document",
     description:
-      "Must be a commissioner-certified copy — green ID book or smart card. Certification must be within the last 3 months.",
+      "A commissioner-certified copy of your green ID book or smart card. Certification must be within the last 3 months.",
   },
   {
     type: "MATRIC_RESULTS",
@@ -105,7 +105,7 @@ const OPTIONAL_ZONE_CONFIGS: ZoneConfig[] = [
     type: "GRADE11_RESULTS",
     label: "Grade 11 results",
     description:
-      "Your official Grade 11 report. UP accepts this in lieu of a Grade 12 certificate. Optional — only upload if you have it.",
+      "Your official Grade 11 report. UP accepts this in lieu of a Grade 12 certificate. Optional. Upload it if you have it.",
   },
 ];
 
@@ -131,7 +131,7 @@ function validateCertDate(dateStr: string): string | null {
   threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
   threeMonthsAgo.setHours(0, 0, 0, 0);
   if (date < threeMonthsAgo)
-    return "Your certified copy has expired — certification must be within the last 3 months. Please get a new certified copy.";
+    return "Your certified copy has expired. Certification must be within the last 3 months. Please get a new certified copy.";
   return null;
 }
 

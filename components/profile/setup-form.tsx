@@ -462,8 +462,8 @@ export function ProfileSetupForm() {
         </h1>
         <p className="text-sm text-muted-foreground">
           Step {step} of {STEPS.length}
-          {step < STEPS.length && " — your progress is saved as you go."}
-          {step === STEPS.length && " — last step."}
+          {step < STEPS.length && ". Your progress is saved as you go."}
+          {step === STEPS.length && ". This is the last step."}
         </p>
       </div>
 
@@ -764,8 +764,8 @@ export function ProfileSetupForm() {
           className="space-y-4 rounded-xl border border-border bg-card p-5 shadow-[var(--shadow-paper)] sm:p-6"
         >
           <p className="text-xs leading-relaxed text-muted-foreground">
-            All optional — but the more we know, the more precisely we can
-            complete each university&rsquo;s forms for you.
+            All optional. The more we know, the more precisely we can complete
+            each university&rsquo;s forms for you.
           </p>
 
           <div className="space-y-1">
@@ -860,7 +860,7 @@ export function ProfileSetupForm() {
           onClick={handleSkipFinalStep}
           className="mx-auto block text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-primary hover:underline"
         >
-          Skip for now — you can add this later in your profile
+          Skip for now. You can add this later in your profile.
         </button>
       )}
 

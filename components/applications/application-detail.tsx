@@ -194,7 +194,7 @@ export function ApplicationDetail({
       setCurrentStatus(updated.status ?? "pending");
       setFeedback({
         kind: "queued",
-        message: "Retrying — we'll update the status shortly.",
+        message: "Retrying. We'll update the status shortly.",
       });
       // Brief lockout to prevent double-tap retries.
       setRetryDisabled(true);
@@ -204,7 +204,7 @@ export function ApplicationDetail({
         if (err.status === 409) {
           setFeedback({
             kind: "conflict",
-            message: "Already retrying — please refresh shortly.",
+            message: "Already retrying. Please refresh shortly.",
           });
           // Lock out subsequent attempts — refresh is the recovery path.
           setRetryDisabled(true);
@@ -269,8 +269,8 @@ export function ApplicationDetail({
       )}
       {challengeResolved && !challenge && (
         <Alert tone="success" role="status">
-          Thanks — we&apos;ve passed that on and your application is continuing.
-          Check back shortly for the updated status.
+          Thank you. We&apos;ve passed that on and your application is
+          continuing. Check back shortly for the updated status.
         </Alert>
       )}
 
