@@ -146,14 +146,27 @@ success). Adding **Grade 12 June** is one `SECTIONS` entry plus a
 `RECORD_TYPE_LABELS` entry once the backend deploys the enum value — see the
 lag note below.
 
-### Regenerated schema brought unrelated surface
+### Regenerated schema brought unrelated surface — now wired up
 
 `npm run types:api` also pulled in backend PR #29's surface: an
 `action_required` application status, `pending_challenge` on applications,
 and `/applications/{id}/consent`, `/challenge`, `/field-mappings` detail
-endpoints. The status badge now renders `action_required` ("Action needed",
-warning tone); **no challenge/consent UI has been built yet** — that's its
-own task.
+endpoints. All of it now has UI:
+
+- The status badge renders `action_required` ("Action needed", warning
+  tone), and list rows carry a "Needs your input — open to continue" line.
+- `ChallengePrompt` (new, on the detail page): while a run is paused on an
+  email challenge, one input per `requested_fields` entry (friendly labels
+  for otp / temp_id / password / …) POSTs to `/applications/{id}/challenge`
+  and folds the returned row back into page state.
+- `ConsentCard` (new, on the detail page): records POPI / application-
+  agreement acceptance via `/applications/{id}/consent`. Recorded consents
+  show as timestamped check rows; missing ones as checkboxes (button needs
+  ≥1 new tick — the backend rejects an all-false POST). Hidden on
+  already-submitted rows that never recorded anything.
+- The detail `/field-mappings` GET still has no surface of its own — the
+  review-screen preview covers the pre-submit flow; a post-submit "what we
+  filled in" view is a possible future addition.
 
 Profile fields the review flagged (religion, the mailing-address toggle,
 `applying_institutional_funding`, `preferred_residence` behind
