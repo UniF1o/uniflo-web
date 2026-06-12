@@ -285,9 +285,9 @@ function SubjectRowEditor({
 
 interface AcademicRecordsFormProps {
   // Which record type this form manages. Defaults to grade_11_final.
-  // Every type loads its existing record on mount. After save, a first-time
-  // grade_11_final (the onboarding baseline) advances to /documents; updates
-  // and all other types show an inline success state instead.
+  // grade_11_final (the required baseline): blank on mount, redirects to
+  // /documents after save. Any other type (Grade 12 April/June results):
+  // loads existing data on mount and shows an inline success state instead.
   recordType?: RecordType;
 }
 
@@ -304,13 +304,10 @@ export function AcademicRecordsForm({
   // This flat structure avoids nested objects while still scoping errors to rows.
   const [rowErrors, setRowErrors] = useState<Record<string, string>>({});
 
-  // formReady: false until the existing-record fetch settles.
-  const [formReady, setFormReady] = useState(false);
-  // saved: true after a save that stays on the page (shows inline success).
+  // formReady: false while loading initial data for non-baseline records.
+  const [formReady, setFormReady] = useState(recordType === "grade_11_final");
+  // saved: true after a successful non-baseline save (no redirect — show inline success).
   const [saved, setSaved] = useState(false);
-  // True when an existing record pre-populated the form — a re-save of the
-  // baseline then stays here instead of replaying the onboarding redirect.
-  const [hadExisting, setHadExisting] = useState(false);
 
   const [institution, setInstitution] = useState("");
   const [year, setYear] = useState("");
@@ -372,9 +369,11 @@ export function AcademicRecordsForm({
     });
   }
 
-  // Load any existing record on mount so the form pre-populates — a returning
-  // student should see their saved marks, not a blank form.
+  // Load any existing non-baseline record on mount so the form pre-populates.
+  // grade_11_final starts with a blank form (it's part of onboarding).
   useEffect(() => {
+    if (recordType === "grade_11_final") return;
+
     async function loadExistingRecord() {
       const supabase = createClient();
       const {
@@ -398,7 +397,6 @@ export function AcademicRecordsForm({
             .json()
             .catch(() => null)) as AcademicRecordResponse | null;
           if (record) {
-            setHadExisting(true);
             setInstitution(record.institution);
             setYear(record.year.toString());
             setSubjects(
@@ -540,12 +538,11 @@ export function AcademicRecordsForm({
         return;
       }
 
-      // First-time Grade 11 save (onboarding): advance to document upload.
-      // Updates and other types: stay and show success.
-      if (recordType === "grade_11_final" && !hadExisting) {
+      // Grade 11 (onboarding): advance to document upload. Anything else:
+      // stay and show success.
+      if (recordType === "grade_11_final") {
         router.push("/documents");
       } else {
-        setHadExisting(true);
         setSaved(true);
       }
     } catch {
@@ -601,10 +598,8 @@ export function AcademicRecordsForm({
     <form onSubmit={handleSubmit} noValidate className="space-y-8">
       {/* ── Institution and year ───────────────────────────────────────────── */}
       <div className="grid gap-4 sm:grid-cols-2">
-        {/* Ids are scoped by record type — multiple form instances share the
-            records page, and duplicate ids would break label association. */}
         <Input
-          id={`${recordType}-institution`}
+          id="institution"
           label="School / institution"
           type="text"
           autoComplete="organization"
@@ -617,7 +612,7 @@ export function AcademicRecordsForm({
           error={fieldErrors.institution}
         />
         <Input
-          id={`${recordType}-year`}
+          id="year"
           label="Year"
           type="number"
           inputMode="numeric"
