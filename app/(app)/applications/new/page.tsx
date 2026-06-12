@@ -37,16 +37,26 @@ export default async function NewApplicationPage() {
         <h1 className="font-display text-3xl tracking-tight text-foreground">
           New application
         </h1>
-        <Alert tone="warning" role="status" title="Automated applications aren't available for your situation yet">
+        <Alert
+          tone="warning"
+          role="status"
+          title="Automated applications aren't available for your situation yet"
+        >
           Uniflo currently only submits on behalf of students in Grade 12, and
           your profile says you&apos;re &ldquo;{activity}&rdquo;. Please apply
           directly on each university&apos;s portal — you&apos;ll find the
           portal links on the{" "}
-          <Link href="/universities" className="font-medium underline underline-offset-2">
+          <Link
+            href="/universities"
+            className="font-medium underline underline-offset-2"
+          >
             universities page
           </Link>
           . If your situation has changed,{" "}
-          <Link href="/profile/edit" className="font-medium underline underline-offset-2">
+          <Link
+            href="/profile/edit"
+            className="font-medium underline underline-offset-2"
+          >
             update your profile
           </Link>
           .
