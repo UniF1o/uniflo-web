@@ -243,7 +243,7 @@ export default function Home() {
               eyebrow="From the class of 2025"
               title="Matrics who actually got in."
               accentText="got in"
-              description="Real students who used Uniflo to land at the universities they wanted. Names changed where requested."
+              description="Real students who used UniFlo to land at the universities they wanted. Names changed where requested."
             />
           </Reveal>
 
@@ -254,7 +254,7 @@ export default function Home() {
                 initials="LM"
                 name="Lesedi M."
                 role="Matric, 2025"
-                quote="I almost gave up halfway through filling forms for the third time. Uniflo did the boring part. I just had to read and tick. UCT confirmed two weeks later."
+                quote="I almost gave up halfway through filling forms for the third time. UniFlo did the boring part. I just had to read and tick. UCT confirmed two weeks later."
               />
             </Reveal>
             <Reveal delayMs={140} scale>
@@ -293,11 +293,11 @@ export default function Home() {
             <Reveal from="right" delayMs={150} className="lg:pt-2">
               <FAQItem
                 defaultOpen
-                question="Does Uniflo pay my application fees?"
+                question="Does UniFlo pay my application fees?"
                 answer={
                   <>
                     No. Each university charges its own fee, and you pay those
-                    directly when you apply. Uniflo only charges for the service
+                    directly when you apply. UniFlo only charges for the service
                     of preparing and submitting your applications — we&rsquo;ll
                     always show you exactly what each university costs before
                     you confirm.
@@ -320,15 +320,15 @@ export default function Home() {
                 question="Do I have to share my password with you?"
                 answer={
                   <>
-                    Never. Uniflo creates an account on each university&rsquo;s
+                    Never. UniFlo creates an account on each university&rsquo;s
                     portal on your behalf, and you can request the login details
-                    at any time. Your Uniflo account password stays with you
+                    at any time. Your UniFlo account password stays with you
                     alone.
                   </>
                 }
               />
               <FAQItem
-                question="What does Uniflo actually do for me?"
+                question="What does UniFlo actually do for me?"
                 answer={
                   <>
                     We map your details to each university&rsquo;s online form,
@@ -451,7 +451,7 @@ export default function Home() {
 
         <div className="border-t border-border">
           <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-6 py-5 text-xs text-muted-foreground sm:flex-row md:px-10">
-            <p>© {year} Uniflo. Apply smarter.</p>
+            <p>© {year} UniFlo. Apply smarter.</p>
             <span className="inline-flex items-center gap-2">
               Made for SA matrics
               <Sprout className="h-4 w-4 origin-bottom text-primary [animation:sway_6s_ease-in-out_infinite] motion-reduce:animate-none" />

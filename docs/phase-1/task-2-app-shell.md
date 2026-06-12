@@ -21,7 +21,7 @@ The structural skeleton that all signed-in product screens will live inside, plu
 | `app/(app)/loading.tsx` | Route-group loading UI. Shown inside the shell while a server-rendered page is streaming. |
 | `app/(auth)/layout.tsx` | Minimal centred layout used by Task 3's login / signup / forgot-password screens. Brand mark at the top, centred card in the middle, footer at the bottom. |
 | `components/layout/app-shell.tsx` | Client component — interactive chrome (drawer state, responsive composition). |
-| `components/layout/brand-mark.tsx` | The "Uniflo" wordmark. Re-used in the navbar, the auth layout, and the landing page. |
+| `components/layout/brand-mark.tsx` | The "UniFlo" wordmark. Re-used in the navbar, the auth layout, and the landing page. |
 | `components/layout/navbar.tsx` | Top utility bar. Logo, user menu, and a hamburger (mobile only) that toggles the sidebar. |
 | `components/layout/sidebar.tsx` | Primary navigation. Fixed column on desktop, slide-in drawer on mobile. |
 | `components/layout/user-menu.tsx` | Avatar button + dropdown with sign-out and a link to `/profile`. |
@@ -32,9 +32,9 @@ The structural skeleton that all signed-in product screens will live inside, plu
 
 | File | Change |
 |---|---|
-| `app/layout.tsx` | Replaced Next.js starter fonts + copy with Uniflo metadata, Instrument Serif, and Geist. Configured a title template so child routes can set short titles like `"Dashboard"` which get expanded to `"Dashboard — Uniflo"`. |
+| `app/layout.tsx` | Replaced Next.js starter fonts + copy with UniFlo metadata, Instrument Serif, and Geist. Configured a title template so child routes can set short titles like `"Dashboard"` which get expanded to `"Dashboard — UniFlo"`. |
 | `app/globals.css` | Replaced the default template with a full design-token foundation — colours, fonts, radii, focus ring, text selection. |
-| `app/page.tsx` | Replaced the Next.js starter page with a real Uniflo landing hero + CTAs into `/signup` and `/login`. |
+| `app/page.tsx` | Replaced the Next.js starter page with a real UniFlo landing hero + CTAs into `/signup` and `/login`. |
 
 ### Dependencies added
 
@@ -118,7 +118,7 @@ Task 2 says "Do not build any screen content yet — just the shell." But a rout
 
 1. **Added `lucide-react`** — the plan didn't list an icon dependency; icons are ubiquitous in the navbar/sidebar/user-menu, and inlining SVGs for each one would have cost more in readability than the dependency costs in bytes.
 2. **Added a minimal `/dashboard` placeholder** — see decision 10 above.
-3. **Replaced the Next.js starter landing page at `/`** — the plan's Task 2 technically covers "app shell" only, but leaving the template page in place would make the Vercel preview inconsistent with the brand, so we shipped a simple Uniflo landing with CTAs into the auth flow.
+3. **Replaced the Next.js starter landing page at `/`** — the plan's Task 2 technically covers "app shell" only, but leaving the template page in place would make the Vercel preview inconsistent with the brand, so we shipped a simple UniFlo landing with CTAs into the auth flow.
 4. **Added a small `cn` utility** — trivial helper, not called out in the plan, but needed to keep the component class strings readable.
 
 Everything else in Task 2's checklist is implemented as specified.

@@ -1,4 +1,4 @@
-# Uniflo — Partner A Detailed Phase 3 Plan (`uniflo-web`)
+# UniFlo — Partner A Detailed Phase 3 Plan (`uniflo-web`)
 
 > Scoped strictly to Phase 3 work in `uniflo-web`. All decisions and constraints referenced here derive from `docs/architecture-designs.md`, `docs/build-action-plan.md`, and `docs/git-github-workflow.md`. Per-task write-ups go under `docs/phase-3/` following the pattern already set by `docs/phase-1/` and `docs/phase-2/`.
 >

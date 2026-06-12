@@ -1,4 +1,4 @@
-# Uniflo — Partner B Detailed Phase 3 Plan (`uniflo-api`)
+# UniFlo — Partner B Detailed Phase 3 Plan (`uniflo-api`)
 
 > Scoped strictly to Phase 3 work in `uniflo-api`. All decisions and constraints referenced here derive from `docs/architecture-designs.md`, `docs/build-action-plan.md`, and `docs/git-github-workflow.md`. This doc lives in `uniflo-web/docs/phase-3/` as the shared coordination artefact — the actual code lands in `uniflo-api`. Per-task write-ups go under `uniflo-api/docs/phase-3/` following the same pattern Partner A uses in `uniflo-web/docs/phase-N/`.
 
@@ -6,7 +6,7 @@
 
 ## Phase 3 Goal
 
-A real student can apply to at least three SA universities through Uniflo and have those applications actually submitted to the live university portals — without the team touching a browser. Playwright runs the submissions invisibly on the backend, Claude maps the student's profile to each university's form fields and rates its own confidence, and the application status moves from `pending` → `processing` → `submitted` (or `failed`) as the real adapter runs. This is the MVP.
+A real student can apply to at least three SA universities through UniFlo and have those applications actually submitted to the live university portals — without the team touching a browser. Playwright runs the submissions invisibly on the backend, Claude maps the student's profile to each university's form fields and rates its own confidence, and the application status moves from `pending` → `processing` → `submitted` (or `failed`) as the real adapter runs. This is the MVP.
 
 **Duration:** Weeks 9–14
 **Reference tag:** `[PHASE-3]`
@@ -27,7 +27,7 @@ For each target portal (start with UCT, Wits, UJ and UP):
 
 - Walk the portal end-to-end with a test account. Take screenshots of every page.
 - Document each step in a shared doc — page URL, form field labels, field types (text/select/file/checkbox), required vs optional, validation rules, error messages, post-submit confirmation page.
-- Map every portal field to the corresponding `student_profiles` / `academic_records` / `documents` field. Flag fields that have no Uniflo equivalent — these are the gaps that drive Claude's confidence scores down.
+- Map every portal field to the corresponding `student_profiles` / `academic_records` / `documents` field. Flag fields that have no UniFlo equivalent — these are the gaps that drive Claude's confidence scores down.
 - Note the file upload sizes, accepted formats, and the file naming the portal expects.
 - Note whether the portal uses captcha, OTP, or any anti-automation measure. If it does, flag it as a blocker and surface it before week 10.
 - Capture the post-submit confirmation page exactly — URL, DOM markers, text that proves "submitted". This is what `verify_submission()` keys off and what the screenshot proof captures.
@@ -101,7 +101,7 @@ Walk every target portal end-to-end, document everything, get sign-off before an
 - [ ] Walk UCT's portal with a test account. Document at `uniflo-api/docs/phase-3/portal-research/uct.md`:
   - Every page URL, in order
   - Every form field — label, DOM selector (best effort), type, required/optional, validation
-  - Field → Uniflo profile mapping
+  - Field → UniFlo profile mapping
   - File uploads — fields, accepted types, size limits, expected naming
   - Anti-automation measures (captcha, OTP, JS challenges)
   - Submission confirmation URL + DOM markers

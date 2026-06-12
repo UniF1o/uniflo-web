@@ -3,7 +3,7 @@
 // display serif, paired with the full name and city. Each chip uses the
 // university's own brand colour so the marquee reads as a row of distinct
 // institutions; the cream-on-colour treatment + serif typography keep the
-// card sitting on the Uniflo paper aesthetic rather than feeling like a
+// card sitting on the UniFlo paper aesthetic rather than feeling like a
 // foreign logo plate.
 import type { FeaturedUniversity } from "@/lib/constants/universities";
 import { Card } from "@/components/ui/card";

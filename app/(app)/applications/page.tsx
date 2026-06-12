@@ -51,7 +51,7 @@ export default async function ApplicationsPage() {
           Applications
         </h1>
         <p className="text-sm text-muted-foreground">
-          Track every application Uniflo has submitted on your behalf.
+          Track every application UniFlo has submitted on your behalf.
         </p>
       </div>
 

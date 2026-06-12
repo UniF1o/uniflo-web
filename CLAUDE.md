@@ -1,6 +1,6 @@
 @AGENTS.md
 
-# Uniflo — uniflo-web Context for Claude Code
+# UniFlo — uniflo-web Context for Claude Code
 
 This file gives Claude Code the context it needs to work effectively in this repository. Read it before touching any code.
 
@@ -16,7 +16,7 @@ Per-task write-ups live in `docs/phase-1/` (all complete) and `docs/phase-2/` (i
 
 ## What This Repo Is
 
-`uniflo-web` is the Next.js frontend for Uniflo — a South African university application automation platform. Students fill in their details once and Uniflo automatically applies to multiple universities on their behalf. The student reviews and approves every application before anything is submitted.
+`uniflo-web` is the Next.js frontend for UniFlo — a South African university application automation platform. Students fill in their details once and UniFlo automatically applies to multiple universities on their behalf. The student reviews and approves every application before anything is submitted.
 
 This repo is owned by **Partner A (Frontend)**. The backend lives in a separate repo: `uniflo-api` (FastAPI + Python).
 

@@ -1,7 +1,7 @@
-# Uniflo — MVP Build Action Plan
+# UniFlo — MVP Build Action Plan
 
 ## Product Summary
-Uniflo is a South African university application automation platform. Students fill in their details once and Uniflo automatically applies to multiple universities on their behalf. The MVP has one job: a student signs up, fills in their profile, selects universities, and Uniflo submits those applications automatically.
+UniFlo is a South African university application automation platform. Students fill in their details once and UniFlo automatically applies to multiple universities on their behalf. The MVP has one job: a student signs up, fills in their profile, selects universities, and UniFlo submits those applications automatically.
 
 ## Phase Status At a Glance
 
@@ -75,7 +75,7 @@ Per-task Phase 1 write-ups (design decisions, what changed during implementation
 
 ### Both Partners
 - [x] Agree on Git branching strategy — Git Flow: `main`, `feature/*`
-- [x] Create a GitHub organisation for Uniflo — separate from personal accounts
+- [x] Create a GitHub organisation for UniFlo — separate from personal accounts
 - [x] Create two repositories — `uniflo-web` (Next.js) and `uniflo-api` (FastAPI)
 - [x] Set up project management — GitHub Projects or Notion for task tracking
 - [x] Create a shared `.env.example` in each repo documenting every environment variable
@@ -256,7 +256,7 @@ Partner A's role in Phase 3 is limited to the frontend UI for confidence scoring
 - [ ] Handle the "failed" state clearly — what does the student see and what can they do if an adapter fails?
 
 ### ✅ Phase 3 Checkpoint
-A real student can apply to at least 3 SA universities through Uniflo. Real browser automation is running on Render. Claude is mapping fields and scoring confidence. This is your MVP.
+A real student can apply to at least 3 SA universities through UniFlo. Real browser automation is running on Render. Claude is mapping fields and scoring confidence. This is your MVP.
 
 ---
 
@@ -290,7 +290,7 @@ A real student can apply to at least 3 SA universities through Uniflo. Real brow
 - [ ] Iterate fast — daily fixes are appropriate during beta
 
 ### ✅ Phase 4 Checkpoint
-Real matric students are using Uniflo. Applications are being submitted. Feedback is coming in. You have a live product.
+Real matric students are using UniFlo. Applications are being submitted. Feedback is coming in. You have a live product.
 
 ---
 

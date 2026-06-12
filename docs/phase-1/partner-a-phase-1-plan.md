@@ -1,4 +1,4 @@
-# Uniflo — Partner A Detailed Phase 1 Plan (`uniflo-web`)
+# UniFlo — Partner A Detailed Phase 1 Plan (`uniflo-web`)
 
 > Scoped strictly to Phase 1 work in `uniflo-web`. All decisions and constraints referenced here derive from `docs/architecture-designs.md`, `docs/build-action-plan.md`, and `docs/git-github-workflow.md`.
 

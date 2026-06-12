@@ -1,4 +1,4 @@
-# Uniflo — Partner A Detailed Phase 2 Plan (`uniflo-web`)
+# UniFlo — Partner A Detailed Phase 2 Plan (`uniflo-web`)
 
 > Scoped strictly to Phase 2 work in `uniflo-web`. All decisions and constraints referenced here derive from `docs/architecture-designs.md`, `docs/build-action-plan.md`, and `docs/git-github-workflow.md`. Per-task write-ups go under `docs/phase-2/` following the pattern already set by `docs/phase-1/`.
 
@@ -124,7 +124,7 @@ Before anything else, replace hand-written API types with generated ones. Every 
 ## Task 2 — University browsing and search
 **Branch:** `feature/universities-browse`
 
-Build the page where students discover which universities Uniflo supports. This is the first screen in the Phase 2 flow — it lives at `/universities` and links from the sidebar and dashboard.
+Build the page where students discover which universities UniFlo supports. This is the first screen in the Phase 2 flow — it lives at `/universities` and links from the sidebar and dashboard.
 
 - [x] Create `app/(app)/universities/page.tsx` as a server component. Fetch the initial university list server-side using the server Supabase client + typed API client, so the list renders on first paint without a loading flash
 - [x] Create `components/universities/university-list.tsx` — client component that receives the initial list as a prop, owns the search input state, and re-fetches on search input change (debounced ~300ms). The server fetch handles first paint; client-side handles interactivity
@@ -198,7 +198,7 @@ The review screen is the data-integrity safeguard that `docs/architecture-design
   - **Documents section** — list of uploaded documents by type, with a check/cross per required slot. Same completeness check
   - **Applications list** — one row per selection showing university name, programme, application year, and an "Edit" link back to `/applications/new`
   - **Submit button** — disabled until every completeness check passes and the terms checkbox below is ticked
-  - **Consent checkbox** — "I confirm the details above are correct and authorise Uniflo to submit applications on my behalf." Mandatory. POPIA-adjacent — see `docs/architecture-designs.md` section 13
+  - **Consent checkbox** — "I confirm the details above are correct and authorise UniFlo to submit applications on my behalf." Mandatory. POPIA-adjacent — see `docs/architecture-designs.md` section 13
 - [x] On submit, POST each selection to `/applications` sequentially (not in parallel — sequential is simpler to report on and rate-limit-friendly). If one fails, stop and show the error with a retry affordance; earlier successes remain submitted
   - Partner B is the source of truth for deadlines. A 4xx from `POST /applications` with a deadline-related error code renders as a clear "Applications to X have closed" message per row
 - [x] On all-success, clear the selection context and redirect to `/applications` (the dashboard from Task 6) with a success toast/inline banner

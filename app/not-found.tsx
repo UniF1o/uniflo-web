@@ -2,7 +2,7 @@
 //
 // Lives at the root so a single screen catches misses across both the
 // public marketing tree and the authenticated (app) routes. Carries the
-// brand washes + sprout motif so a wrong URL still feels like Uniflo.
+// brand washes + sprout motif so a wrong URL still feels like UniFlo.
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BrandMark } from "@/components/layout/brand-mark";

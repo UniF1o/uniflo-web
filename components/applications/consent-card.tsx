@@ -94,7 +94,7 @@ export function ConsentCard({
         {!allDone && (
           <p className="text-sm text-muted-foreground">
             The {universityName} portal asks for these during submission —
-            recording them here lets Uniflo accept on your behalf.
+            recording them here lets UniFlo accept on your behalf.
           </p>
         )}
 

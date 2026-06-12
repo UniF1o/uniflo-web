@@ -417,7 +417,7 @@ export function ReviewScreen({
           Review your application
         </h1>
         <p className="text-sm text-muted-foreground">
-          Confirm your details before Uniflo submits on your behalf.
+          Confirm your details before UniFlo submits on your behalf.
         </p>
       </div>
 
@@ -426,7 +426,7 @@ export function ReviewScreen({
           tone="warning"
           title="Automated applications aren't available for your situation yet"
         >
-          Uniflo currently only submits on behalf of students in Grade 12, and
+          UniFlo currently only submits on behalf of students in Grade 12, and
           your profile says you&apos;re &ldquo;{profile?.current_activity}
           &rdquo;. Please apply directly on each university&apos;s portal, or{" "}
           <Link
@@ -680,7 +680,7 @@ export function ReviewScreen({
           disabled={isSubmitting}
         />
         <span className="text-sm text-foreground">
-          I confirm the details above are correct and authorise Uniflo to submit
+          I confirm the details above are correct and authorise UniFlo to submit
           applications on my behalf.
         </span>
       </label>

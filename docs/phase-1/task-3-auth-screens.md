@@ -77,7 +77,7 @@ The `redirectTo` in `signInWithOAuth()` must point to this route. It is set to `
 
 The forgot password success message reads: *"If an account exists for [email], you'll receive a password reset link shortly."*
 
-This deliberately avoids confirming or denying whether the email has a Uniflo account. An attacker cannot probe the user database by submitting this form and watching for different responses.
+This deliberately avoids confirming or denying whether the email has a UniFlo account. An attacker cannot probe the user database by submitting this form and watching for different responses.
 
 ### 6. Error message mapping
 
