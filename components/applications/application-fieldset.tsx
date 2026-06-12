@@ -13,8 +13,17 @@ const YEAR_OPTIONS = [
 // The backend caps total choices at 3 — one primary + at most two additional.
 export const MAX_ADDITIONAL_PROGRAMMES = 2;
 
-// Ordinal labels for each choice slot so students see "1st / 2nd / 3rd choice".
-const CHOICE_LABELS = ["1st choice", "2nd choice", "3rd choice"];
+// Per-slot labels for the additional choices. Choices 2–3 genuinely reach the
+// portals now: UP and UCT fill two, Wits up to three (UJ's second choice is
+// still backend-pending), hence the per-portal hints in the copy.
+const ADDITIONAL_LABELS = [
+  "Second choice (recommended)",
+  "Third choice (Wits only)",
+];
+const ADD_BUTTON_LABELS = [
+  "Add a second choice (recommended)",
+  "Add a third choice (Wits only)",
+];
 
 interface ApplicationFieldsetProps {
   entry: SelectionEntry;
@@ -56,7 +65,7 @@ export function ApplicationFieldset({
 
       <Input
         id={`programme-${entry.universityId}`}
-        label={`Programme (${CHOICE_LABELS[0]})`}
+        label="Programme (1st choice)"
         type="text"
         placeholder="e.g. BSc Computer Science"
         value={programme}
@@ -75,7 +84,7 @@ export function ApplicationFieldset({
           <div className="flex-1">
             <Input
               id={`programme-${entry.universityId}-additional-${i}`}
-              label={`Programme (${CHOICE_LABELS[i + 1]})`}
+              label={ADDITIONAL_LABELS[i]}
               type="text"
               placeholder="e.g. BCom Accounting"
               value={value}
@@ -86,7 +95,7 @@ export function ApplicationFieldset({
           <button
             type="button"
             onClick={() => onRemoveProgramme(i)}
-            aria-label={`Remove ${CHOICE_LABELS[i + 1]} programme`}
+            aria-label={`Remove ${i === 0 ? "second" : "third"} choice`}
             className="mb-2.5 rounded p-1 text-muted-foreground transition-colors hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <Trash2 size={15} aria-hidden />
@@ -97,7 +106,7 @@ export function ApplicationFieldset({
       {canAddMore && (
         <Button type="button" variant="ghost" onClick={onAddProgramme}>
           <Plus size={16} aria-hidden />
-          Add another programme choice
+          {ADD_BUTTON_LABELS[additionalProgrammes.length]}
         </Button>
       )}
 
