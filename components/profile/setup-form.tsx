@@ -402,11 +402,20 @@ export function ProfileSetupForm() {
       <StepIndicator current={step} />
 
       {/* Step heading */}
-      <div className="space-y-1">
-        <h1 className="font-display text-3xl tracking-tight text-foreground">
+      <div className="relative space-y-1">
+        {/* Sky bloom — matches the app-wide page headers. */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -left-24 -top-20 h-48 w-[28rem] rounded-full bg-[radial-gradient(closest-side,var(--color-soft),transparent)] opacity-80 blur-2xl"
+        />
+        <p className="relative flex items-center gap-2 text-xs font-medium uppercase tracking-[0.22em] text-primary">
+          <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-primary" />
+          Profile setup
+        </p>
+        <h1 className="relative font-display text-3xl tracking-tight text-foreground">
           {STEPS[step - 1]}
         </h1>
-        <p className="text-sm text-muted-foreground">
+        <p className="relative text-sm text-muted-foreground">
           Step {step} of {STEPS.length}
           {step < STEPS.length && " — your progress is saved as you go."}
           {step === STEPS.length && " — last step."}
@@ -420,7 +429,11 @@ export function ProfileSetupForm() {
        * a form element. Both paths call the same handleContinue handler. */}
       {/* ── Step 1: Personal details ─────────────────────────────────────── */}
       {step === 1 && (
-        <form onSubmit={handleContinue} noValidate className="space-y-4">
+        <form
+          onSubmit={handleContinue}
+          noValidate
+          className="space-y-4 rounded-xl border border-border bg-card p-5 shadow-[var(--shadow-paper)] sm:p-6"
+        >
           <div className="grid gap-4 sm:grid-cols-2">
             <Input
               id="firstName"
@@ -487,7 +500,11 @@ export function ProfileSetupForm() {
 
       {/* ── Step 2: Contact details ──────────────────────────────────────── */}
       {step === 2 && (
-        <form onSubmit={handleContinue} noValidate className="space-y-4">
+        <form
+          onSubmit={handleContinue}
+          noValidate
+          className="space-y-4 rounded-xl border border-border bg-card p-5 shadow-[var(--shadow-paper)] sm:p-6"
+        >
           <Input
             id="phone"
             label="Phone number"
@@ -590,7 +607,11 @@ export function ProfileSetupForm() {
 
       {/* ── Step 3: Demographics ────────────────────────────────────────── */}
       {step === 3 && (
-        <form onSubmit={handleContinue} noValidate className="space-y-4">
+        <form
+          onSubmit={handleContinue}
+          noValidate
+          className="space-y-4 rounded-xl border border-border bg-card p-5 shadow-[var(--shadow-paper)] sm:p-6"
+        >
           <Select
             id="gender"
             label="Gender"
@@ -626,7 +647,11 @@ export function ProfileSetupForm() {
 
       {/* ── Step 4: Background ──────────────────────────────────────────── */}
       {step === 4 && (
-        <form onSubmit={handleContinue} noValidate className="space-y-4">
+        <form
+          onSubmit={handleContinue}
+          noValidate
+          className="space-y-4 rounded-xl border border-border bg-card p-5 shadow-[var(--shadow-paper)] sm:p-6"
+        >
           <Select
             id="religion"
             label="Religion"

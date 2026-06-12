@@ -362,7 +362,7 @@ export function ReviewScreen({
           </InlineAlert>
         ) : (
           <>
-            <dl className="divide-y divide-border rounded-lg border border-border">
+            <dl className="divide-y divide-border rounded-lg border border-border bg-card shadow-[var(--shadow-paper)]">
               {profileRows.map((row) => (
                 <div
                   key={row.label}
@@ -444,7 +444,7 @@ export function ReviewScreen({
           </InlineAlert>
         ) : (
           <div className="space-y-3">
-            <ul className="divide-y divide-border rounded-lg border border-border">
+            <ul className="divide-y divide-border rounded-lg border border-border bg-card shadow-[var(--shadow-paper)]">
               {REQUIRED_DOC_TYPES.map((type) => {
                 const uploaded = uploadedTypes.has(type);
                 return (
@@ -481,7 +481,7 @@ export function ReviewScreen({
 
       {/* Applications list */}
       <ReviewSection title="Your applications">
-        <div className="divide-y divide-border rounded-lg border border-border">
+        <div className="divide-y divide-border rounded-lg border border-border bg-card shadow-[var(--shadow-paper)]">
           {entries.map((entry) => {
             const status = statuses[entry.universityId];
             return (

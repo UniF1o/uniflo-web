@@ -182,7 +182,7 @@ export function FieldMappingReview({
         {open && (
           <ul
             id={sectionId}
-            className="divide-y divide-border rounded-lg border border-border"
+            className="divide-y divide-border rounded-lg border border-border bg-card shadow-[var(--shadow-paper)]"
           >
             {flagged.map((entry) => (
               <FlaggedRow key={entry.field_id} entry={entry} />

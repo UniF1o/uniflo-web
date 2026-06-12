@@ -58,7 +58,7 @@ export function ApplicationFieldset({
   const canAddMore = additionalProgrammes.length < MAX_ADDITIONAL_PROGRAMMES;
 
   return (
-    <div className="space-y-4 rounded-lg border border-border p-5">
+    <div className="space-y-4 rounded-xl border border-border bg-card p-5 shadow-[var(--shadow-paper)]">
       <h3 className="text-sm font-semibold text-foreground">
         {entry.universityName}
       </h3>

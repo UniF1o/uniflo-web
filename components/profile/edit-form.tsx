@@ -44,9 +44,10 @@ function newRowId(): string {
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+    <h2 className="flex items-center gap-2 font-display text-xl tracking-tight text-foreground">
+      <span aria-hidden className="h-px w-5 shrink-0 bg-primary/60" />
       {children}
-    </p>
+    </h2>
   );
 }
 
@@ -439,7 +440,7 @@ export function ProfileEditForm() {
   }
 
   return (
-    <form onSubmit={handleSave} noValidate className="space-y-10">
+    <form onSubmit={handleSave} noValidate className="space-y-6">
       {saved && (
         <Alert tone="success">
           <span className="inline-flex items-center gap-2">
@@ -450,7 +451,7 @@ export function ProfileEditForm() {
       )}
 
       {/* ── Personal details ──────────────────────────────────────────────── */}
-      <div className="space-y-4">
+      <div className="space-y-4 rounded-xl border border-border bg-card p-5 shadow-[var(--shadow-paper)] sm:p-6">
         <SectionLabel>Personal details</SectionLabel>
         <div className="grid gap-4 sm:grid-cols-2">
           <Input
@@ -509,7 +510,7 @@ export function ProfileEditForm() {
       </div>
 
       {/* ── Additional names ──────────────────────────────────────────────── */}
-      <div className="space-y-4">
+      <div className="space-y-4 rounded-xl border border-border bg-card p-5 shadow-[var(--shadow-paper)] sm:p-6">
         <SectionLabel>Additional names</SectionLabel>
         <p className="-mt-2 text-xs text-muted-foreground">
           Optional, but some university portals ask for these.
@@ -555,7 +556,7 @@ export function ProfileEditForm() {
       </div>
 
       {/* ── Contact details ───────────────────────────────────────────────── */}
-      <div className="space-y-4">
+      <div className="space-y-4 rounded-xl border border-border bg-card p-5 shadow-[var(--shadow-paper)] sm:p-6">
         <SectionLabel>Contact details</SectionLabel>
         <Input
           id="phone"
@@ -653,7 +654,7 @@ export function ProfileEditForm() {
       </div>
 
       {/* ── Mailing address ───────────────────────────────────────────────── */}
-      <div className="space-y-4">
+      <div className="space-y-4 rounded-xl border border-border bg-card p-5 shadow-[var(--shadow-paper)] sm:p-6">
         <SectionLabel>Mailing address</SectionLabel>
         <Checkbox
           id="mailingSameAsResidential"
@@ -715,7 +716,7 @@ export function ProfileEditForm() {
       </div>
 
       {/* ── Identity ──────────────────────────────────────────────────────── */}
-      <div className="space-y-4">
+      <div className="space-y-4 rounded-xl border border-border bg-card p-5 shadow-[var(--shadow-paper)] sm:p-6">
         <SectionLabel>Identity</SectionLabel>
         <div className="grid gap-4 sm:grid-cols-2">
           <Select
@@ -746,7 +747,7 @@ export function ProfileEditForm() {
       </div>
 
       {/* ── Background ────────────────────────────────────────────────────── */}
-      <div className="space-y-4">
+      <div className="space-y-4 rounded-xl border border-border bg-card p-5 shadow-[var(--shadow-paper)] sm:p-6">
         <SectionLabel>Background</SectionLabel>
         <Select
           id="religion"
@@ -824,7 +825,7 @@ export function ProfileEditForm() {
       </div>
 
       {/* ── Studies & activity ────────────────────────────────────────────── */}
-      <div className="space-y-4">
+      <div className="space-y-4 rounded-xl border border-border bg-card p-5 shadow-[var(--shadow-paper)] sm:p-6">
         <SectionLabel>Studies &amp; activity</SectionLabel>
         <Select
           id="currentActivity"
@@ -854,7 +855,7 @@ export function ProfileEditForm() {
       </div>
 
       {/* ── Funding & residence ───────────────────────────────────────────── */}
-      <div className="space-y-4">
+      <div className="space-y-4 rounded-xl border border-border bg-card p-5 shadow-[var(--shadow-paper)] sm:p-6">
         <SectionLabel>Funding &amp; residence</SectionLabel>
         <Checkbox
           id="wantsResidence"
@@ -887,7 +888,7 @@ export function ProfileEditForm() {
       </div>
 
       {/* ── NBT ───────────────────────────────────────────────────────────── */}
-      <div className="space-y-4">
+      <div className="space-y-4 rounded-xl border border-border bg-card p-5 shadow-[var(--shadow-paper)] sm:p-6">
         <SectionLabel>National Benchmark Test (NBT)</SectionLabel>
         <p className="-mt-2 text-xs text-muted-foreground">
           You write the NBT yourself — we just record your reference so UCT can
@@ -926,7 +927,7 @@ export function ProfileEditForm() {
       </div>
 
       {/* ── Redress (UCT) ─────────────────────────────────────────────────── */}
-      <div className="space-y-4">
+      <div className="space-y-4 rounded-xl border border-border bg-card p-5 shadow-[var(--shadow-paper)] sm:p-6">
         <SectionLabel>Redress (UCT only)</SectionLabel>
         <p className="-mt-2 text-xs text-muted-foreground">
           UCT&rsquo;s application asks apartheid-era redress questions. Add any

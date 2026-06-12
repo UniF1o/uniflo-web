@@ -280,7 +280,7 @@ function DocumentZoneCard({
   }
 
   return (
-    <div className="rounded-lg border border-border p-4 space-y-3">
+    <div className="space-y-3 rounded-xl border border-border bg-card p-4 shadow-[var(--shadow-paper)] sm:p-5">
       {/* Zone label and description. The id on the <p> is referenced by
        * aria-describedby on each trigger button below. */}
       <div>
@@ -637,7 +637,8 @@ export function DocumentsUploadForm() {
 
       {/* ── Optional documents ──────────────────────────────────────────── */}
       <div className="space-y-3 pt-2">
-        <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+        <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+          <span aria-hidden className="h-px w-5 shrink-0 bg-primary/60" />
           Optional
         </p>
         {OPTIONAL_ZONE_CONFIGS.map((config) => (

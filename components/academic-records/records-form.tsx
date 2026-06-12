@@ -197,7 +197,7 @@ function SubjectRowEditor({
   return (
     // `relative` allows the trash button to be absolutely positioned at
     // the top-right corner without affecting the flow of the form fields.
-    <div className="relative rounded-lg border border-border p-4 space-y-3">
+    <div className="relative space-y-3 rounded-lg border border-border bg-background p-4">
       {removable && (
         <button
           type="button"
