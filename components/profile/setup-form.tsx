@@ -402,20 +402,15 @@ export function ProfileSetupForm() {
       <StepIndicator current={step} />
 
       {/* Step heading */}
-      <div className="relative space-y-1">
-        {/* Sky bloom — matches the app-wide page headers. */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -left-24 -top-20 h-48 w-[28rem] rounded-full bg-[radial-gradient(closest-side,var(--color-soft),transparent)] opacity-80 blur-2xl"
-        />
-        <p className="relative flex items-center gap-2 text-xs font-medium uppercase tracking-[0.22em] text-primary">
+      <div className="space-y-1">
+        <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.22em] text-primary">
           <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-primary" />
           Profile setup
         </p>
-        <h1 className="relative font-display text-3xl tracking-tight text-foreground">
+        <h1 className="font-display text-3xl tracking-tight text-foreground">
           {STEPS[step - 1]}
         </h1>
-        <p className="relative text-sm text-muted-foreground">
+        <p className="text-sm text-muted-foreground">
           Step {step} of {STEPS.length}
           {step < STEPS.length && " — your progress is saved as you go."}
           {step === STEPS.length && " — last step."}

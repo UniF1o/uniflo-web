@@ -1,8 +1,8 @@
 // PageHeader — the editorial opener every authenticated page shares.
 //
-// Brings the landing page's section-heading language inside the app: a
-// cobalt kicker line, the display serif title, and a soft sky wash glowing
-// behind the top of the page so the cream never reads as a flat void.
+// A cobalt kicker line, the display serif title, and an optional action
+// slot. Deliberately quieter than the landing page — no washes or glows
+// inside the app; depth comes from the lifted card surfaces below.
 //
 //   <PageHeader
 //     kicker="Your applications"
@@ -32,15 +32,8 @@ export function PageHeader({
   className,
 }: PageHeaderProps) {
   return (
-    <header className={cn("relative", className)}>
-      {/* Atmospheric wash — a pale sky bloom behind the heading. Oversized
-       * and blurred so it reads as light on paper, not a shape. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -left-28 -top-24 h-64 w-[34rem] rounded-full bg-[radial-gradient(closest-side,var(--color-soft),transparent)] opacity-80 blur-2xl"
-      />
-
-      <div className="relative flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <header className={className}>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="space-y-2">
           <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.22em] text-primary">
             <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-primary" />

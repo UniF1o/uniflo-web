@@ -21,6 +21,7 @@ import {
   BellRing,
   CalendarClock,
   CheckCircle2,
+  CircleHelp,
   FileText,
   NotebookPen,
   UserCircle2,
@@ -63,13 +64,8 @@ function GreetingHero({ inSetup }: { inSetup: boolean }) {
   });
 
   return (
-    <header className="relative">
-      {/* Sky bloom behind the greeting — the page top should feel lit. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -left-28 -top-24 h-64 w-[34rem] rounded-full bg-[radial-gradient(closest-side,var(--color-soft),transparent)] opacity-80 blur-2xl"
-      />
-      <div className="relative space-y-2">
+    <header>
+      <div className="space-y-2">
         <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.22em] text-primary">
           <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-primary" />
           {today}
@@ -236,6 +232,45 @@ function HowItWorks() {
         ))}
       </div>
     </Section>
+  );
+}
+
+// ─── Current-activity nudge ──────────────────────────────────────────────────
+
+// The setup wizard never asks what the student is currently doing, but the
+// answer gates whether automated submission is even allowed for them. Until
+// it's answered, keep a quiet prompt on the dashboard.
+function ActivityNudge() {
+  const { profile } = useJourney();
+  if (profile?.current_activity) return null;
+
+  return (
+    <Card
+      variant="paper"
+      className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between"
+    >
+      <div className="flex items-start gap-3">
+        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
+          <CircleHelp size={17} aria-hidden />
+        </span>
+        <div className="space-y-0.5">
+          <p className="text-sm font-medium text-foreground">
+            Quick one — what are you doing this year?
+          </p>
+          <p className="text-xs leading-relaxed text-muted-foreground">
+            Whether you&rsquo;re in Grade 12, upgrading, or working changes how
+            we submit for you. Ten seconds in your profile.
+          </p>
+        </div>
+      </div>
+      <Link
+        href="/profile/edit"
+        className="inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80"
+      >
+        Answer it
+        <ArrowRight size={14} aria-hidden />
+      </Link>
+    </Card>
   );
 }
 
@@ -509,6 +544,7 @@ export function DashboardHome() {
 
       {setupDone ? (
         <>
+          <ActivityNudge />
           <ApplicationsOverview universityNames={universityNames} />
           <DeadlinesSection universities={universities} />
         </>

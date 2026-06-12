@@ -152,7 +152,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                       className={cn(
                         "group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
                         isActive
-                          ? "bg-[linear-gradient(90deg,rgba(31,78,216,0.12),rgba(227,235,255,0.45))] font-medium text-primary"
+                          ? "bg-primary/10 font-medium text-primary"
                           : "text-foreground hover:bg-muted hover:text-primary",
                       )}
                     >

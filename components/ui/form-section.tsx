@@ -1,9 +1,9 @@
 // FormSection — a titled card for one group of form fields.
 //
-// Gives every data-entry page the same rhythm: a serif title on a softly
-// sky-tinted header band, an optional description and badge, then the
-// fields on lifted paper. Replaces the bare uppercase labels that made the
-// form pages read as walls of inputs.
+// Gives every data-entry page the same rhythm: a serif title on a quiet
+// header band, an optional description and badge, then the fields on
+// lifted paper. Replaces the bare uppercase labels that made the form
+// pages read as walls of inputs.
 import { Card } from "./card";
 import { cn } from "@/lib/utils/cn";
 
@@ -25,7 +25,7 @@ export function FormSection({
 }: FormSectionProps) {
   return (
     <Card variant="paper" className={cn("overflow-hidden", className)}>
-      <div className="border-b border-border bg-[linear-gradient(110deg,var(--color-soft)_0%,transparent_60%)] px-5 py-4 sm:px-6">
+      <div className="border-b border-border bg-muted/25 px-5 py-4 sm:px-6">
         <div className="flex items-center justify-between gap-3">
           <h2 className="font-display text-xl tracking-tight text-foreground">
             {title}

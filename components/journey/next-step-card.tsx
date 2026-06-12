@@ -24,7 +24,7 @@ export function NextStepCard({ className }: { className?: string }) {
         "relative overflow-hidden rounded-2xl border p-6 shadow-[var(--shadow-soft)] sm:p-7",
         nextStep.urgent
           ? "border-warning/40 bg-warning/5"
-          : "border-foreground/10 bg-[linear-gradient(135deg,var(--color-soft)_0%,var(--color-card)_55%,var(--color-card)_100%)]",
+          : "border-border bg-card",
         className,
       )}
     >

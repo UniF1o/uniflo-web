@@ -235,19 +235,14 @@ export function ApplicationDetail({
         Back to applications
       </Link>
 
-      <div className="relative space-y-2">
-        {/* Sky bloom behind the title, matching the app-wide page headers. */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -left-24 -top-20 h-52 w-[30rem] rounded-full bg-[radial-gradient(closest-side,var(--color-soft),transparent)] opacity-80 blur-2xl"
-        />
-        <div className="relative flex flex-wrap items-center gap-3">
+      <div className="space-y-2">
+        <div className="flex flex-wrap items-center gap-3">
           <h1 className="font-display text-3xl tracking-tight text-foreground md:text-4xl">
             {universityName}
           </h1>
           {currentStatus && <StatusBadge status={currentStatus} />}
         </div>
-        <p className="relative text-sm text-muted-foreground">
+        <p className="text-sm text-muted-foreground">
           {application.programme} · {application.application_year}
         </p>
       </div>

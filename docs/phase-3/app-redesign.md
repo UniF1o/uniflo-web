@@ -56,13 +56,18 @@ via `profileMissing` on the journey.
   most of why the app stopped reading as flat white.
 - `PageHeader` — every app page opens the same way now: cobalt kicker dot +
   tracked-uppercase label, display-serif title with one cobalt-accented
-  word, description, optional action slot, and a blurred sky-wash bloom
-  behind the heading.
+  word, description, optional action slot. The first iteration also put a
+  blurred sky-wash bloom behind every heading; user feedback ("the glow is
+  cool for the landing page but not suitable for every page — minimal like
+  Notion, but not flat") removed it app-wide. Depth now comes only from the
+  lifted card surfaces.
 - `Section` — standard in-page kicker heading (cobalt dash + tracked
   uppercase) with an action slot. Replaced the ad-hoc uppercase `<h2>`s on
   the detail page, settings, and the dashboard sections.
-- `FormSection` — serif title on a sky-tinted header band over a lifted
-  card body. Used by contacts cards and the academic-records sections.
+- `FormSection` — serif title on a quiet sand-tinted header band
+  (`bg-muted/25`, calmed from a sky gradient in the same feedback round)
+  over a lifted card body. Used by contacts cards and the academic-records
+  sections.
 - **Sidebar**: nav grouped to mirror the journey ("Your story": Profile,
   Academic records, Documents, Contacts; "Applying": Universities,
   Applications), active links get a cobalt rail + soft gradient, and —
@@ -83,6 +88,19 @@ via `profileMissing` on the journey.
   countdown (warning inside three weeks), `PageHeader`. Apply form got
   the kicker + wash and a serif title.
 - **Settings / profile overview**: `PageHeader` + `Section`.
+
+## The optional-fields gap
+
+The user asked the right question: the setup wizard only collects the
+required core, so the optional portal fields (title, mailing address,
+current activity, funding/residence, NBT, redress) are only ever seen by
+students who open `/profile/edit` — which nothing prompts them to do. Most
+of those blanks are tolerable, but `current_activity` gates whether
+automated submission is allowed at all. Fix in this branch: an
+`ActivityNudge` card on the post-setup dashboard ("Quick one — what are you
+doing this year?") that renders until the field is answered. A broader
+option — an optional, skippable "anything else?" wizard step — is left as a
+product decision.
 
 ## Design decisions
 
