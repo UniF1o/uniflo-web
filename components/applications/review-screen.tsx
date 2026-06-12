@@ -8,6 +8,7 @@ import { useSelection, type SelectionEntry } from "@/lib/state/selection";
 import { apiClient, ApiError } from "@/lib/api/client";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { PrivacyNote } from "@/components/ui/privacy-note";
 import {
   GENDER_LABELS,
   HOME_LANGUAGE_LABELS,
@@ -64,7 +65,10 @@ function ReviewSection({
 }) {
   return (
     <div className="space-y-3">
-      <h2 className="text-base font-semibold text-foreground">{title}</h2>
+      <h2 className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+        <span aria-hidden className="h-px w-5 shrink-0 bg-primary/60" />
+        {title}
+      </h2>
       {children}
     </div>
   );
@@ -560,6 +564,7 @@ export function ReviewScreen({
       </ReviewSection>
 
       {/* Consent */}
+      <PrivacyNote />
       <label className="flex cursor-pointer items-start gap-3">
         <input
           type="checkbox"

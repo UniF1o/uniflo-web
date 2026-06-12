@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ContactsManager } from "@/components/contacts/contacts-manager";
 import { PageHeader } from "@/components/layout/page-header";
+import { PrivacyNote } from "@/components/ui/privacy-note";
 
 export const metadata: Metadata = {
   title: "Contacts",
@@ -19,6 +20,7 @@ export default function ContactsPage() {
         description="Add a parent or guardian once — universities reuse them wherever they ask for a next of kin, emergency contact, or account holder."
       />
       <ContactsManager />
+      <PrivacyNote />
     </div>
   );
 }

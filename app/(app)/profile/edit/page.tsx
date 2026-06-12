@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { PageHeader } from "@/components/layout/page-header";
+import { PrivacyNote } from "@/components/ui/privacy-note";
 import { ProfileEditForm } from "@/components/profile/edit-form";
 
 export const metadata: Metadata = {
@@ -19,6 +20,7 @@ export default function ProfileEditPage() {
         description="Update any of your details below. Only fields you change will be saved."
       />
       <ProfileEditForm />
+      <PrivacyNote />
     </div>
   );
 }

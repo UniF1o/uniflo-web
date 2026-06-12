@@ -6,6 +6,7 @@
 import type { Metadata } from "next";
 import { DocumentsUploadForm } from "@/components/documents/upload-form";
 import { PageHeader } from "@/components/layout/page-header";
+import { PrivacyNote } from "@/components/ui/privacy-note";
 
 export const metadata: Metadata = {
   title: "Documents",
@@ -26,6 +27,7 @@ export default function DocumentsPage() {
       />
 
       <DocumentsUploadForm />
+      <PrivacyNote className="mt-8" />
     </div>
   );
 }

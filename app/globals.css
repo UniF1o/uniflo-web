@@ -80,6 +80,20 @@
   }
 }
 
+/* Page-content entrance inside the app shell. Subtle rise + fade on every
+ * route change — enough to make navigation feel acknowledged, quiet enough
+ * to disappear from notice. Suppressed by the global reduced-motion rule. */
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Fade up + slide on entrance — used for hero word stagger. */
 @keyframes fade-up {
   from {

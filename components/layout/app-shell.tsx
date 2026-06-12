@@ -59,7 +59,13 @@ export function AppShell({ user, profileName, children }: AppShellProps) {
         {/* min-w-0 prevents flex children from growing wider than the viewport
          * when page content is long (e.g. wide tables or code blocks). */}
         <main className="min-w-0 flex-1">
-          <div className="mx-auto w-full max-w-6xl px-4 pt-6 pb-24 md:px-8 md:pt-10">
+          {/* Keyed on pathname so the entrance animation replays on every
+           * route change — navigation feels acknowledged without a loading
+           * flash. Reduced-motion users get an instant swap. */}
+          <div
+            key={pathname}
+            className="mx-auto w-full max-w-6xl px-4 pt-6 pb-24 [animation:page-enter_0.35s_cubic-bezier(0.2,0.8,0.2,1)_both] md:px-8 md:pt-10"
+          >
             {children}
           </div>
         </main>

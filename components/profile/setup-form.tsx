@@ -32,6 +32,7 @@ import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import { PrivacyNote } from "@/components/ui/privacy-note";
 import { Select } from "@/components/ui/select";
 import { cn } from "@/lib/utils/cn";
 import { validateSAID } from "@/lib/utils/sa-id";
@@ -202,13 +203,14 @@ function StepIndicator({ current }: { current: number }) {
             >
               {isDone ? <CheckCircle2 size={14} /> : stepNum}
             </div>
-            {/* Label — visible from sm (640px) upward only. */}
+            {/* Label — always visible for the active step so phone users
+             * aren't navigating by bare circles; the rest appear from sm. */}
             <span
               className={cn(
-                "hidden text-xs sm:inline",
+                "text-xs",
                 isActive
-                  ? "font-medium text-foreground"
-                  : "text-muted-foreground",
+                  ? "inline font-medium text-foreground"
+                  : "hidden text-muted-foreground sm:inline",
               )}
             >
               {title}
@@ -861,6 +863,8 @@ export function ProfileSetupForm() {
           Skip for now — you can add this later in your profile
         </button>
       )}
+
+      <PrivacyNote className="mx-auto max-w-md justify-center" />
     </div>
   );
 }
