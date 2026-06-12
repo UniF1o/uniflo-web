@@ -15,6 +15,9 @@
 @theme {
   /* ── Colors ──────────────────────────────────────────────────────────── */
   --color-background: #fbf6ec; /* cream paper — warmer than office white */
+  --color-card: #fffdf6; /* lifted paper — one step brighter than the page
+                          * so cards visibly float instead of dissolving
+                          * into the cream background */
   --color-foreground: #14182b; /* charcoal-blue ink, kept clearly distinct
                                 * from the navy accent below (~15:1 on bg) */
   --color-muted: #ede2cd; /* warm sand for muted surfaces */

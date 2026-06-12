@@ -8,6 +8,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/layout/app-shell";
+import { JourneyProvider } from "@/lib/journey/journey";
 import { SelectionProvider } from "@/lib/state/selection";
 import { SelectionBar } from "@/components/universities/selection-bar";
 import type { components } from "@/lib/api/schema";
@@ -63,10 +64,12 @@ export default async function ProtectedLayout({
 
   return (
     <SelectionProvider>
-      <AppShell user={user} profileName={profileName}>
-        {children}
-      </AppShell>
-      <SelectionBar />
+      <JourneyProvider>
+        <AppShell user={user} profileName={profileName}>
+          {children}
+        </AppShell>
+        <SelectionBar />
+      </JourneyProvider>
     </SelectionProvider>
   );
 }
