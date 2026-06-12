@@ -30,10 +30,11 @@ import { Select } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { NSC_SUBJECTS } from "@/lib/constants/nsc-subjects";
 import { cn } from "@/lib/utils/cn";
-import type {
-  AcademicRecordPayload,
-  AcademicRecordResponse,
-  RecordType,
+import {
+  RECORD_TYPE_LABELS,
+  type AcademicRecordPayload,
+  type AcademicRecordResponse,
+  type RecordType,
 } from "@/lib/api/academic-records";
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -284,8 +285,9 @@ function SubjectRowEditor({
 
 interface AcademicRecordsFormProps {
   // Which record type this form manages. Defaults to grade_11_final.
-  // grade_12_april: loads existing data on mount, shows success state after save.
-  // grade_11_final: blank on mount, redirects to /documents after save.
+  // grade_11_final (the required baseline): blank on mount, redirects to
+  // /documents after save. Any other type (Grade 12 April/June results):
+  // loads existing data on mount and shows an inline success state instead.
   recordType?: RecordType;
 }
 
@@ -302,9 +304,9 @@ export function AcademicRecordsForm({
   // This flat structure avoids nested objects while still scoping errors to rows.
   const [rowErrors, setRowErrors] = useState<Record<string, string>>({});
 
-  // formReady: false while loading initial data for grade_12_april records.
+  // formReady: false while loading initial data for non-baseline records.
   const [formReady, setFormReady] = useState(recordType === "grade_11_final");
-  // saved: true after a successful grade_12_april save (no redirect — show inline success).
+  // saved: true after a successful non-baseline save (no redirect — show inline success).
   const [saved, setSaved] = useState(false);
 
   const [institution, setInstitution] = useState("");
@@ -367,12 +369,12 @@ export function AcademicRecordsForm({
     });
   }
 
-  // Load existing April record on mount so the form pre-populates.
-  // Only runs for grade_12_april — grade_11_final starts with a blank form.
+  // Load any existing non-baseline record on mount so the form pre-populates.
+  // grade_11_final starts with a blank form (it's part of onboarding).
   useEffect(() => {
-    if (recordType !== "grade_12_april") return;
+    if (recordType === "grade_11_final") return;
 
-    async function loadAprilRecord() {
+    async function loadExistingRecord() {
       const supabase = createClient();
       const {
         data: { session },
@@ -387,7 +389,7 @@ export function AcademicRecordsForm({
 
       try {
         const res = await fetch(
-          `${apiUrl}/academic-records?record_type=grade_12_april`,
+          `${apiUrl}/academic-records?record_type=${recordType}`,
           { headers: { Authorization: `Bearer ${token}` } },
         );
         if (res.ok) {
@@ -414,7 +416,7 @@ export function AcademicRecordsForm({
       setFormReady(true);
     }
 
-    loadAprilRecord();
+    loadExistingRecord();
   }, [recordType]);
 
   // Validates all fields, builds the payload, and POSTs to the backend.
@@ -536,11 +538,12 @@ export function AcademicRecordsForm({
         return;
       }
 
-      // Grade 11: advance to document upload. April: stay and show success.
-      if (recordType === "grade_12_april") {
-        setSaved(true);
-      } else {
+      // Grade 11 (onboarding): advance to document upload. Anything else:
+      // stay and show success.
+      if (recordType === "grade_11_final") {
         router.push("/documents");
+      } else {
+        setSaved(true);
       }
     } catch {
       // Network-level failure (offline, DNS, timeout, etc.).
@@ -577,7 +580,7 @@ export function AcademicRecordsForm({
         <Alert tone="success">
           <span className="inline-flex items-center gap-2">
             <CheckCircle2 size={15} aria-hidden />
-            Grade 12 April results saved.
+            {RECORD_TYPE_LABELS[recordType]} results saved.
           </span>
         </Alert>
         <button
