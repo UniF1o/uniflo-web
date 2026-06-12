@@ -13,9 +13,8 @@ export default function ContactsPage() {
           Contacts
         </h1>
         <p className="text-sm text-muted-foreground">
-          Add the people universities ask about — next of kin, fee payer,
-          guardian, and an emergency contact. All optional, but they speed up
-          your applications.
+          Add a parent or guardian once — universities reuse them wherever they
+          ask for a next of kin, emergency contact, or account holder.
         </p>
       </div>
       <ContactsManager />

@@ -9,6 +9,13 @@
 //   GET    /contacts                          → ContactResponse[]
 //   POST   /contacts                          → upsert (ContactWrite → 201)
 //   DELETE /contacts?contact_type=<type>      → 204
+//
+// The backend enum still has four contact types, but after the cross-portal
+// review (uniflo-api PR #49) the UI captures at most two. UP asks for no
+// contact person; UCT, UJ and Wits all derive next-of-kin / emergency / fee
+// roles from one person via backend fallback chains. So:
+//   guardian  — the single "Parent / Guardian" section, always shown
+//   fee_payer — captured only when someone different pays the fees
 import type { components } from "@/lib/api/schema";
 import { apiClient } from "@/lib/api/client";
 
@@ -16,34 +23,26 @@ export type ContactType = components["schemas"]["ContactType"];
 export type ContactResponse = components["schemas"]["ContactResponse"];
 export type ContactWrite = components["schemas"]["ContactWrite"];
 
-// The four contact types, in display order, with the copy each card shows.
-export const CONTACT_TYPES: ReadonlyArray<{
+export interface ManagedContactConfig {
   value: ContactType;
   label: string;
   description: string;
-}> = [
-  {
-    value: "next_of_kin",
-    label: "Next of kin",
-    description:
-      "Your closest relative. Wits requires their email and mobile to differ from yours.",
-  },
-  {
-    value: "fee_payer",
-    label: "Fee payer",
-    description: "Whoever pays your fees. UJ needs their full postal address.",
-  },
-  {
-    value: "guardian",
-    label: "Guardian",
-    description: "A parent or legal guardian, if applicable.",
-  },
-  {
-    value: "emergency",
-    label: "Emergency contact",
-    description: "Who the university should call in an emergency.",
-  },
-];
+}
+
+export const GUARDIAN_CONTACT: ManagedContactConfig = {
+  value: "guardian",
+  label: "Parent / Guardian",
+  description:
+    "Universities reuse this person wherever they ask for a next of kin or " +
+    "emergency contact — you only capture them once.",
+};
+
+export const FEE_PAYER_CONTACT: ManagedContactConfig = {
+  value: "fee_payer",
+  label: "Fee payer",
+  description:
+    "The person who pays your fees. UJ asks for their full postal address.",
+};
 
 export function listContacts(): Promise<ContactResponse[]> {
   return apiClient.get<ContactResponse[]>("/contacts");
