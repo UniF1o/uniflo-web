@@ -106,8 +106,21 @@ export function ApplicationList({
               >
                 <Card
                   variant="paper"
-                  className="group flex flex-col gap-2 px-5 py-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-foreground/20 hover:shadow-[var(--shadow-soft)] sm:flex-row sm:items-center sm:gap-4"
+                  className="group relative flex flex-col gap-2 overflow-hidden py-4 pl-6 pr-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-foreground/20 hover:shadow-[var(--shadow-soft)] sm:flex-row sm:items-center sm:gap-4"
                 >
+                  {/* Status rail — slim colour edge so the list scans by
+                   * state before any text is read. */}
+                  <span
+                    aria-hidden
+                    className={cn(
+                      "absolute inset-y-0 left-0 w-1",
+                      app.status === "submitted" && "bg-success",
+                      app.status === "processing" && "bg-primary",
+                      app.status === "pending" && "bg-border",
+                      app.status === "failed" && "bg-destructive",
+                      app.status === "action_required" && "bg-warning",
+                    )}
+                  />
                   <div className="min-w-0 flex-1 space-y-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <p className="text-sm font-medium text-foreground">
