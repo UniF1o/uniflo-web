@@ -266,6 +266,61 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/applications/{application_id}/field-mappings": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Field Mapping */
+    get: operations["applications_field_mappings"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/applications/{application_id}/consent": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Record Consent */
+    post: operations["applications_consent"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/applications/{application_id}/challenge": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Supply Challenge
+     * @description Answer the pending email challenge the automation run is waiting on
+     *     (status `action_required`) — e.g. the OTP the portal emailed the student.
+     */
+    post: operations["applications_supply_challenge"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/applications/{application_id}/retry": {
     parameters: {
       query?: never;
@@ -439,23 +494,62 @@ export interface components {
        * Format: date-time
        */
       created_at: string;
+      /** Popi Consent At */
+      popi_consent_at?: string | null;
+      /** Agreement Consent At */
+      agreement_consent_at?: string | null;
       latest_job?: components["schemas"]["ApplicationJobRead"] | null;
       /**
        * Choices
        * @default []
        */
       choices: components["schemas"]["ApplicationChoiceRead"][];
+      pending_challenge?: components["schemas"]["PendingChallengeRead"] | null;
     };
     /**
      * ApplicationStatus
      * @enum {string}
      */
-    ApplicationStatus: "pending" | "processing" | "submitted" | "failed";
+    ApplicationStatus:
+      | "pending"
+      | "processing"
+      | "action_required"
+      | "submitted"
+      | "failed";
     /** Body_documents_upload */
     Body_documents_upload: {
       /** File */
       file: string;
       document_type: components["schemas"]["DocumentType"];
+    };
+    /**
+     * ChallengeSupplyRequest
+     * @description The student's answer to a pending challenge: one value per requested
+     *     field name (extra keys are ignored, missing ones are a 422).
+     */
+    ChallengeSupplyRequest: {
+      /** Values */
+      values: {
+        [key: string]: string;
+      };
+    };
+    /**
+     * ConsentRequest
+     * @description Records the student's explicit acceptance after they've viewed the portal's
+     *     POPI notice / application agreement (surfaced by the frontend). At least one
+     *     must be true.
+     */
+    ConsentRequest: {
+      /**
+       * Popi
+       * @default false
+       */
+      popi: boolean;
+      /**
+       * Agreement
+       * @default false
+       */
+      agreement: boolean;
     };
     /** ContactResponse */
     ContactResponse: {
@@ -597,6 +691,54 @@ export interface components {
       | "White"
       | "Other";
     /**
+     * FieldMappingEntryRead
+     * @description One mapped field for the review screen. `flagged` == low confidence
+     *     (below the threshold in force when the mapping was produced).
+     */
+    FieldMappingEntryRead: {
+      /** Field Id */
+      field_id: string;
+      /** Value */
+      value?: string | null;
+      /** Confidence */
+      confidence: number;
+      /** Flagged */
+      flagged: boolean;
+      /**
+       * Reasoning
+       * @default
+       */
+      reasoning: string;
+      /** Source Profile Field */
+      source_profile_field?: string | null;
+    };
+    /** FieldMappingRead */
+    FieldMappingRead: {
+      /**
+       * Application Id
+       * Format: uuid
+       */
+      application_id: string;
+      /**
+       * University Id
+       * Format: uuid
+       */
+      university_id: string;
+      /** Overall Confidence */
+      overall_confidence: number;
+      /** Confidence Threshold */
+      confidence_threshold: number;
+      /** Entries */
+      entries: components["schemas"]["FieldMappingEntryRead"][];
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /** Updated At */
+      updated_at?: string | null;
+    };
+    /**
      * GenderEnum
      * @enum {string}
      */
@@ -627,6 +769,29 @@ export interface components {
      * @enum {string}
      */
     MaritalStatusEnum: "Single" | "Married" | "Divorced" | "Widowed" | "Other";
+    /**
+     * PendingChallengeRead
+     * @description An unanswered email challenge the run is waiting on — non-null while the
+     *     status is `action_required`. The app shows one input per requested field
+     *     (e.g. ["otp"], or ["temp_id", "password"]) and posts the values to
+     *     /applications/{id}/challenge.
+     */
+    PendingChallengeRead: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Portal Slug */
+      portal_slug: string;
+      /** Requested Fields */
+      requested_fields: string[];
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+    };
     /**
      * RecordType
      * @enum {string}
@@ -1597,6 +1762,107 @@ export interface operations {
       };
     };
   };
+  applications_field_mappings: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        application_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["FieldMappingRead"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  applications_consent: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        application_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ConsentRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApplicationRead"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  applications_supply_challenge: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        application_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ChallengeSupplyRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApplicationRead"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
   applications_retry: {
     parameters: {
       query?: never;
@@ -1614,7 +1880,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["ApplicationRead"];
         };
       };
       /** @description Validation Error */

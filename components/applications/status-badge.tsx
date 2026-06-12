@@ -1,5 +1,5 @@
 // StatusBadge — thin wrapper around the token-driven `Badge` for application
-// status pills. Maps the four status values from the OpenAPI schema onto a
+// status pills. Maps the status values from the OpenAPI schema onto a
 // `tone` + `label` pair so callers don't have to remember the mapping.
 import { Badge } from "@/components/ui/badge";
 import type { components } from "@/lib/api/schema";
@@ -17,6 +17,9 @@ const STATUS_MAP: Record<
   // Submitting — the worker is actively driving the university portal.
   // Info tone (cobalt) + dot signals motion.
   processing: { label: "Submitting…", tone: "info", dot: true },
+  // Action required — the run is paused on an email challenge (e.g. a portal
+  // OTP) and waits for the student. Warning tone: needs attention, not broken.
+  action_required: { label: "Action needed", tone: "warning", dot: true },
   // Submitted — the happy path. Success tone + dot for the "done" feel.
   submitted: { label: "Submitted", tone: "success", dot: true },
   // Failed — needs the user's attention. Destructive tone, no dot (the
