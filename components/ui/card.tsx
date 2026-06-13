@@ -23,12 +23,13 @@ interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const variantClasses: Record<CardVariant, string> = {
-  paper:
-    "rounded-xl border border-border bg-background shadow-[var(--shadow-paper)]",
+  // bg-card (lifted paper) rather than bg-background — surfaces must sit a
+  // visible step above the cream page or the whole app reads flat.
+  paper: "rounded-xl border border-border bg-card shadow-[var(--shadow-paper)]",
   elevated:
-    "rounded-xl border border-border bg-background shadow-[var(--shadow-soft)]",
+    "rounded-xl border border-border bg-card shadow-[var(--shadow-soft)]",
   feature:
-    "rounded-2xl border border-foreground/10 bg-[linear-gradient(135deg,var(--color-soft)_0%,var(--color-background)_60%,var(--color-muted)_100%)] shadow-[var(--shadow-soft)]",
+    "rounded-2xl border border-foreground/10 bg-[linear-gradient(135deg,var(--color-soft)_0%,var(--color-card)_60%,var(--color-muted)_100%)] shadow-[var(--shadow-soft)]",
 };
 
 export const Card = forwardRef<HTMLDivElement, CardProps>(

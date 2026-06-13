@@ -99,7 +99,7 @@ export function FieldMappingReview({
       <SectionShell title={universityName}>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-muted-foreground">
-            Mapping in progress — refresh shortly.
+            Mapping in progress. Refresh shortly.
           </p>
           <button
             type="button"
@@ -182,7 +182,7 @@ export function FieldMappingReview({
         {open && (
           <ul
             id={sectionId}
-            className="divide-y divide-border rounded-lg border border-border"
+            className="divide-y divide-border rounded-lg border border-border bg-card shadow-[var(--shadow-paper)]"
           >
             {flagged.map((entry) => (
               <FlaggedRow key={entry.field_id} entry={entry} />
@@ -252,7 +252,7 @@ function FlaggedRow({ entry }: { entry: FieldMappingEntry }) {
           <p className="break-words text-xs text-muted-foreground">
             {entry.value === null || entry.value === "" ? (
               <span className="italic text-destructive">
-                Not filled — please review.
+                Not filled. Please review.
               </span>
             ) : (
               entry.value

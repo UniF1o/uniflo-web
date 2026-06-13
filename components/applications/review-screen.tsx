@@ -8,6 +8,7 @@ import { useSelection, type SelectionEntry } from "@/lib/state/selection";
 import { apiClient, ApiError } from "@/lib/api/client";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { PrivacyNote } from "@/components/ui/privacy-note";
 import {
   GENDER_LABELS,
   HOME_LANGUAGE_LABELS,
@@ -64,7 +65,10 @@ function ReviewSection({
 }) {
   return (
     <div className="space-y-3">
-      <h2 className="text-base font-semibold text-foreground">{title}</h2>
+      <h2 className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+        <span aria-hidden className="h-px w-5 shrink-0 bg-primary/60" />
+        {title}
+      </h2>
       {children}
     </div>
   );
@@ -362,7 +366,7 @@ export function ReviewScreen({
           </InlineAlert>
         ) : (
           <>
-            <dl className="divide-y divide-border rounded-lg border border-border">
+            <dl className="divide-y divide-border rounded-lg border border-border bg-card shadow-[var(--shadow-paper)]">
               {profileRows.map((row) => (
                 <div
                   key={row.label}
@@ -444,7 +448,7 @@ export function ReviewScreen({
           </InlineAlert>
         ) : (
           <div className="space-y-3">
-            <ul className="divide-y divide-border rounded-lg border border-border">
+            <ul className="divide-y divide-border rounded-lg border border-border bg-card shadow-[var(--shadow-paper)]">
               {REQUIRED_DOC_TYPES.map((type) => {
                 const uploaded = uploadedTypes.has(type);
                 return (
@@ -481,7 +485,7 @@ export function ReviewScreen({
 
       {/* Applications list */}
       <ReviewSection title="Your applications">
-        <div className="divide-y divide-border rounded-lg border border-border">
+        <div className="divide-y divide-border rounded-lg border border-border bg-card shadow-[var(--shadow-paper)]">
           {entries.map((entry) => {
             const status = statuses[entry.universityId];
             return (
@@ -516,7 +520,7 @@ export function ReviewScreen({
                   {status === "portal_unavailable" && (
                     <p role="alert" className="text-xs text-warning">
                       Applications to {entry.universityName} are temporarily
-                      unavailable — please try again later.
+                      unavailable. Please try again later.
                     </p>
                   )}
                 </div>
@@ -560,6 +564,7 @@ export function ReviewScreen({
       </ReviewSection>
 
       {/* Consent */}
+      <PrivacyNote />
       <label className="flex cursor-pointer items-start gap-3">
         <input
           type="checkbox"

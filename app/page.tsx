@@ -150,8 +150,8 @@ export default function Home() {
 
             <p className="max-w-xl text-lg leading-relaxed text-muted-foreground md:text-xl">
               Fill in your details once. Pick your universities. Review every
-              application before we submit it on your behalf — so nothing goes
-              out without your signature.
+              application before we submit it on your behalf. Nothing goes out
+              without your signature.
             </p>
 
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -215,7 +215,7 @@ export default function Home() {
                 eyebrow="Top universities"
                 title="The big six, all in one place."
                 accentText="big six"
-                description="A handful of the most-requested South African universities — and the marquee keeps moving so does our coverage. Hover to pause the scroll."
+                description="A handful of the most-requested South African universities, with coverage that keeps growing. Hover to pause the scroll."
               />
             </div>
           </Reveal>
@@ -286,7 +286,7 @@ export default function Home() {
                 eyebrow="Common questions"
                 title="The stuff your matric WhatsApp group keeps asking."
                 accentText="WhatsApp group"
-                description="If you don't see your question here, message us — we'll add it."
+                description="If you don't see your question here, message us and we'll add it."
               />
             </Reveal>
 
@@ -298,7 +298,7 @@ export default function Home() {
                   <>
                     No. Each university charges its own fee, and you pay those
                     directly when you apply. UniFlo only charges for the service
-                    of preparing and submitting your applications — we&rsquo;ll
+                    of preparing and submitting your applications. We&rsquo;ll
                     always show you exactly what each university costs before
                     you confirm.
                   </>
@@ -311,8 +311,8 @@ export default function Home() {
                     Each university&rsquo;s open and close dates are shown on
                     its page. Once you start an application, your dashboard
                     shows the closing date and we send reminders before it
-                    closes. Closed universities can&rsquo;t be applied to —
-                    that&rsquo;s the only thing we can&rsquo;t help with.
+                    closes. Closed universities can&rsquo;t be applied to.
+                    That&rsquo;s the only thing we can&rsquo;t help with.
                   </>
                 }
               />

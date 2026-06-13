@@ -44,8 +44,8 @@ export default async function NewApplicationPage() {
         >
           UniFlo currently only submits on behalf of students in Grade 12, and
           your profile says you&apos;re &ldquo;{activity}&rdquo;. Please apply
-          directly on each university&apos;s portal — you&apos;ll find the
-          portal links on the{" "}
+          directly on each university&apos;s portal. You&apos;ll find the portal
+          links on the{" "}
           <Link
             href="/universities"
             className="font-medium underline underline-offset-2"

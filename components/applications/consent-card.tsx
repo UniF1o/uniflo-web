@@ -40,7 +40,7 @@ function RecordedRow({ label, at }: { label: string; at: string }) {
       <span>
         {label}{" "}
         <span className="text-xs text-muted-foreground">
-          — recorded {formatDate(at)}
+          · Recorded {formatDate(at)}
         </span>
       </span>
     </p>
@@ -90,11 +90,11 @@ export function ConsentCard({
       <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
         Portal consents
       </h2>
-      <div className="space-y-4 rounded-lg border border-border p-5">
+      <div className="space-y-4 rounded-xl border border-border bg-card p-5 shadow-[var(--shadow-paper)]">
         {!allDone && (
           <p className="text-sm text-muted-foreground">
-            The {universityName} portal asks for these during submission —
-            recording them here lets UniFlo accept on your behalf.
+            The {universityName} portal asks for these during submission.
+            Recording them here lets UniFlo accept on your behalf.
           </p>
         )}
 

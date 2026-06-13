@@ -28,14 +28,22 @@ function UniversityCardSkeleton() {
 
 interface UniversityListProps {
   initialUniversities: University[];
+  // True when the server-side fetch failed. The list opens in its error
+  // state and the student can retry without a full page reload.
+  initialError?: boolean;
 }
 
-export function UniversityList({ initialUniversities }: UniversityListProps) {
+export function UniversityList({
+  initialUniversities,
+  initialError = false,
+}: UniversityListProps) {
   const { add, remove, isSelected } = useSelection();
   const [query, setQuery] = useState("");
   const [universities, setUniversities] = useState(initialUniversities);
   const [searching, setSearching] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(
+    initialError ? "Couldn't load universities. Please try again." : null,
+  );
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const fetchUniversities = useCallback(async (q: string) => {
@@ -125,13 +133,17 @@ export function UniversityList({ initialUniversities }: UniversityListProps) {
           ))}
         </div>
       ) : universities.length === 0 ? (
-        <Card variant="paper" className="p-8 text-center">
-          <p className="text-sm text-muted-foreground">
-            {query.trim()
-              ? `No universities match “${query}”. Try a different search.`
-              : "No universities are available right now."}
-          </p>
-        </Card>
+        // When the load failed, the error alert above is the message; an
+        // additional "none available" card would contradict it.
+        !error && (
+          <Card variant="paper" className="p-8 text-center">
+            <p className="text-sm text-muted-foreground">
+              {query.trim()
+                ? `No universities match “${query}”. Try a different search.`
+                : "No universities are available right now."}
+            </p>
+          </Card>
+        )
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {universities.map((u) => (

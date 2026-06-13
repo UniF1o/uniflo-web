@@ -41,8 +41,8 @@ const caveat = Caveat({
 
 export const metadata: Metadata = {
   title: {
-    default: "UniFlo — Apply to SA universities, automated",
-    template: "%s — UniFlo",
+    default: "UniFlo | Apply to SA universities, automated",
+    template: "%s | UniFlo",
   },
   description:
     "UniFlo helps South African students apply to multiple universities in one go. Fill in your details once, review every application, and let us handle the rest.",

@@ -32,6 +32,7 @@ import {
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { FormSection } from "@/components/ui/form-section";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -154,173 +155,171 @@ function ContactCard({
   const id = config.value;
 
   return (
-    <section className="space-y-4 rounded-lg border border-border p-5">
-      <div className="flex items-start justify-between gap-3">
-        <div className="space-y-0.5">
-          <h2 className="text-sm font-semibold text-foreground">
-            {config.label}
-          </h2>
-          <p className="text-xs text-muted-foreground">{config.description}</p>
-        </div>
-        {status === "saved" && (
+    <FormSection
+      title={config.label}
+      description={config.description}
+      badge={
+        status === "saved" ? (
           <span className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-success">
             <CheckCircle2 size={14} aria-hidden />
             Saved
           </span>
-        )}
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Select
-          id={`${id}-title`}
-          label="Title"
-          placeholder="Select title"
-          options={TITLE_OPTIONS}
-          value={f.title}
-          onChange={(ev) => onFieldChange("title", ev.target.value)}
-        />
-        <Select
-          id={`${id}-relationship`}
-          label="Relationship"
-          placeholder="Select relationship"
-          options={RELATIONSHIP_OPTIONS}
-          value={f.relationship}
-          onChange={(ev) => onFieldChange("relationship", ev.target.value)}
-        />
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Input
-          id={`${id}-first-name`}
-          label="First name"
-          type="text"
-          value={f.first_name}
-          onChange={(ev) => onFieldChange("first_name", ev.target.value)}
-          error={e.first_name}
-        />
-        <Input
-          id={`${id}-last-name`}
-          label="Last name"
-          type="text"
-          value={f.last_name}
-          onChange={(ev) => onFieldChange("last_name", ev.target.value)}
-        />
-      </div>
-
-      <Input
-        id={`${id}-id-number`}
-        label="SA ID number"
-        type="text"
-        inputMode="numeric"
-        maxLength={13}
-        value={f.id_number}
-        onChange={(ev) =>
-          onFieldChange("id_number", ev.target.value.replace(/\D/g, ""))
-        }
-        error={e.id_number}
-      />
-
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Input
-          id={`${id}-email`}
-          label="Email"
-          type="email"
-          value={f.email}
-          onChange={(ev) => onFieldChange("email", ev.target.value)}
-          error={e.email}
-        />
-        <Input
-          id={`${id}-phone`}
-          label="Mobile"
-          type="tel"
-          value={f.phone}
-          onChange={(ev) => onFieldChange("phone", ev.target.value)}
-          error={e.phone}
-        />
-      </div>
-
+        ) : undefined
+      }
+    >
       <div className="space-y-4">
-        <div className="space-y-0.5">
-          <h3 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Address
-          </h3>
-          <p className="text-xs text-muted-foreground">{addressHint}</p>
-        </div>
-
-        <Input
-          id={`${id}-street`}
-          label="Street address"
-          type="text"
-          value={f.street_address}
-          onChange={(ev) => onFieldChange("street_address", ev.target.value)}
-        />
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Input
-            id={`${id}-suburb`}
-            label="Suburb"
-            type="text"
-            value={f.suburb}
-            onChange={(ev) => onFieldChange("suburb", ev.target.value)}
-          />
-          <Input
-            id={`${id}-city`}
-            label="City / Town"
-            type="text"
-            value={f.city}
-            onChange={(ev) => onFieldChange("city", ev.target.value)}
-          />
-        </div>
-
         <div className="grid gap-4 sm:grid-cols-2">
           <Select
-            id={`${id}-province`}
-            label="Province"
-            placeholder="Select province"
-            options={SA_PROVINCE_OPTIONS}
-            value={f.province}
-            onChange={(ev) => onFieldChange("province", ev.target.value)}
+            id={`${id}-title`}
+            label="Title"
+            placeholder="Select title"
+            options={TITLE_OPTIONS}
+            value={f.title}
+            onChange={(ev) => onFieldChange("title", ev.target.value)}
           />
-          <Input
-            id={`${id}-postal`}
-            label="Postal code"
-            type="text"
-            inputMode="numeric"
-            maxLength={4}
-            value={f.postal_code}
-            onChange={(ev) =>
-              onFieldChange("postal_code", ev.target.value.replace(/\D/g, ""))
-            }
-            error={e.postal_code}
+          <Select
+            id={`${id}-relationship`}
+            label="Relationship"
+            placeholder="Select relationship"
+            options={RELATIONSHIP_OPTIONS}
+            value={f.relationship}
+            onChange={(ev) => onFieldChange("relationship", ev.target.value)}
           />
         </div>
-      </div>
 
-      {apiError && <Alert tone="destructive">{apiError}</Alert>}
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Input
+            id={`${id}-first-name`}
+            label="First name"
+            type="text"
+            value={f.first_name}
+            onChange={(ev) => onFieldChange("first_name", ev.target.value)}
+            error={e.first_name}
+          />
+          <Input
+            id={`${id}-last-name`}
+            label="Last name"
+            type="text"
+            value={f.last_name}
+            onChange={(ev) => onFieldChange("last_name", ev.target.value)}
+          />
+        </div>
 
-      <div className="flex gap-3">
-        <Button
-          type="button"
-          onClick={onSave}
-          loading={isSaving}
-          disabled={busy}
-        >
-          Save contact
-        </Button>
-        {present && (
+        <Input
+          id={`${id}-id-number`}
+          label="SA ID number"
+          type="text"
+          inputMode="numeric"
+          maxLength={13}
+          value={f.id_number}
+          onChange={(ev) =>
+            onFieldChange("id_number", ev.target.value.replace(/\D/g, ""))
+          }
+          error={e.id_number}
+        />
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Input
+            id={`${id}-email`}
+            label="Email"
+            type="email"
+            value={f.email}
+            onChange={(ev) => onFieldChange("email", ev.target.value)}
+            error={e.email}
+          />
+          <Input
+            id={`${id}-phone`}
+            label="Mobile"
+            type="tel"
+            value={f.phone}
+            onChange={(ev) => onFieldChange("phone", ev.target.value)}
+            error={e.phone}
+          />
+        </div>
+
+        <div className="space-y-4">
+          <div className="space-y-0.5">
+            <h3 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Address
+            </h3>
+            <p className="text-xs text-muted-foreground">{addressHint}</p>
+          </div>
+
+          <Input
+            id={`${id}-street`}
+            label="Street address"
+            type="text"
+            value={f.street_address}
+            onChange={(ev) => onFieldChange("street_address", ev.target.value)}
+          />
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Input
+              id={`${id}-suburb`}
+              label="Suburb"
+              type="text"
+              value={f.suburb}
+              onChange={(ev) => onFieldChange("suburb", ev.target.value)}
+            />
+            <Input
+              id={`${id}-city`}
+              label="City / Town"
+              type="text"
+              value={f.city}
+              onChange={(ev) => onFieldChange("city", ev.target.value)}
+            />
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Select
+              id={`${id}-province`}
+              label="Province"
+              placeholder="Select province"
+              options={SA_PROVINCE_OPTIONS}
+              value={f.province}
+              onChange={(ev) => onFieldChange("province", ev.target.value)}
+            />
+            <Input
+              id={`${id}-postal`}
+              label="Postal code"
+              type="text"
+              inputMode="numeric"
+              maxLength={4}
+              value={f.postal_code}
+              onChange={(ev) =>
+                onFieldChange("postal_code", ev.target.value.replace(/\D/g, ""))
+              }
+              error={e.postal_code}
+            />
+          </div>
+        </div>
+
+        {apiError && <Alert tone="destructive">{apiError}</Alert>}
+
+        <div className="flex gap-3">
           <Button
             type="button"
-            variant="ghost"
-            onClick={onRemove}
-            loading={isDeleting}
+            onClick={onSave}
+            loading={isSaving}
             disabled={busy}
           >
-            <Trash2 size={15} aria-hidden />
-            Remove
+            Save contact
           </Button>
-        )}
+          {present && (
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={onRemove}
+              loading={isDeleting}
+              disabled={busy}
+            >
+              <Trash2 size={15} aria-hidden />
+              Remove
+            </Button>
+          )}
+        </div>
       </div>
-    </section>
+    </FormSection>
   );
 }
 
@@ -475,7 +474,7 @@ export function ContactsManager() {
       // UCT requires the guardian's ID number once any guardian detail is
       // given — saving the card at all counts, so it's required here.
       if (!f.id_number.trim()) {
-        next.id_number = "Required — UCT needs the guardian's SA ID number.";
+        next.id_number = "Required. UCT needs the guardian's SA ID number.";
       }
       // Wits hard-rejects a guardian whose email or mobile matches the
       // applicant's own.
@@ -601,7 +600,7 @@ export function ContactsManager() {
         status={status.guardian}
         apiError={apiErrors.guardian}
         present={present.guardian}
-        addressHint="Optional — if left blank, your own address is used where a portal needs one."
+        addressHint="Optional. If left blank, your own address is used where a portal needs one."
         onFieldChange={(field, value) => setField("guardian", field, value)}
         onSave={() => void handleSave("guardian")}
         onRemove={() => void handleDelete("guardian")}
@@ -610,7 +609,7 @@ export function ContactsManager() {
       <Checkbox
         id="different-fee-payer"
         label="Someone different pays the fees"
-        description="Leave off if the parent/guardian above (or you) pays — universities reuse their details."
+        description="Leave this off if the parent or guardian above pays. Universities reuse their details."
         checked={showFeePayer}
         onChange={(ev) => void handleFeePayerToggle(ev.target.checked)}
         disabled={status.fee_payer === "deleting"}
@@ -624,7 +623,7 @@ export function ContactsManager() {
           status={status.fee_payer}
           apiError={apiErrors.fee_payer}
           present={present.fee_payer}
-          addressHint="UJ asks for the fee payer's full postal address — fill it in if you can."
+          addressHint="UJ asks for the fee payer's full postal address. Fill it in if you can."
           onFieldChange={(field, value) => setField("fee_payer", field, value)}
           onSave={() => void handleSave("fee_payer")}
           onRemove={() => void handleDelete("fee_payer")}

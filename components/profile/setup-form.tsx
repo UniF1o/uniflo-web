@@ -1,9 +1,12 @@
-// ProfileSetupForm — three-step form that collects a student's full profile.
+// ProfileSetupForm — five-step wizard that collects a student's full profile.
 //
 // Steps:
-//   1. Personal details — first name, last name, date of birth, SA ID number
-//   2. Contact details  — phone number, residential address, nationality
-//   3. Demographics     — gender, home language
+//   1. Personal details  — first name, last name, date of birth, SA ID number
+//   2. Contact details   — phone number, residential address, nationality
+//   3. Demographics      — gender, home language
+//   4. Background        — religion, disability, marital status, ethnicity
+//   5. Studies & funding — optional (skippable): current activity, residence
+//                          and funding intentions
 //
 // API saves:
 //   After each step the user clicks "Save and continue", which POSTs the
@@ -27,7 +30,9 @@ import { CheckCircle2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import { PrivacyNote } from "@/components/ui/privacy-note";
 import { Select } from "@/components/ui/select";
 import { cn } from "@/lib/utils/cn";
 import { validateSAID } from "@/lib/utils/sa-id";
@@ -37,6 +42,7 @@ import {
   ETHNICITY_OPTIONS,
   GENDER_OPTIONS,
   HOME_LANGUAGE_OPTIONS,
+  CURRENT_ACTIVITY_OPTIONS,
   MARITAL_STATUS_OPTIONS,
   NATIONALITY_OPTIONS,
   RELIGION_OPTIONS,
@@ -50,6 +56,7 @@ const STEPS = [
   "Contact details",
   "Demographics",
   "Background",
+  "Studies & funding",
 ] as const;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -78,6 +85,13 @@ interface ProfilePayload {
   disability?: string;
   marital_status?: string;
   ethnicity?: string;
+  // Step 5 — all optional, but they feed the automation (current_activity
+  // gates whether automated submission is allowed at all).
+  current_activity?: string | null;
+  wants_residence?: boolean;
+  preferred_residence?: string | null;
+  applying_nsfas?: boolean;
+  applying_institutional_funding?: boolean;
 }
 
 // ─── Validation ───────────────────────────────────────────────────────────────
@@ -189,13 +203,14 @@ function StepIndicator({ current }: { current: number }) {
             >
               {isDone ? <CheckCircle2 size={14} /> : stepNum}
             </div>
-            {/* Label — visible from sm (640px) upward only. */}
+            {/* Label — always visible for the active step so phone users
+             * aren't navigating by bare circles; the rest appear from sm. */}
             <span
               className={cn(
-                "hidden text-xs sm:inline",
+                "text-xs",
                 isActive
-                  ? "font-medium text-foreground"
-                  : "text-muted-foreground",
+                  ? "inline font-medium text-foreground"
+                  : "hidden text-muted-foreground sm:inline",
               )}
             >
               {title}
@@ -255,6 +270,14 @@ export function ProfileSetupForm() {
   const [disability, setDisability] = useState("");
   const [maritalStatus, setMaritalStatus] = useState("");
   const [ethnicity, setEthnicity] = useState("");
+
+  // Step 5: studies & funding — every field optional, so no validator.
+  const [currentActivity, setCurrentActivity] = useState("");
+  const [wantsResidence, setWantsResidence] = useState(false);
+  const [preferredResidence, setPreferredResidence] = useState("");
+  const [applyingNsfas, setApplyingNsfas] = useState(false);
+  const [applyingInstitutionalFunding, setApplyingInstitutionalFunding] =
+    useState(false);
 
   // Removes one field's error message the moment the user starts correcting it.
   // The early-return (`if (!prev[key]) return prev`) avoids a re-render when
@@ -332,7 +355,8 @@ export function ProfileSetupForm() {
     e?.preventDefault();
     setApiError(null);
 
-    // Run the validator for whichever step is active.
+    // Run the validator for whichever step is active. Step 5 is entirely
+    // optional, so it has no validator.
     const errors =
       step === 1
         ? validateStep1({ firstName, lastName, dateOfBirth, idNumber })
@@ -348,7 +372,14 @@ export function ProfileSetupForm() {
             })
           : step === 3
             ? validateStep3({ gender, homeLanguage })
-            : validateStep4({ religion, disability, maritalStatus, ethnicity });
+            : step === 4
+              ? validateStep4({
+                  religion,
+                  disability,
+                  maritalStatus,
+                  ethnicity,
+                })
+              : {};
 
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
@@ -382,6 +413,18 @@ export function ProfileSetupForm() {
         marital_status: maritalStatus,
         ethnicity,
       }),
+      // Blank optional strings go up as null — backend field validators
+      // reject empty strings.
+      ...(step >= 5 && {
+        current_activity: currentActivity || null,
+        wants_residence: wantsResidence,
+        preferred_residence:
+          wantsResidence && preferredResidence.trim()
+            ? preferredResidence.trim()
+            : null,
+        applying_nsfas: applyingNsfas,
+        applying_institutional_funding: applyingInstitutionalFunding,
+      }),
     };
 
     const saved = await saveProfile(payload);
@@ -389,11 +432,18 @@ export function ProfileSetupForm() {
 
     if (!saved) return;
 
-    if (step < 4) {
+    if (step < STEPS.length) {
       setStep((s) => s + 1);
     } else {
       router.push("/academic-records");
     }
+  }
+
+  // Step 5 is optional — skipping moves on without another POST (everything
+  // up to step 4 is already saved). The dashboard keeps nudging for
+  // current_activity until it's answered.
+  function handleSkipFinalStep() {
+    router.push("/academic-records");
   }
 
   return (
@@ -403,13 +453,17 @@ export function ProfileSetupForm() {
 
       {/* Step heading */}
       <div className="space-y-1">
+        <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.22em] text-primary">
+          <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-primary" />
+          Profile setup
+        </p>
         <h1 className="font-display text-3xl tracking-tight text-foreground">
           {STEPS[step - 1]}
         </h1>
         <p className="text-sm text-muted-foreground">
           Step {step} of {STEPS.length}
-          {step < STEPS.length && " — your progress is saved as you go."}
-          {step === STEPS.length && " — last step."}
+          {step < STEPS.length && ". Your progress is saved as you go."}
+          {step === STEPS.length && ". This is the last step."}
         </p>
       </div>
 
@@ -420,7 +474,11 @@ export function ProfileSetupForm() {
        * a form element. Both paths call the same handleContinue handler. */}
       {/* ── Step 1: Personal details ─────────────────────────────────────── */}
       {step === 1 && (
-        <form onSubmit={handleContinue} noValidate className="space-y-4">
+        <form
+          onSubmit={handleContinue}
+          noValidate
+          className="space-y-4 rounded-xl border border-border bg-card p-5 shadow-[var(--shadow-paper)] sm:p-6"
+        >
           <div className="grid gap-4 sm:grid-cols-2">
             <Input
               id="firstName"
@@ -487,7 +545,11 @@ export function ProfileSetupForm() {
 
       {/* ── Step 2: Contact details ──────────────────────────────────────── */}
       {step === 2 && (
-        <form onSubmit={handleContinue} noValidate className="space-y-4">
+        <form
+          onSubmit={handleContinue}
+          noValidate
+          className="space-y-4 rounded-xl border border-border bg-card p-5 shadow-[var(--shadow-paper)] sm:p-6"
+        >
           <Input
             id="phone"
             label="Phone number"
@@ -590,7 +652,11 @@ export function ProfileSetupForm() {
 
       {/* ── Step 3: Demographics ────────────────────────────────────────── */}
       {step === 3 && (
-        <form onSubmit={handleContinue} noValidate className="space-y-4">
+        <form
+          onSubmit={handleContinue}
+          noValidate
+          className="space-y-4 rounded-xl border border-border bg-card p-5 shadow-[var(--shadow-paper)] sm:p-6"
+        >
           <Select
             id="gender"
             label="Gender"
@@ -626,7 +692,11 @@ export function ProfileSetupForm() {
 
       {/* ── Step 4: Background ──────────────────────────────────────────── */}
       {step === 4 && (
-        <form onSubmit={handleContinue} noValidate className="space-y-4">
+        <form
+          onSubmit={handleContinue}
+          noValidate
+          className="space-y-4 rounded-xl border border-border bg-card p-5 shadow-[var(--shadow-paper)] sm:p-6"
+        >
           <Select
             id="religion"
             label="Religion"
@@ -686,6 +756,68 @@ export function ProfileSetupForm() {
         </form>
       )}
 
+      {/* ── Step 5: Studies & funding (optional) ────────────────────────── */}
+      {step === 5 && (
+        <form
+          onSubmit={handleContinue}
+          noValidate
+          className="space-y-4 rounded-xl border border-border bg-card p-5 shadow-[var(--shadow-paper)] sm:p-6"
+        >
+          <p className="text-xs leading-relaxed text-muted-foreground">
+            All optional. The more we know, the more precisely we can complete
+            each university&rsquo;s forms for you.
+          </p>
+
+          <div className="space-y-1">
+            <Select
+              id="currentActivity"
+              label="What are you currently doing?"
+              placeholder="Select option"
+              options={CURRENT_ACTIVITY_OPTIONS}
+              value={currentActivity}
+              onChange={(e) => setCurrentActivity(e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">
+              If you&rsquo;re in Grade 12 now, we can submit applications
+              automatically on your behalf.
+            </p>
+          </div>
+
+          <div className="space-y-2 pt-1">
+            <Checkbox
+              id="wantsResidence"
+              label="I want to apply for university residence"
+              checked={wantsResidence}
+              onChange={(e) => setWantsResidence(e.target.checked)}
+            />
+            {wantsResidence && (
+              <Input
+                id="preferredResidence"
+                label="Preferred residence (optional)"
+                type="text"
+                placeholder="e.g. Barnato Hall"
+                value={preferredResidence}
+                onChange={(e) => setPreferredResidence(e.target.value)}
+              />
+            )}
+            <Checkbox
+              id="applyingNsfas"
+              label="I am applying for NSFAS funding"
+              checked={applyingNsfas}
+              onChange={(e) => setApplyingNsfas(e.target.checked)}
+            />
+            <Checkbox
+              id="applyingInstitutionalFunding"
+              label="I am applying for institutional funding / bursaries"
+              checked={applyingInstitutionalFunding}
+              onChange={(e) =>
+                setApplyingInstitutionalFunding(e.target.checked)
+              }
+            />
+          </div>
+        </form>
+      )}
+
       {/* API-level error (session expired, network failure, server 4xx/5xx).
        * role="alert" makes screen readers announce it when it appears.
        * Shown below the fields and above the navigation buttons. */}
@@ -719,6 +851,20 @@ export function ProfileSetupForm() {
           {step === STEPS.length ? "Complete setup" : "Save and continue"}
         </Button>
       </div>
+
+      {/* Step 5 escape hatch — the step is optional and must feel optional.
+       * Everything up to step 4 is already saved, so skipping loses nothing. */}
+      {step === STEPS.length && !loading && (
+        <button
+          type="button"
+          onClick={handleSkipFinalStep}
+          className="mx-auto block text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-primary hover:underline"
+        >
+          Skip for now. You can add this later in your profile.
+        </button>
+      )}
+
+      <PrivacyNote className="mx-auto max-w-md justify-center" />
     </div>
   );
 }

@@ -34,7 +34,7 @@ function RowList({
   rows: Array<{ label: string; value: string | null }>;
 }) {
   return (
-    <dl className="divide-y divide-border rounded-lg border border-border">
+    <dl className="divide-y divide-border rounded-lg border border-border bg-card shadow-[var(--shadow-paper)]">
       {rows.map((row) => (
         <div
           key={row.label}
@@ -128,7 +128,7 @@ export function ProfileOverview() {
     return (
       <div className="space-y-4">
         <Skeleton className="h-4 w-32" />
-        <div className="space-y-3 rounded-lg border border-border p-5">
+        <div className="space-y-3 rounded-xl border border-border bg-card p-5 shadow-[var(--shadow-paper)]">
           {Array.from({ length: 8 }).map((_, i) => (
             <Skeleton key={i} className="h-4 w-full" />
           ))}

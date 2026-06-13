@@ -123,7 +123,7 @@ describe("FieldMappingReview", () => {
     );
 
     expect(
-      screen.getByText(/Mapping in progress — refresh shortly/),
+      screen.getByText(/Mapping in progress. Refresh shortly/),
     ).toBeInTheDocument();
     fireEvent.click(
       screen.getByRole("button", {

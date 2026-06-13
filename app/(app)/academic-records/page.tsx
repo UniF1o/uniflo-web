@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { AcademicRecordsForm } from "@/components/academic-records/records-form";
+import { FormSection } from "@/components/ui/form-section";
+import { PageHeader } from "@/components/layout/page-header";
 import type { RecordType } from "@/lib/api/academic-records";
 
 export const metadata: Metadata = {
@@ -21,35 +23,27 @@ const SECTIONS: { type: RecordType; heading: string; description: string }[] = [
     type: "grade_12_april",
     heading: "Grade 12 April results",
     description:
-      "Add these once you have them — universities use your most recent marks.",
+      "Add these once you have them. Universities use your most recent marks.",
   },
 ];
 
 export default function AcademicRecordsPage() {
   return (
-    <div className="max-w-2xl space-y-12">
-      <div className="space-y-1">
-        <h1 className="font-display text-3xl tracking-tight text-foreground">
-          Academic records
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Enter your results. These are used to match you with eligible
-          university programmes.
-        </p>
-      </div>
+    <div className="max-w-2xl space-y-8">
+      <PageHeader
+        kicker="Your story"
+        title="Academic records"
+        description="Enter your results once. They decide which programmes universities match you with."
+      />
 
       {SECTIONS.map((section) => (
-        <section key={section.type} className="space-y-6">
-          <div className="space-y-1">
-            <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
-              {section.heading}
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              {section.description}
-            </p>
-          </div>
+        <FormSection
+          key={section.type}
+          title={section.heading}
+          description={section.description}
+        >
           <AcademicRecordsForm recordType={section.type} />
-        </section>
+        </FormSection>
       ))}
     </div>
   );

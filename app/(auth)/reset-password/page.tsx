@@ -96,7 +96,7 @@ export default function ResetPasswordPage() {
 
     if (error) {
       setFormError(
-        "Failed to update your password. The link may have expired — request a new one.",
+        "Failed to update your password. The link may have expired. Request a new one.",
       );
       setStep("ready");
       return;
@@ -187,7 +187,7 @@ export default function ResetPasswordPage() {
             Set a new password.
           </h1>
           <p className="text-sm leading-relaxed text-muted-foreground">
-            Choose a strong password — at least 8 characters.
+            Choose a strong password of at least 8 characters.
           </p>
         </div>
 

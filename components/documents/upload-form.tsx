@@ -84,7 +84,7 @@ const REQUIRED_ZONE_CONFIGS: ZoneConfig[] = [
     type: "ID_COPY",
     label: "Certified copy of SA ID document",
     description:
-      "Must be a commissioner-certified copy — green ID book or smart card. Certification must be within the last 3 months.",
+      "A commissioner-certified copy of your green ID book or smart card. Certification must be within the last 3 months.",
   },
   {
     type: "MATRIC_RESULTS",
@@ -105,7 +105,7 @@ const OPTIONAL_ZONE_CONFIGS: ZoneConfig[] = [
     type: "GRADE11_RESULTS",
     label: "Grade 11 results",
     description:
-      "Your official Grade 11 report. UP accepts this in lieu of a Grade 12 certificate. Optional — only upload if you have it.",
+      "Your official Grade 11 report. UP accepts this in lieu of a Grade 12 certificate. Optional. Upload it if you have it.",
   },
 ];
 
@@ -131,11 +131,40 @@ function validateCertDate(dateStr: string): string | null {
   threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
   threeMonthsAgo.setHours(0, 0, 0, 0);
   if (date < threeMonthsAgo)
-    return "Your certified copy has expired — certification must be within the last 3 months. Please get a new certified copy.";
+    return "Your certified copy has expired. Certification must be within the last 3 months. Please get a new certified copy.";
   return null;
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
+
+// The backend stores uploads under generated ids and never records the
+// original file name, so we remember it client-side. Best-effort: the name
+// survives revisits on the same device/browser (the common "did I upload the
+// right file?" case) and silently degrades to timestamp-only elsewhere.
+// A cross-device fix needs an original_filename column on uniflo-api.
+const DOC_NAME_STORE_KEY = "uniflo-document-names";
+
+function readStoredNames(): Partial<Record<DocumentType, string>> {
+  if (typeof window === "undefined") return {};
+  try {
+    return JSON.parse(
+      window.localStorage.getItem(DOC_NAME_STORE_KEY) ?? "{}",
+    ) as Partial<Record<DocumentType, string>>;
+  } catch {
+    return {};
+  }
+}
+
+function storeDocumentName(type: DocumentType, name: string) {
+  try {
+    const all = readStoredNames();
+    all[type] = name;
+    window.localStorage.setItem(DOC_NAME_STORE_KEY, JSON.stringify(all));
+  } catch {
+    // Storage unavailable (private mode, quota) — the in-session name still
+    // shows; only the revisit fallback is lost.
+  }
+}
 
 // Returns an error string if the file is invalid, or null if it passes.
 // Called before the upload starts so the student gets instant feedback.
@@ -280,7 +309,7 @@ function DocumentZoneCard({
   }
 
   return (
-    <div className="rounded-lg border border-border p-4 space-y-3">
+    <div className="space-y-3 rounded-xl border border-border bg-card p-4 shadow-[var(--shadow-paper)] sm:p-5">
       {/* Zone label and description. The id on the <p> is referenced by
        * aria-describedby on each trigger button below. */}
       <div>
@@ -463,6 +492,7 @@ export function DocumentsUploadForm() {
         // list can't drift out of sync with the rest of the API auth.
         // An empty list returns 200 with [], not 404.
         const docs = await apiClient.get<ExistingDocument[]>("/documents");
+        const storedNames = readStoredNames();
 
         setZones((prev) => {
           const next = { ...prev };
@@ -472,9 +502,10 @@ export function DocumentsUploadForm() {
             if (!(doc.type in next)) continue;
             next[doc.type] = {
               status: "uploaded",
-              // The original file name isn't stored in the documents table.
-              // null here means the "uploaded" card shows only the timestamp.
-              fileName: null,
+              // The documents table doesn't keep the original file name —
+              // fall back to the name remembered at upload time on this
+              // device, or timestamp-only when there isn't one.
+              fileName: storedNames[doc.type] ?? null,
               uploadedAt: doc.uploaded_at,
               progress: 100,
               error: null,
@@ -552,7 +583,9 @@ export function DocumentsUploadForm() {
         (pct) => updateZone(type, { progress: pct }),
       );
 
-      // Upload confirmed by the backend — mark the zone as done.
+      // Upload confirmed by the backend — mark the zone as done and remember
+      // the original name for future visits on this device.
+      storeDocumentName(type, file.name);
       updateZone(type, {
         status: "uploaded",
         uploadedAt: result.uploaded_at,
@@ -637,7 +670,8 @@ export function DocumentsUploadForm() {
 
       {/* ── Optional documents ──────────────────────────────────────────── */}
       <div className="space-y-3 pt-2">
-        <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+        <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+          <span aria-hidden className="h-px w-5 shrink-0 bg-primary/60" />
           Optional
         </p>
         {OPTIONAL_ZONE_CONFIGS.map((config) => (

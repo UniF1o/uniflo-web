@@ -25,7 +25,7 @@ export function validateSAID(
   if (month < 1 || month > 12 || day < 1 || day > 31) {
     return {
       valid: false,
-      reason: "ID number contains an invalid date — please check it.",
+      reason: "ID number contains an invalid date. Please check it.",
     };
   }
 
@@ -47,7 +47,7 @@ export function validateSAID(
   if (checkDigit !== parseInt(id[12], 10)) {
     return {
       valid: false,
-      reason: "ID number is invalid — please double-check it.",
+      reason: "ID number is invalid. Please double-check it.",
     };
   }
 

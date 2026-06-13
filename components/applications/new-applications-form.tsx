@@ -214,9 +214,13 @@ export function NewApplicationsForm() {
         Back to universities
       </Link>
 
-      <div className="space-y-1">
+      <div className="space-y-2">
+        <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.22em] text-primary">
+          <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-primary" />
+          Applying
+        </p>
         <h1 className="font-display text-3xl tracking-tight text-foreground">
-          Apply
+          Programme choices
         </h1>
         <p className="text-sm text-muted-foreground">
           Add programme details for each selected university. You can list up to

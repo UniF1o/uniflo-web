@@ -34,7 +34,7 @@ export const GUARDIAN_CONTACT: ManagedContactConfig = {
   label: "Parent / Guardian",
   description:
     "Universities reuse this person wherever they ask for a next of kin or " +
-    "emergency contact — you only capture them once.",
+    "emergency contact. You only capture them once.",
 };
 
 export const FEE_PAYER_CONTACT: ManagedContactConfig = {

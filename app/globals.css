@@ -15,6 +15,9 @@
 @theme {
   /* ── Colors ──────────────────────────────────────────────────────────── */
   --color-background: #fbf6ec; /* cream paper — warmer than office white */
+  --color-card: #fffdf6; /* lifted paper — one step brighter than the page
+                          * so cards visibly float instead of dissolving
+                          * into the cream background */
   --color-foreground: #14182b; /* charcoal-blue ink, kept clearly distinct
                                 * from the navy accent below (~15:1 on bg) */
   --color-muted: #ede2cd; /* warm sand for muted surfaces */
@@ -74,6 +77,20 @@
   }
   to {
     transform: translateX(-50%);
+  }
+}
+
+/* Page-content entrance inside the app shell. Subtle rise + fade on every
+ * route change — enough to make navigation feel acknowledged, quiet enough
+ * to disappear from notice. Suppressed by the global reduced-motion rule. */
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 

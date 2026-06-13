@@ -4,11 +4,10 @@
 // Mobile: fixed drawer that slides in from the left when the user taps
 //         the hamburger. A translucent backdrop covers the rest of the screen.
 //
-// Active-state design: soft sky tint background + cobalt text + a small
-// left-edge bar. Quieter than a fully-filled cobalt button and lets the
-// icon read as cobalt rather than fighting the fill colour.
-//
-// To add a new nav section, append an entry to NAV_ITEMS below.
+// Navigation is grouped to mirror the student journey: their story (the data
+// they capture once), then applying (where that data goes). Active links get
+// a cobalt rail + a soft sky gradient so the current section is felt at a
+// glance without a heavy fill.
 "use client";
 
 import Link from "next/link";
@@ -19,12 +18,13 @@ import {
   Users,
   FileText,
   GraduationCap,
+  NotebookPen,
   ClipboardList,
   Settings,
   X,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { Sprout } from "@/components/ui/motifs";
+import { JourneyMini } from "@/components/journey/journey-mini";
 import { cn } from "@/lib/utils/cn";
 
 interface SidebarProps {
@@ -42,14 +42,41 @@ interface NavItem {
   icon: LucideIcon;
 }
 
-const NAV_ITEMS: readonly NavItem[] = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/profile", label: "Profile", icon: UserCircle2 },
-  { href: "/contacts", label: "Contacts", icon: Users },
-  { href: "/documents", label: "Documents", icon: FileText },
-  { href: "/universities", label: "Universities", icon: GraduationCap },
-  { href: "/applications", label: "Applications", icon: ClipboardList },
-  { href: "/settings", label: "Settings", icon: Settings },
+interface NavGroup {
+  // null = no visible label (the dashboard + settings rows stand alone).
+  label: string | null;
+  items: readonly NavItem[];
+}
+
+const NAV_GROUPS: readonly NavGroup[] = [
+  {
+    label: null,
+    items: [{ href: "/dashboard", label: "Dashboard", icon: LayoutDashboard }],
+  },
+  {
+    label: "Your story",
+    items: [
+      { href: "/profile", label: "Profile", icon: UserCircle2 },
+      {
+        href: "/academic-records",
+        label: "Academic records",
+        icon: NotebookPen,
+      },
+      { href: "/documents", label: "Documents", icon: FileText },
+      { href: "/contacts", label: "Contacts", icon: Users },
+    ],
+  },
+  {
+    label: "Applying",
+    items: [
+      { href: "/universities", label: "Universities", icon: GraduationCap },
+      { href: "/applications", label: "Applications", icon: ClipboardList },
+    ],
+  },
+  {
+    label: null,
+    items: [{ href: "/settings", label: "Settings", icon: Settings }],
+  },
 ] as const;
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
@@ -89,7 +116,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             type="button"
             onClick={onClose}
             aria-label="Close navigation"
-            className="-mr-2 inline-flex h-10 w-10 items-center justify-center rounded-md text-foreground transition-colors hover:bg-muted"
+            className="-mr-2 inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-md text-foreground transition-colors hover:bg-muted"
           >
             <X size={20} />
           </button>
@@ -100,58 +127,66 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         <div className="hidden md:block md:h-4" />
 
         {/* Nav list. Using <nav> for semantics + keyboard a11y. */}
-        <nav className="flex flex-col gap-1 p-3">
-          {NAV_ITEMS.map((item) => {
-            // Highlight the item if on its exact path or any sub-route
-            // (e.g. /profile/edit still highlights "Profile").
-            const isActive =
-              pathname === item.href || pathname.startsWith(`${item.href}/`);
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={onClose}
-                aria-current={isActive ? "page" : undefined}
-                className={cn(
-                  "group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
-                  isActive
-                    ? "bg-primary/10 font-medium text-primary"
-                    : "text-foreground hover:bg-muted hover:text-primary",
-                )}
-              >
-                {/* Active indicator — small cobalt bar pinned to the left edge
-                 * of the link so the navigation reads top-to-bottom even on a
-                 * scan. Hidden when inactive. */}
-                {isActive && (
-                  <span
-                    aria-hidden
-                    className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-primary"
-                  />
-                )}
-                <Icon
-                  size={18}
-                  className={cn(
-                    "shrink-0 transition-colors",
-                    isActive
-                      ? "text-primary"
-                      : "text-muted-foreground group-hover:text-primary",
-                  )}
-                />
-                <span className="truncate">{item.label}</span>
-              </Link>
-            );
-          })}
+        <nav className="flex flex-col gap-5 overflow-y-auto p-3">
+          {NAV_GROUPS.map((group, groupIndex) => (
+            <div key={group.label ?? `group-${groupIndex}`}>
+              {group.label && (
+                <p className="px-3 pb-1.5 text-[0.65rem] font-medium uppercase tracking-[0.22em] text-muted-foreground">
+                  {group.label}
+                </p>
+              )}
+              <div className="flex flex-col gap-1">
+                {group.items.map((item) => {
+                  // Highlight the item if on its exact path or any sub-route
+                  // (e.g. /profile/edit still highlights "Profile").
+                  const isActive =
+                    pathname === item.href ||
+                    pathname.startsWith(`${item.href}/`);
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={onClose}
+                      aria-current={isActive ? "page" : undefined}
+                      className={cn(
+                        "group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
+                        isActive
+                          ? "bg-primary/10 font-medium text-primary"
+                          : "text-foreground hover:bg-muted hover:text-primary",
+                      )}
+                    >
+                      {/* Active indicator — small cobalt bar pinned to the
+                       * left edge so the navigation reads top-to-bottom even
+                       * on a scan. Hidden when inactive. */}
+                      {isActive && (
+                        <span
+                          aria-hidden
+                          className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-primary"
+                        />
+                      )}
+                      <Icon
+                        size={18}
+                        className={cn(
+                          "shrink-0 transition-colors",
+                          isActive
+                            ? "text-primary"
+                            : "text-muted-foreground group-hover:text-primary",
+                        )}
+                      />
+                      <span className="truncate">{item.label}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </nav>
 
-        {/* Footer hint — gives the sidebar visual closure and reinforces the
-         * editorial tone. Small, muted, non-interactive. */}
-        <div className="mt-auto border-t border-border p-4 text-xs leading-relaxed text-muted-foreground">
-          <p className="flex items-center gap-1.5 font-display text-sm text-foreground">
-            One application
-            <Sprout className="h-3.5 w-3.5 text-primary" />
-          </p>
-          <p>Every university.</p>
+        {/* Footer — the journey at a glance. Falls back to the brand tagline
+         * while the journey data is still loading. */}
+        <div className="mt-auto border-t border-border p-4">
+          <JourneyMini />
         </div>
       </aside>
     </>

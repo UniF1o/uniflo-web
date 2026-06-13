@@ -21,6 +21,7 @@ import { getFailureCopy, isRetryable } from "@/lib/applications/failure-copy";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Section } from "@/components/ui/section";
 import { StatusBadge } from "./status-badge";
 import { CelebrationBanner } from "./celebration-banner";
 import { SubmissionConfirmation } from "./submission-confirmation";
@@ -193,7 +194,7 @@ export function ApplicationDetail({
       setCurrentStatus(updated.status ?? "pending");
       setFeedback({
         kind: "queued",
-        message: "Retrying — we'll update the status shortly.",
+        message: "Retrying. We'll update the status shortly.",
       });
       // Brief lockout to prevent double-tap retries.
       setRetryDisabled(true);
@@ -203,7 +204,7 @@ export function ApplicationDetail({
         if (err.status === 409) {
           setFeedback({
             kind: "conflict",
-            message: "Already retrying — please refresh shortly.",
+            message: "Already retrying. Please refresh shortly.",
           });
           // Lock out subsequent attempts — refresh is the recovery path.
           setRetryDisabled(true);
@@ -268,8 +269,8 @@ export function ApplicationDetail({
       )}
       {challengeResolved && !challenge && (
         <Alert tone="success" role="status">
-          Thanks — we&apos;ve passed that on and your application is continuing.
-          Check back shortly for the updated status.
+          Thank you. We&apos;ve passed that on and your application is
+          continuing. Check back shortly for the updated status.
         </Alert>
       )}
 
@@ -343,10 +344,7 @@ export function ApplicationDetail({
       )}
 
       {/* Application details */}
-      <div className="space-y-3">
-        <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
-          Application
-        </h2>
+      <Section kicker="Application">
         <Card variant="paper" as="dl" className="overflow-hidden">
           <DetailRow label="Programme">{application.programme}</DetailRow>
           <DetailRow label="Year">{application.application_year}</DetailRow>
@@ -357,7 +355,7 @@ export function ApplicationDetail({
             {formatDate(application.created_at) ?? "—"}
           </DetailRow>
         </Card>
-      </div>
+      </Section>
 
       {showConsentCard && (
         <ConsentCard
@@ -373,10 +371,7 @@ export function ApplicationDetail({
        * primary. Each choice carries its own eligibility once the automation
        * assesses it. */}
       {choices.length > 1 && (
-        <div className="space-y-3">
-          <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
-            Programme choices
-          </h2>
+        <Section kicker="Programme choices">
           <Card variant="paper" as="ul" className="overflow-hidden">
             {choices.map((choice, i) => (
               <li
@@ -395,17 +390,14 @@ export function ApplicationDetail({
               </li>
             ))}
           </Card>
-        </div>
+        </Section>
       )}
 
       {/* What the automation filled in — read-only mapping summary. Rendered
        * only once the mapping exists; rows the AI was unsure about are
        * listed with their confidence so the student can spot-check. */}
       {mappingState.kind === "ready" && mappingState.entries.length > 0 && (
-        <div className="space-y-3">
-          <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
-            What we filled in
-          </h2>
+        <Section kicker="What we filled in">
           <FieldMappingReview
             universityId={application.id}
             universityName={universityName}
@@ -413,17 +405,14 @@ export function ApplicationDetail({
             readOnly
             onRefresh={() => void loadMappings()}
           />
-        </div>
+        </Section>
       )}
 
       {/* Latest automation job — keep the structured view so support can see
        * attempts and update times at a glance. The failure summary above
        * surfaces the friendly version; this card is the raw data. */}
       {job && (
-        <div className="space-y-3">
-          <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
-            Automation
-          </h2>
+        <Section kicker="Automation">
           <Card variant="paper" as="dl" className="overflow-hidden">
             {job.status && (
               <DetailRow label="Status">
@@ -435,7 +424,7 @@ export function ApplicationDetail({
               {formatDate(job.updated_at) ?? "—"}
             </DetailRow>
           </Card>
-        </div>
+        </Section>
       )}
     </div>
   );

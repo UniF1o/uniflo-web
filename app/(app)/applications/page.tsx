@@ -4,6 +4,9 @@ import { ArrowRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { serverApiGet } from "@/lib/api/server";
 import { Alert } from "@/components/ui/alert";
+import { Card } from "@/components/ui/card";
+import { Sprout } from "@/components/ui/motifs";
+import { PageHeader } from "@/components/layout/page-header";
 import { ApplicationList } from "@/components/applications/application-list";
 import { CelebrationBanner } from "@/components/applications/celebration-banner";
 import { Suspense } from "react";
@@ -46,35 +49,36 @@ export default async function ApplicationsPage() {
         <CelebrationBanner />
       </Suspense>
 
-      <div className="space-y-1">
-        <h1 className="font-display text-3xl tracking-tight text-foreground">
-          Applications
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Track every application UniFlo has submitted on your behalf.
-        </p>
-      </div>
+      <PageHeader
+        kicker="Applying"
+        title="Applications"
+        description="Every application UniFlo sends on your behalf, with its live status. We flag anything that needs your attention."
+      />
 
       {applications === null ? (
         <Alert tone="destructive">
           Could not load your applications. Refresh the page and try again.
         </Alert>
       ) : applications.length === 0 ? (
-        <div className="rounded-lg border border-border px-6 py-12 text-center">
+        <Card
+          variant="paper"
+          className="flex flex-col items-center gap-3 px-6 py-12 text-center"
+        >
+          <Sprout aria-hidden className="h-10 w-10 text-primary/40" />
           <p className="text-sm font-medium text-foreground">
             No applications yet
           </p>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">
             Browse universities to start your first application.
           </p>
           <Link
             href="/universities"
-            className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+            className="mt-1 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
           >
             Browse universities
             <ArrowRight size={14} aria-hidden />
           </Link>
-        </div>
+        </Card>
       ) : (
         <ApplicationList
           initialItems={applications}
