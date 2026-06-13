@@ -30,10 +30,11 @@ import { Select } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { NSC_SUBJECTS } from "@/lib/constants/nsc-subjects";
 import { cn } from "@/lib/utils/cn";
-import type {
-  AcademicRecordPayload,
-  AcademicRecordResponse,
-  RecordType,
+import {
+  RECORD_TYPE_LABELS,
+  type AcademicRecordPayload,
+  type AcademicRecordResponse,
+  type RecordType,
 } from "@/lib/api/academic-records";
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -45,7 +46,20 @@ type SubjectRow = {
   name: string; // Value from NSC_SUBJECTS, "Other", or "" (not yet set).
   customName: string; // Free-text name — only relevant when name === "Other".
   mark: string; // Raw input value, e.g. "78" or "". Parsed on submit.
+  // NSC achievement level (1–7) alongside the percentage. Optional — UP needs
+  // it, the other portals only use the mark. "" when not specified.
+  nscLevel: string;
 };
+
+// NSC achievement levels 1–7. The leading blank lets a student clear the value
+// back to "not specified" since the field is optional.
+const NSC_LEVEL_OPTIONS = [
+  { value: "", label: "Not specified" },
+  ...Array.from({ length: 7 }, (_, i) => {
+    const level = String(7 - i);
+    return { value: level, label: `Level ${level}` };
+  }),
+];
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -139,6 +153,13 @@ function validateSubject(row: SubjectRow): Record<string, string> {
       errors.mark = "Must be 0–100.";
     }
   }
+  // NSC level is optional; only validate when the student picked something.
+  if (row.nscLevel) {
+    const lvl = parseInt(row.nscLevel, 10);
+    if (isNaN(lvl) || lvl < 1 || lvl > 7) {
+      errors.nscLevel = "Must be 1–7.";
+    }
+  }
   return errors;
 }
 
@@ -153,7 +174,12 @@ function validateSubject(row: SubjectRow): Record<string, string> {
 interface SubjectRowEditorProps {
   row: SubjectRow;
   // Validation errors for this row's fields.
-  errors: { name?: string; customName?: string; mark?: string };
+  errors: {
+    name?: string;
+    customName?: string;
+    mark?: string;
+    nscLevel?: string;
+  };
   // Called whenever the user edits any field in this row.
   onChange: (patch: Partial<SubjectRow>) => void;
   onRemove: () => void;
@@ -207,23 +233,35 @@ function SubjectRowEditor({
         />
       </div>
 
-      {/* Mark input — constrained to a narrow width since it only holds 0–3 digits.
-       * step={1} restricts the browser's number spinner and native validation
-       * to integers only, preventing decimal entries like "78.5". */}
-      <div className="w-32">
-        <Input
-          id={`subject-mark-${row.id}`}
-          label="Mark (%)"
-          type="number"
-          inputMode="numeric"
-          min={0}
-          max={100}
-          step={1}
-          placeholder="0–100"
-          value={row.mark}
-          onChange={(e) => onChange({ mark: e.target.value })}
-          error={errors.mark}
-        />
+      {/* Mark + NSC level. Mark is required (0–100); NSC level is optional
+       * (1–7) and only used by some portals. step={1} on the mark restricts the
+       * native spinner and validation to integers, blocking "78.5". */}
+      <div className="flex flex-wrap gap-3">
+        <div className="w-32">
+          <Input
+            id={`subject-mark-${row.id}`}
+            label="Mark (%)"
+            type="number"
+            inputMode="numeric"
+            min={0}
+            max={100}
+            step={1}
+            placeholder="0–100"
+            value={row.mark}
+            onChange={(e) => onChange({ mark: e.target.value })}
+            error={errors.mark}
+          />
+        </div>
+        <div className="w-40">
+          <Select
+            id={`subject-nsc-${row.id}`}
+            label="NSC level"
+            options={NSC_LEVEL_OPTIONS}
+            value={row.nscLevel}
+            onChange={(e) => onChange({ nscLevel: e.target.value })}
+            error={errors.nscLevel}
+          />
+        </div>
       </div>
 
       {/* Custom name — conditionally rendered when "Other" is selected.
@@ -247,8 +285,9 @@ function SubjectRowEditor({
 
 interface AcademicRecordsFormProps {
   // Which record type this form manages. Defaults to grade_11_final.
-  // grade_12_april: loads existing data on mount, shows success state after save.
-  // grade_11_final: blank on mount, redirects to /documents after save.
+  // Every type loads its existing record on mount. After save, a first-time
+  // grade_11_final (the onboarding baseline) advances to /documents; updates
+  // and all other types show an inline success state instead.
   recordType?: RecordType;
 }
 
@@ -265,16 +304,19 @@ export function AcademicRecordsForm({
   // This flat structure avoids nested objects while still scoping errors to rows.
   const [rowErrors, setRowErrors] = useState<Record<string, string>>({});
 
-  // formReady: false while loading initial data for grade_12_april records.
-  const [formReady, setFormReady] = useState(recordType === "grade_11_final");
-  // saved: true after a successful grade_12_april save (no redirect — show inline success).
+  // formReady: false until the existing-record fetch settles.
+  const [formReady, setFormReady] = useState(false);
+  // saved: true after a save that stays on the page (shows inline success).
   const [saved, setSaved] = useState(false);
+  // True when an existing record pre-populated the form — a re-save of the
+  // baseline then stays here instead of replaying the onboarding redirect.
+  const [hadExisting, setHadExisting] = useState(false);
 
   const [institution, setInstitution] = useState("");
   const [year, setYear] = useState("");
   // Start with one blank row so the form doesn't look empty on first load.
   const [subjects, setSubjects] = useState<SubjectRow[]>([
-    { id: newId(), name: "", customName: "", mark: "" },
+    { id: newId(), name: "", customName: "", mark: "", nscLevel: "" },
   ]);
 
   // Removes one top-level field error (institution, year, subjects) the moment
@@ -311,7 +353,7 @@ export function AcademicRecordsForm({
   function addRow() {
     setSubjects((prev) => [
       ...prev,
-      { id: newId(), name: "", customName: "", mark: "" },
+      { id: newId(), name: "", customName: "", mark: "", nscLevel: "" },
     ]);
     // Clear the subjects-level error since there's now at least one row.
     clearError("subjects");
@@ -330,12 +372,10 @@ export function AcademicRecordsForm({
     });
   }
 
-  // Load existing April record on mount so the form pre-populates.
-  // Only runs for grade_12_april — grade_11_final starts with a blank form.
+  // Load any existing record on mount so the form pre-populates — a returning
+  // student should see their saved marks, not a blank form.
   useEffect(() => {
-    if (recordType !== "grade_12_april") return;
-
-    async function loadAprilRecord() {
+    async function loadExistingRecord() {
       const supabase = createClient();
       const {
         data: { session },
@@ -350,7 +390,7 @@ export function AcademicRecordsForm({
 
       try {
         const res = await fetch(
-          `${apiUrl}/academic-records?record_type=grade_12_april`,
+          `${apiUrl}/academic-records?record_type=${recordType}`,
           { headers: { Authorization: `Bearer ${token}` } },
         );
         if (res.ok) {
@@ -358,6 +398,7 @@ export function AcademicRecordsForm({
             .json()
             .catch(() => null)) as AcademicRecordResponse | null;
           if (record) {
+            setHadExisting(true);
             setInstitution(record.institution);
             setYear(record.year.toString());
             setSubjects(
@@ -366,6 +407,7 @@ export function AcademicRecordsForm({
                 name: s.name,
                 customName: s.custom_name ?? "",
                 mark: s.mark.toString(),
+                nscLevel: s.nsc_level != null ? s.nsc_level.toString() : "",
               })),
             );
           }
@@ -376,7 +418,7 @@ export function AcademicRecordsForm({
       setFormReady(true);
     }
 
-    loadAprilRecord();
+    loadExistingRecord();
   }, [recordType]);
 
   // Validates all fields, builds the payload, and POSTs to the backend.
@@ -434,11 +476,21 @@ export function AcademicRecordsForm({
       year: parseInt(year, 10),
       subjects: subjects.map((row) => {
         const mark = parseInt(row.mark, 10);
+        // Only attach nsc_level when the student set one — omit it otherwise so
+        // the payload stays clean for portals that don't use it.
+        const nscLevel = row.nscLevel
+          ? { nsc_level: parseInt(row.nscLevel, 10) }
+          : {};
         // "Other" entries carry custom_name per the locked JSON contract.
         if (row.name === "Other") {
-          return { name: "Other" as const, custom_name: row.customName, mark };
+          return {
+            name: "Other" as const,
+            custom_name: row.customName,
+            mark,
+            ...nscLevel,
+          };
         }
-        return { name: row.name, mark };
+        return { name: row.name, mark, ...nscLevel };
       }),
       record_type: recordType,
     };
@@ -488,11 +540,13 @@ export function AcademicRecordsForm({
         return;
       }
 
-      // Grade 11: advance to document upload. April: stay and show success.
-      if (recordType === "grade_12_april") {
-        setSaved(true);
-      } else {
+      // First-time Grade 11 save (onboarding): advance to document upload.
+      // Updates and other types: stay and show success.
+      if (recordType === "grade_11_final" && !hadExisting) {
         router.push("/documents");
+      } else {
+        setHadExisting(true);
+        setSaved(true);
       }
     } catch {
       // Network-level failure (offline, DNS, timeout, etc.).
@@ -529,7 +583,7 @@ export function AcademicRecordsForm({
         <Alert tone="success">
           <span className="inline-flex items-center gap-2">
             <CheckCircle2 size={15} aria-hidden />
-            Grade 12 April results saved.
+            {RECORD_TYPE_LABELS[recordType]} results saved.
           </span>
         </Alert>
         <button
@@ -547,8 +601,10 @@ export function AcademicRecordsForm({
     <form onSubmit={handleSubmit} noValidate className="space-y-8">
       {/* ── Institution and year ───────────────────────────────────────────── */}
       <div className="grid gap-4 sm:grid-cols-2">
+        {/* Ids are scoped by record type — multiple form instances share the
+            records page, and duplicate ids would break label association. */}
         <Input
-          id="institution"
+          id={`${recordType}-institution`}
           label="School / institution"
           type="text"
           autoComplete="organization"
@@ -561,7 +617,7 @@ export function AcademicRecordsForm({
           error={fieldErrors.institution}
         />
         <Input
-          id="year"
+          id={`${recordType}-year`}
           label="Year"
           type="number"
           inputMode="numeric"
@@ -607,6 +663,7 @@ export function AcademicRecordsForm({
                 name: rowErrors[`${row.id}.name`],
                 customName: rowErrors[`${row.id}.customName`],
                 mark: rowErrors[`${row.id}.mark`],
+                nscLevel: rowErrors[`${row.id}.nscLevel`],
               }}
               onChange={(patch) => {
                 updateRow(row.id, patch);

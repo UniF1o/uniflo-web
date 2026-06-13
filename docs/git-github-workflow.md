@@ -1,4 +1,4 @@
-# Uniflo — Git & GitHub Guide
+# UniFlo — Git & GitHub Guide
 
 This is the source of truth for how we use Git and GitHub across both repositories (`uniflo-api` and `uniflo-web`). When in doubt, check here first.
 

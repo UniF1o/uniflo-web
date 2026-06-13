@@ -1,4 +1,4 @@
-// Login screen — signs an existing user into Uniflo.
+// Login screen — signs an existing user into UniFlo.
 //
 // Server component so we can check the session before rendering. A signed-in
 // user landing here is redirected to /dashboard, avoiding the confusing UX of

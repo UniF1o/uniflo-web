@@ -1,4 +1,4 @@
-// Sign up screen — creates a new Uniflo account.
+// Sign up screen — creates a new UniFlo account.
 //
 // Server component so we can check the session before rendering. A signed-in
 // user landing here is redirected to /dashboard, avoiding the confusing UX of

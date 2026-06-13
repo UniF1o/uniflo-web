@@ -1,9 +1,9 @@
 // Phase 3 type overlay + typed API helpers.
 //
-// Partner B has not yet published the updated OpenAPI spec covering the new
-// /applications/{id}/field-mappings endpoint, the structured last_error shape,
-// the portal_reference/verified_at fields on the latest job, or the 202/409
-// retry semantics. Once the spec lands, `npm run types:api` regenerates
+// The deployed spec now covers /applications/{id}/field-mappings, consent and
+// challenge, but still lacks response models for the mapping envelope, the
+// structured last_error shape, and the portal_reference/verified_at job
+// fields. Once those land, `npm run types:api` regenerates
 // `lib/api/schema.d.ts` with these shapes natively — at which point most of
 // this file becomes a re-export and `JobError` etc. should be sourced from
 // the generated schema. The helpers themselves stay.
@@ -33,9 +33,8 @@ export interface FieldMappingEntry {
   category?: string | null;
 }
 
-// The endpoint envelope. Returns mappings for one application — the review
-// screen iterates by the (preview) application identifier and merges the
-// results into per-university sections.
+// The endpoint envelope. Returns mappings for one application — surfaced on
+// the application detail page once the worker has mapped the fields.
 export interface FieldMappingsResponse {
   application_id: string;
   university_id: string;
@@ -152,28 +151,6 @@ export function getFieldMappings(
   );
 }
 
-// Mapping preview during the review-before-submit flow. The application
-// doesn't exist yet — the backend computes a transient mapping keyed by
-// (student, university, programme, year). Returns the same envelope shape.
-//
-// Partner B's spec for this endpoint isn't locked. Until it lands the helper
-// hits the canonical URL Partner A's plan expects; when the URL changes, the
-// component code stays untouched.
-export function previewFieldMappings(params: {
-  university_id: string;
-  programme: string;
-  application_year: number;
-}): Promise<FieldMappingsResponse> {
-  const search = new URLSearchParams({
-    university_id: params.university_id,
-    programme: params.programme,
-    application_year: String(params.application_year),
-  });
-  return apiClient.get<FieldMappingsResponse>(
-    `/applications/preview/field-mappings?${search.toString()}`,
-  );
-}
-
 // Retry a failed application. Partner B's spec promises 202 on success +
 // 409 if the application is already processing or submitted; this helper
 // surfaces the refreshed row to the caller. Errors propagate as ApiError so
@@ -183,5 +160,37 @@ export function retryApplication(
 ): Promise<components["schemas"]["ApplicationRead"]> {
   return apiClient.post<components["schemas"]["ApplicationRead"]>(
     `/applications/${applicationId}/retry`,
+  );
+}
+
+// ─── Email challenges + consent (status: action_required) ────────────────────
+
+// Non-null on ApplicationRead while the run is paused waiting on the student
+// (e.g. the OTP the portal emailed them).
+export type PendingChallengeRead =
+  components["schemas"]["PendingChallengeRead"];
+
+// Answer the pending challenge: one value per requested field name. The
+// backend 422s on missing keys and ignores extras; returns the refreshed row.
+export function supplyChallenge(
+  applicationId: string,
+  values: Record<string, string>,
+): Promise<components["schemas"]["ApplicationRead"]> {
+  return apiClient.post<components["schemas"]["ApplicationRead"]>(
+    `/applications/${applicationId}/challenge`,
+    { values },
+  );
+}
+
+// Record the student's POPI / application-agreement acceptance for one
+// application. At least one flag must be true; returns the refreshed row
+// with the consent timestamps set.
+export function recordConsent(
+  applicationId: string,
+  consent: { popi: boolean; agreement: boolean },
+): Promise<components["schemas"]["ApplicationRead"]> {
+  return apiClient.post<components["schemas"]["ApplicationRead"]>(
+    `/applications/${applicationId}/consent`,
+    consent,
   );
 }

@@ -1,6 +1,6 @@
 # uniflo-web
 
-Frontend for **Uniflo** — a South African university application automation platform. Students fill in their details once and Uniflo automatically applies to multiple universities on their behalf. Students review and approve every application before anything is submitted.
+Frontend for **UniFlo** — a South African university application automation platform. Students fill in their details once and UniFlo automatically applies to multiple universities on their behalf. Students review and approve every application before anything is submitted.
 
 This repo is owned by **Partner A (Frontend)**. The FastAPI backend lives separately in `uniflo-api`.
 

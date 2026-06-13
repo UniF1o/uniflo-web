@@ -10,7 +10,7 @@ This document captures what was built, design decisions, and any deviations from
 
 ## What was built
 
-Students can now browse and search the universities Uniflo supports at `/universities`. The page renders on first paint without a loading flash, degrades to a client-side fetch for subsequent searches, and handles all states (loading, empty, error) with appropriate affordances.
+Students can now browse and search the universities UniFlo supports at `/universities`. The page renders on first paint without a loading flash, degrades to a client-side fetch for subsequent searches, and handles all states (loading, empty, error) with appropriate affordances.
 
 ### Files added
 

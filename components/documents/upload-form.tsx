@@ -71,12 +71,15 @@ const CERT_DATE_MIN = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000)
 // 10 MB in bytes — warn and reject before uploading if the file exceeds this.
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
-// Static config for each zone. The `type` value is sent directly to the backend.
-const ZONE_CONFIGS: Array<{
+type ZoneConfig = {
   type: DocumentType;
   label: string;
   description: string;
-}> = [
+};
+
+// Required documents — every student must upload all three before applying.
+// The `type` value is sent directly to the backend.
+const REQUIRED_ZONE_CONFIGS: ZoneConfig[] = [
   {
     type: "ID_COPY",
     label: "Certified copy of SA ID document",
@@ -93,6 +96,16 @@ const ZONE_CONFIGS: Array<{
     label: "Grade 12 April results",
     description:
       "Your official school progress report for Grade 12 April/mid-year. Required by UCT and some other universities.",
+  },
+];
+
+// Optional documents — accepted by some portals but not required to submit.
+const OPTIONAL_ZONE_CONFIGS: ZoneConfig[] = [
+  {
+    type: "GRADE11_RESULTS",
+    label: "Grade 11 results",
+    description:
+      "Your official Grade 11 report. UP accepts this in lieu of a Grade 12 certificate. Optional — only upload if you have it.",
   },
 ];
 
@@ -229,7 +242,7 @@ function uploadViaXhr(
 //   error     — error message, "Try again" button (triggers a new file pick)
 
 interface DocumentZoneCardProps {
-  config: (typeof ZONE_CONFIGS)[number];
+  config: ZoneConfig;
   state: ZoneState;
   // Called with the selected File object after the user picks one.
   onFileSelect: (file: File) => void;
@@ -426,6 +439,7 @@ export function DocumentsUploadForm() {
     ID_COPY: { ...INITIAL_ZONE },
     MATRIC_RESULTS: { ...INITIAL_ZONE },
     GRADE12_APRIL: { ...INITIAL_ZONE },
+    GRADE11_RESULTS: { ...INITIAL_ZONE },
     TRANSCRIPT: { ...INITIAL_ZONE }, // kept so API load handles any legacy type
   });
 
@@ -557,10 +571,12 @@ export function DocumentsUploadForm() {
     }
   }
 
-  const uploadedCount = ZONE_CONFIGS.filter(
+  // Progress reflects required documents only — the optional Grade 11 zone
+  // doesn't gate the "all uploaded" CTA.
+  const uploadedCount = REQUIRED_ZONE_CONFIGS.filter(
     (c) => zones[c.type].status === "uploaded",
   ).length;
-  const total = ZONE_CONFIGS.length;
+  const total = REQUIRED_ZONE_CONFIGS.length;
   const allUploaded = uploadedCount === total;
 
   function handleCertDateChange(val: string) {
@@ -603,7 +619,7 @@ export function DocumentsUploadForm() {
         </div>
       </div>
 
-      {ZONE_CONFIGS.map((config) => {
+      {REQUIRED_ZONE_CONFIGS.map((config) => {
         const isIdZone = config.type === "ID_COPY";
         return (
           <DocumentZoneCard
@@ -618,6 +634,21 @@ export function DocumentsUploadForm() {
           />
         );
       })}
+
+      {/* ── Optional documents ──────────────────────────────────────────── */}
+      <div className="space-y-3 pt-2">
+        <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+          Optional
+        </p>
+        {OPTIONAL_ZONE_CONFIGS.map((config) => (
+          <DocumentZoneCard
+            key={config.type}
+            config={config}
+            state={zones[config.type]}
+            onFileSelect={(file) => handleFileSelect(config.type, file)}
+          />
+        ))}
+      </div>
 
       {allUploaded && (
         <div className="flex flex-col gap-3 pt-2 sm:flex-row">

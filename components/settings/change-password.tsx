@@ -127,7 +127,7 @@ export function ChangePasswordSection() {
             Change password
           </h2>
           <p className="text-sm text-muted-foreground">
-            Update the password you use to sign in to Uniflo.
+            Update the password you use to sign in to UniFlo.
           </p>
         </div>
       </div>

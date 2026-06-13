@@ -1,10 +1,17 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { ChevronLeft, Mail, RefreshCw } from "lucide-react";
+import {
+  ChevronLeft,
+  Mail,
+  RefreshCw,
+  CheckCircle2,
+  XCircle,
+} from "lucide-react";
 import { ApiError } from "@/lib/api/client";
 import {
+  getFieldMappings,
   parseJobError,
   retryApplication,
   type AugmentedApplicationJobRead,
@@ -17,11 +24,34 @@ import { Card } from "@/components/ui/card";
 import { StatusBadge } from "./status-badge";
 import { CelebrationBanner } from "./celebration-banner";
 import { SubmissionConfirmation } from "./submission-confirmation";
+import { ChallengePrompt } from "./challenge-prompt";
+import { ConsentCard } from "./consent-card";
+import { FieldMappingReview, type MappingState } from "./field-mapping-review";
 import { formatDate } from "@/lib/utils/format";
 import type { components } from "@/lib/api/schema";
 
 type ApplicationRead = components["schemas"]["ApplicationRead"];
 type ApplicationStatus = components["schemas"]["ApplicationStatus"];
+type ApplicationChoice = components["schemas"]["ApplicationChoiceRead"];
+
+// Eligibility is filled in by the automation later — null means "not yet
+// assessed". Render a quiet pending state until the worker reports back.
+function EligibilityTag({ eligible }: { eligible?: boolean | null }) {
+  if (eligible == null) {
+    return <span className="text-xs text-muted-foreground">Pending</span>;
+  }
+  return eligible ? (
+    <span className="inline-flex items-center gap-1 text-xs font-medium text-success">
+      <CheckCircle2 size={12} aria-hidden />
+      Eligible
+    </span>
+  ) : (
+    <span className="inline-flex items-center gap-1 text-xs font-medium text-destructive">
+      <XCircle size={12} aria-hidden />
+      Not eligible
+    </span>
+  );
+}
 
 function DetailRow({
   label,
@@ -68,15 +98,54 @@ export function ApplicationDetail({
   universityName,
   supportEmail,
 }: ApplicationDetailProps) {
+  // Ordered programme choices (primary first). Defaults to [] on older rows
+  // that predate the multi-choice contract.
+  const choices: ApplicationChoice[] = application.choices ?? [];
+
   const [currentStatus, setCurrentStatus] = useState<ApplicationStatus | null>(
     application.status,
   );
+  // Live mirrors of the row fields that change while the student is on the
+  // page (challenge answered, consent recorded). Seeded from the server-
+  // rendered prop and refreshed from each POST's returned row.
+  const [challenge, setChallenge] = useState(
+    application.pending_challenge ?? null,
+  );
+  const [popiConsentAt, setPopiConsentAt] = useState(
+    application.popi_consent_at ?? null,
+  );
+  const [agreementConsentAt, setAgreementConsentAt] = useState(
+    application.agreement_consent_at ?? null,
+  );
+  // Shows a one-off "we've passed that on" confirmation after a challenge.
+  const [challengeResolved, setChallengeResolved] = useState(false);
   const [isRetrying, setIsRetrying] = useState(false);
   // After a successful retry we lock the button briefly so a double-tap
   // doesn't fire a second request before the optimistic status update lands
   // and the row would otherwise re-enable.
   const [retryDisabled, setRetryDisabled] = useState(false);
   const [feedback, setFeedback] = useState<RetryFeedback | null>(null);
+
+  // What the automation filled in on the portal. The endpoint 404s until the
+  // mapping job has produced output — treated as "unavailable" and the
+  // section stays hidden rather than showing a misleading error.
+  const [mappingState, setMappingState] = useState<MappingState>({
+    kind: "loading",
+  });
+
+  const loadMappings = useCallback(async () => {
+    setMappingState({ kind: "loading" });
+    try {
+      const data = await getFieldMappings(application.id);
+      setMappingState({ kind: "ready", entries: data.entries });
+    } catch {
+      setMappingState({ kind: "unavailable" });
+    }
+  }, [application.id]);
+
+  useEffect(() => {
+    void loadMappings();
+  }, [loadMappings]);
 
   // Treat latest_job as the augmented shape — Phase 3 adds optional
   // portal_reference / verified_at fields. Existing readers like the
@@ -96,6 +165,22 @@ export function ApplicationDetail({
     currentStatus === "failed" &&
     structuredError != null &&
     isRetryable(structuredError.code, structuredError.retryable);
+
+  // Folds a refreshed row (from the challenge / consent POSTs) back into the
+  // pieces of state this page tracks.
+  function applyServerUpdate(updated: ApplicationRead) {
+    setCurrentStatus(updated.status ?? null);
+    setChallenge(updated.pending_challenge ?? null);
+    setPopiConsentAt(updated.popi_consent_at ?? null);
+    setAgreementConsentAt(updated.agreement_consent_at ?? null);
+  }
+
+  // Hide the consent card on already-submitted rows that never recorded
+  // anything (pre-consent history) — there's nothing useful to do there.
+  const showConsentCard =
+    currentStatus !== "submitted" ||
+    popiConsentAt != null ||
+    agreementConsentAt != null;
 
   async function handleRetry() {
     setIsRetrying(true);
@@ -166,6 +251,27 @@ export function ApplicationDetail({
       <Suspense fallback={null}>
         <CelebrationBanner />
       </Suspense>
+
+      {/* Email challenge — the run is paused waiting on the student (e.g. a
+       * portal OTP). Highest-priority surface, so it sits above everything
+       * else on the page. */}
+      {currentStatus === "action_required" && challenge && (
+        <ChallengePrompt
+          applicationId={application.id}
+          universityName={universityName}
+          challenge={challenge}
+          onResolved={(updated) => {
+            applyServerUpdate(updated);
+            setChallengeResolved(true);
+          }}
+        />
+      )}
+      {challengeResolved && !challenge && (
+        <Alert tone="success" role="status">
+          Thanks — we&apos;ve passed that on and your application is continuing.
+          Check back shortly for the updated status.
+        </Alert>
+      )}
 
       {/* Submission proof — Phase 3. Renders when the latest job has
        * landed at status "submitted". `latest_job.status` is the source of
@@ -252,6 +358,63 @@ export function ApplicationDetail({
           </DetailRow>
         </Card>
       </div>
+
+      {showConsentCard && (
+        <ConsentCard
+          applicationId={application.id}
+          universityName={universityName}
+          popiConsentAt={popiConsentAt}
+          agreementConsentAt={agreementConsentAt}
+          onUpdated={applyServerUpdate}
+        />
+      )}
+
+      {/* Programme choices — rendered when the student listed more than the
+       * primary. Each choice carries its own eligibility once the automation
+       * assesses it. */}
+      {choices.length > 1 && (
+        <div className="space-y-3">
+          <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+            Programme choices
+          </h2>
+          <Card variant="paper" as="ul" className="overflow-hidden">
+            {choices.map((choice, i) => (
+              <li
+                key={choice.choice_number}
+                className={cnRow(i === choices.length - 1)}
+              >
+                <span className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground sm:w-40">
+                  Choice {choice.choice_number}
+                </span>
+                <span className="flex flex-1 items-center justify-between gap-3">
+                  <span className="text-sm text-foreground">
+                    {choice.programme}
+                  </span>
+                  <EligibilityTag eligible={choice.eligible} />
+                </span>
+              </li>
+            ))}
+          </Card>
+        </div>
+      )}
+
+      {/* What the automation filled in — read-only mapping summary. Rendered
+       * only once the mapping exists; rows the AI was unsure about are
+       * listed with their confidence so the student can spot-check. */}
+      {mappingState.kind === "ready" && mappingState.entries.length > 0 && (
+        <div className="space-y-3">
+          <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+            What we filled in
+          </h2>
+          <FieldMappingReview
+            universityId={application.id}
+            universityName={universityName}
+            state={mappingState}
+            readOnly
+            onRefresh={() => void loadMappings()}
+          />
+        </div>
+      )}
 
       {/* Latest automation job — keep the structured view so support can see
        * attempts and update times at a glance. The failure summary above

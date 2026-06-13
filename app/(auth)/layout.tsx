@@ -17,7 +17,7 @@ export default function AuthLayout({
     <div className="relative flex min-h-dvh flex-col overflow-hidden">
       {/* Atmospheric washes — pale sky bloom top-right and a deeper cobalt
        * haze lower down. Same recipe as the landing page so signing in
-       * doesn't feel like leaving Uniflo. */}
+       * doesn't feel like leaving UniFlo. */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[80vh] bg-[radial-gradient(ellipse_70%_60%_at_85%_5%,_var(--color-soft)_0%,_transparent_60%)]"
@@ -48,7 +48,7 @@ export default function AuthLayout({
        * gesture with the landing page footer. */}
       <footer className="px-6 py-6 text-center text-xs text-muted-foreground">
         <p className="inline-flex items-center gap-2">
-          © {new Date().getFullYear()} Uniflo
+          © {new Date().getFullYear()} UniFlo
           <Sprout className="h-3.5 w-3.5 text-primary" />
           Built for SA matrics
         </p>

@@ -1,7 +1,7 @@
-# Uniflo — Technical Architecture
+# UniFlo — Technical Architecture
 
 ## Product Summary
-Uniflo is a South African university application automation platform. Students fill in their details once and AI agents automatically apply to multiple universities and colleges on their behalf. The student reviews and approves every application before submission.
+UniFlo is a South African university application automation platform. Students fill in their details once and AI agents automatically apply to multiple universities and colleges on their behalf. The student reviews and approves every application before submission.
 
 ## Architectural Philosophy
 - **Modular monolith first** — one codebase with clearly separated modules, structured to split into microservices later without rewrites
@@ -41,12 +41,12 @@ Uniflo is a South African university application automation platform. Students f
 ### 1. Frontend — Next.js + Tailwind CSS
 **[MVP]**
 
-Next.js is chosen over plain React for server-side rendering (SSR), which is critical for SEO so students can find Uniflo on Google. The App Router handles complex layouts like the dashboard, application tracker, and document vault. Tailwind CSS handles responsive design — essential for SA's mobile-first user base.
+Next.js is chosen over plain React for server-side rendering (SSR), which is critical for SEO so students can find UniFlo on Google. The App Router handles complex layouts like the dashboard, application tracker, and document vault. Tailwind CSS handles responsive design — essential for SA's mobile-first user base.
 
 **Hosting — Vercel:**
 Vercel connects directly to the GitHub repo and deploys automatically on push to `main`.
 
-⚠️ **Important:** Vercel's free Hobby plan is restricted to personal, non-commercial use. Uniflo is a commercial product. During development the Hobby plan is acceptable, but we must upgrade to Vercel Pro ($20/month) before beta launch to comply with Vercel's terms of service.
+⚠️ **Important:** Vercel's free Hobby plan is restricted to personal, non-commercial use. UniFlo is a commercial product. During development the Hobby plan is acceptable, but we must upgrade to Vercel Pro ($20/month) before beta launch to comply with Vercel's terms of service.
 
 **Mobile strategy:** Web-first, fully responsive. React Native mobile app is a post-MVP expansion.
 
@@ -55,7 +55,7 @@ Vercel connects directly to the GitHub repo and deploys automatically on push to
 ### 2. Backend — FastAPI (Python)
 **[MVP]**
 
-FastAPI is chosen over Django because Django's "batteries included" approach bundles things Uniflo doesn't need (templates, admin panel, built-in ORM) when the frontend is a separate Next.js app. FastAPI is async-first by design — critical for background jobs and automation workers. It auto-generates Swagger API documentation at `/docs` with zero configuration.
+FastAPI is chosen over Django because Django's "batteries included" approach bundles things UniFlo doesn't need (templates, admin panel, built-in ORM) when the frontend is a separate Next.js app. FastAPI is async-first by design — critical for background jobs and automation workers. It auto-generates Swagger API documentation at `/docs` with zero configuration.
 
 FastAPI is chosen over NestJS because the team is comfortable with Python, and Python's AI/ML ecosystem (Anthropic SDK, LangChain) targets Python first.
 
@@ -86,7 +86,7 @@ Each module is self-contained and can be extracted into its own microservice lat
 ### 3. Database — PostgreSQL via Supabase
 **[MVP → Scale: AWS RDS]**
 
-PostgreSQL is chosen because Uniflo's data is relational — students, applications, universities, documents, jobs all have clear relationships. It is ACID compliant, guaranteeing data integrity on application submissions. JSONB columns handle flexible fields like subject combinations that vary per student.
+PostgreSQL is chosen because UniFlo's data is relational — students, applications, universities, documents, jobs all have clear relationships. It is ACID compliant, guaranteeing data integrity on application submissions. JSONB columns handle flexible fields like subject combinations that vary per student.
 
 ⚠️ **Supabase free tier caveat:** Free projects are automatically paused after 7 days of inactivity. Acceptable during active development (you're touching it daily). Must upgrade to Supabase Pro ($25/month) before beta launch for guaranteed uptime (we will see if this is really necessary). Use a GitHub Actions scheduled ping as a workaround during slower development periods.
 
@@ -193,7 +193,7 @@ When volume demands it, Celery replaces BackgroundTasks. Redis acts as the messa
 ### 5. AI Layer — Claude API (Anthropic)
 **[MVP — field mapping and confidence scoring only]**
 
-Claude handles two specific tasks in Uniflo. Essay/motivation letter assistance is deliberately excluded from the MVP to control API costs.
+Claude handles two specific tasks in UniFlo. Essay/motivation letter assistance is deliberately excluded from the MVP to control API costs.
 
 **Task 1 — Field mapping intelligence:**
 Given a university's form structure, Claude maps the student's profile fields to the correct form fields — even when field names differ across portals (e.g. "Surname" vs "Last Name"). This produces a mapping object that Playwright executes.
@@ -264,12 +264,12 @@ Real-time in-app status updates ("Your UCT application was submitted") are a pos
 **Sentry — error tracking:**
 Catches and reports errors across both the Next.js frontend and FastAPI backend in real time.
 
-⚠️ **Important:** Sentry's free Developer plan is limited to 1 user. Since Uniflo has two co-founders, you either share one login during development or pay $26/month for the Team plan (unlimited users). Budget for Team plan from beta launch.
+⚠️ **Important:** Sentry's free Developer plan is limited to 1 user. Since UniFlo has two co-founders, you either share one login during development or pay $26/month for the Team plan (unlimited users). Budget for Team plan from beta launch.
 
 **UptimeRobot — uptime monitoring:**
 Monitors app availability 24/7 and sends immediate alerts on downtime. Free tier includes 50 monitors at 5-minute intervals.
 
-⚠️ **Important:** UptimeRobot's free plan is restricted to personal, non-commercial use. Uniflo is commercial — budget for the Solo plan (~$7/month) from beta launch.
+⚠️ **Important:** UptimeRobot's free plan is restricted to personal, non-commercial use. UniFlo is commercial — budget for the Solo plan (~$7/month) from beta launch.
 
 **Dual purpose during development:** UptimeRobot's pings to your Render backend every 5 minutes also prevent Render's cold start problem. Two birds, one stone.
 
@@ -300,7 +300,7 @@ Nothing merges to `main` with a failing test. This is the rule from day one.
 ### 13. Security
 **[MVP — non-negotiable]**
 
-Uniflo handles sensitive personal data — ID numbers, academic records — of minors. Security is not optional.
+UniFlo handles sensitive personal data — ID numbers, academic records — of minors. Security is not optional.
 
 - Encryption at rest for all documents and PII
 - HTTPS everywhere, TLS 1.3

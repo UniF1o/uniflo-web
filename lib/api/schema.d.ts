@@ -127,6 +127,25 @@ export interface paths {
     patch: operations["academic_records_update"];
     trace?: never;
   };
+  "/contacts": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Contacts */
+    get: operations["contacts_list"];
+    put?: never;
+    /** Upsert Contact */
+    post: operations["contacts_upsert"];
+    /** Delete Contact */
+    delete: operations["contacts_delete"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/documents/upload": {
     parameters: {
       query?: never;
@@ -247,6 +266,61 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/applications/{application_id}/field-mappings": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Field Mapping */
+    get: operations["applications_field_mappings"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/applications/{application_id}/consent": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Record Consent */
+    post: operations["applications_consent"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/applications/{application_id}/challenge": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Supply Challenge
+     * @description Answer the pending email challenge the automation run is waiting on
+     *     (status `action_required`) — e.g. the OTP the portal emailed the student.
+     */
+    post: operations["applications_supply_challenge"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/applications/{application_id}/retry": {
     parameters: {
       query?: never;
@@ -344,6 +418,15 @@ export interface components {
       /** Aggregate */
       aggregate?: number | null;
     };
+    /** ApplicationChoiceRead */
+    ApplicationChoiceRead: {
+      /** Choice Number */
+      choice_number: number;
+      /** Programme */
+      programme: string;
+      /** Eligible */
+      eligible?: boolean | null;
+    };
     /** ApplicationCreate */
     ApplicationCreate: {
       /**
@@ -353,6 +436,8 @@ export interface components {
       university_id: string;
       /** Programme */
       programme: string;
+      /** Additional Programmes */
+      additional_programmes?: string[] | null;
       /** Application Year */
       application_year: number;
     };
@@ -409,19 +494,147 @@ export interface components {
        * Format: date-time
        */
       created_at: string;
+      /** Popi Consent At */
+      popi_consent_at?: string | null;
+      /** Agreement Consent At */
+      agreement_consent_at?: string | null;
       latest_job?: components["schemas"]["ApplicationJobRead"] | null;
+      /**
+       * Choices
+       * @default []
+       */
+      choices: components["schemas"]["ApplicationChoiceRead"][];
+      pending_challenge?: components["schemas"]["PendingChallengeRead"] | null;
     };
     /**
      * ApplicationStatus
      * @enum {string}
      */
-    ApplicationStatus: "pending" | "processing" | "submitted" | "failed";
+    ApplicationStatus:
+      | "pending"
+      | "processing"
+      | "action_required"
+      | "submitted"
+      | "failed";
     /** Body_documents_upload */
     Body_documents_upload: {
       /** File */
       file: string;
       document_type: components["schemas"]["DocumentType"];
     };
+    /**
+     * ChallengeSupplyRequest
+     * @description The student's answer to a pending challenge: one value per requested
+     *     field name (extra keys are ignored, missing ones are a 422).
+     */
+    ChallengeSupplyRequest: {
+      /** Values */
+      values: {
+        [key: string]: string;
+      };
+    };
+    /**
+     * ConsentRequest
+     * @description Records the student's explicit acceptance after they've viewed the portal's
+     *     POPI notice / application agreement (surfaced by the frontend). At least one
+     *     must be true.
+     */
+    ConsentRequest: {
+      /**
+       * Popi
+       * @default false
+       */
+      popi: boolean;
+      /**
+       * Agreement
+       * @default false
+       */
+      agreement: boolean;
+    };
+    /** ContactResponse */
+    ContactResponse: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Student Id
+       * Format: uuid
+       */
+      student_id: string;
+      contact_type: components["schemas"]["ContactType"];
+      /** Title */
+      title?: string | null;
+      /** First Name */
+      first_name?: string | null;
+      /** Last Name */
+      last_name?: string | null;
+      /** Relationship */
+      relationship?: string | null;
+      /** Id Number */
+      id_number?: string | null;
+      /** Email */
+      email?: string | null;
+      /** Phone */
+      phone?: string | null;
+      /** Street Address */
+      street_address?: string | null;
+      /** Suburb */
+      suburb?: string | null;
+      /** City */
+      city?: string | null;
+      /** Province */
+      province?: string | null;
+      /** Postal Code */
+      postal_code?: string | null;
+      /** Updated At */
+      updated_at?: string | null;
+    };
+    /**
+     * ContactType
+     * @enum {string}
+     */
+    ContactType: "next_of_kin" | "fee_payer" | "guardian" | "emergency";
+    /** ContactWrite */
+    ContactWrite: {
+      contact_type: components["schemas"]["ContactType"];
+      /** Title */
+      title?: string | null;
+      /** First Name */
+      first_name?: string | null;
+      /** Last Name */
+      last_name?: string | null;
+      /** Relationship */
+      relationship?: string | null;
+      /** Id Number */
+      id_number?: string | null;
+      /** Email */
+      email?: string | null;
+      /** Phone */
+      phone?: string | null;
+      /** Street Address */
+      street_address?: string | null;
+      /** Suburb */
+      suburb?: string | null;
+      /** City */
+      city?: string | null;
+      /** Province */
+      province?: string | null;
+      /** Postal Code */
+      postal_code?: string | null;
+    };
+    /**
+     * CurrentActivityEnum
+     * @enum {string}
+     */
+    CurrentActivityEnum:
+      | "Currently in Grade 12"
+      | "Upgrading matric"
+      | "Gap year"
+      | "Employed"
+      | "At university"
+      | "Other";
     /**
      * DisabilityEnum
      * @enum {string}
@@ -460,7 +673,12 @@ export interface components {
      * DocumentType
      * @enum {string}
      */
-    DocumentType: "ID_COPY" | "MATRIC_RESULTS" | "TRANSCRIPT" | "GRADE12_APRIL";
+    DocumentType:
+      | "ID_COPY"
+      | "MATRIC_RESULTS"
+      | "TRANSCRIPT"
+      | "GRADE12_APRIL"
+      | "GRADE11_RESULTS";
     /**
      * EthnicityEnum
      * @enum {string}
@@ -472,6 +690,54 @@ export interface components {
       | "Asian"
       | "White"
       | "Other";
+    /**
+     * FieldMappingEntryRead
+     * @description One mapped field for the review screen. `flagged` == low confidence
+     *     (below the threshold in force when the mapping was produced).
+     */
+    FieldMappingEntryRead: {
+      /** Field Id */
+      field_id: string;
+      /** Value */
+      value?: string | null;
+      /** Confidence */
+      confidence: number;
+      /** Flagged */
+      flagged: boolean;
+      /**
+       * Reasoning
+       * @default
+       */
+      reasoning: string;
+      /** Source Profile Field */
+      source_profile_field?: string | null;
+    };
+    /** FieldMappingRead */
+    FieldMappingRead: {
+      /**
+       * Application Id
+       * Format: uuid
+       */
+      application_id: string;
+      /**
+       * University Id
+       * Format: uuid
+       */
+      university_id: string;
+      /** Overall Confidence */
+      overall_confidence: number;
+      /** Confidence Threshold */
+      confidence_threshold: number;
+      /** Entries */
+      entries: components["schemas"]["FieldMappingEntryRead"][];
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /** Updated At */
+      updated_at?: string | null;
+    };
     /**
      * GenderEnum
      * @enum {string}
@@ -504,6 +770,29 @@ export interface components {
      */
     MaritalStatusEnum: "Single" | "Married" | "Divorced" | "Widowed" | "Other";
     /**
+     * PendingChallengeRead
+     * @description An unanswered email challenge the run is waiting on — non-null while the
+     *     status is `action_required`. The app shows one input per requested field
+     *     (e.g. ["otp"], or ["temp_id", "password"]) and posts the values to
+     *     /applications/{id}/challenge.
+     */
+    PendingChallengeRead: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Portal Slug */
+      portal_slug: string;
+      /** Requested Fields */
+      requested_fields: string[];
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+    };
+    /**
      * RecordType
      * @enum {string}
      */
@@ -533,10 +822,17 @@ export interface components {
        * Format: uuid
        */
       user_id: string;
+      title?: components["schemas"]["TitleEnum"] | null;
       /** First Name */
       first_name?: string | null;
+      /** Middle Names */
+      middle_names?: string | null;
       /** Last Name */
       last_name?: string | null;
+      /** Maiden Name */
+      maiden_name?: string | null;
+      /** Preferred Name */
+      preferred_name?: string | null;
       /** Id Number */
       id_number?: string | null;
       /** Date Of Birth */
@@ -553,14 +849,55 @@ export interface components {
       province?: string | null;
       /** Postal Code */
       postal_code?: string | null;
+      /** Mailing Same As Residential */
+      mailing_same_as_residential?: boolean | null;
+      /** Mailing Street Address */
+      mailing_street_address?: string | null;
+      /** Mailing Suburb */
+      mailing_suburb?: string | null;
+      /** Mailing City */
+      mailing_city?: string | null;
+      /** Mailing Province */
+      mailing_province?: string | null;
+      /** Mailing Postal Code */
+      mailing_postal_code?: string | null;
       /** Nationality */
       nationality?: string | null;
+      /** Is Sa Citizen */
+      is_sa_citizen?: boolean | null;
       gender?: components["schemas"]["GenderEnum"] | null;
       home_language?: components["schemas"]["HomeLanguageEnum"] | null;
       religion?: components["schemas"]["ReligionEnum"] | null;
       disability?: components["schemas"]["DisabilityEnum"] | null;
+      /** Disability Detail */
+      disability_detail?: string | null;
+      /** Disability Assistance */
+      disability_assistance?: string | null;
       marital_status?: components["schemas"]["MaritalStatusEnum"] | null;
       ethnicity?: components["schemas"]["EthnicityEnum"] | null;
+      current_activity?: components["schemas"]["CurrentActivityEnum"] | null;
+      /** Exam Number */
+      exam_number?: string | null;
+      /** Sport */
+      sport?: string | null;
+      /** Wants Residence */
+      wants_residence?: boolean | null;
+      /** Preferred Residence */
+      preferred_residence?: string | null;
+      /** Applying Nsfas */
+      applying_nsfas?: boolean | null;
+      /** Applying Institutional Funding */
+      applying_institutional_funding?: boolean | null;
+      /** Nbt Reference */
+      nbt_reference?: string | null;
+      /** Nbt Year */
+      nbt_year?: number | null;
+      /** Nbt Date */
+      nbt_date?: string | null;
+      /** Redress Factors */
+      redress_factors?: {
+        [key: string]: unknown;
+      } | null;
       /** Updated At */
       updated_at?: string | null;
       /** Is Complete */
@@ -568,10 +905,17 @@ export interface components {
     };
     /** StudentProfileWrite */
     StudentProfileWrite: {
+      title?: components["schemas"]["TitleEnum"] | null;
       /** First Name */
       first_name?: string | null;
+      /** Middle Names */
+      middle_names?: string | null;
       /** Last Name */
       last_name?: string | null;
+      /** Maiden Name */
+      maiden_name?: string | null;
+      /** Preferred Name */
+      preferred_name?: string | null;
       /** Id Number */
       id_number?: string | null;
       /** Date Of Birth */
@@ -588,14 +932,55 @@ export interface components {
       province?: string | null;
       /** Postal Code */
       postal_code?: string | null;
+      /** Mailing Same As Residential */
+      mailing_same_as_residential?: boolean | null;
+      /** Mailing Street Address */
+      mailing_street_address?: string | null;
+      /** Mailing Suburb */
+      mailing_suburb?: string | null;
+      /** Mailing City */
+      mailing_city?: string | null;
+      /** Mailing Province */
+      mailing_province?: string | null;
+      /** Mailing Postal Code */
+      mailing_postal_code?: string | null;
       /** Nationality */
       nationality?: string | null;
+      /** Is Sa Citizen */
+      is_sa_citizen?: boolean | null;
       gender?: components["schemas"]["GenderEnum"] | null;
       home_language?: components["schemas"]["HomeLanguageEnum"] | null;
       religion?: components["schemas"]["ReligionEnum"] | null;
       disability?: components["schemas"]["DisabilityEnum"] | null;
+      /** Disability Detail */
+      disability_detail?: string | null;
+      /** Disability Assistance */
+      disability_assistance?: string | null;
       marital_status?: components["schemas"]["MaritalStatusEnum"] | null;
       ethnicity?: components["schemas"]["EthnicityEnum"] | null;
+      current_activity?: components["schemas"]["CurrentActivityEnum"] | null;
+      /** Exam Number */
+      exam_number?: string | null;
+      /** Sport */
+      sport?: string | null;
+      /** Wants Residence */
+      wants_residence?: boolean | null;
+      /** Preferred Residence */
+      preferred_residence?: string | null;
+      /** Applying Nsfas */
+      applying_nsfas?: boolean | null;
+      /** Applying Institutional Funding */
+      applying_institutional_funding?: boolean | null;
+      /** Nbt Reference */
+      nbt_reference?: string | null;
+      /** Nbt Year */
+      nbt_year?: number | null;
+      /** Nbt Date */
+      nbt_date?: string | null;
+      /** Redress Factors */
+      redress_factors?: {
+        [key: string]: unknown;
+      } | null;
     };
     /** SubjectIn */
     SubjectIn: {
@@ -603,6 +988,8 @@ export interface components {
       name: string;
       /** Mark */
       mark: number;
+      /** Nsc Level */
+      nsc_level?: number | null;
       /** Custom Name */
       custom_name?: string | null;
     };
@@ -612,9 +999,16 @@ export interface components {
       name: string;
       /** Mark */
       mark: number;
+      /** Nsc Level */
+      nsc_level?: number | null;
       /** Custom Name */
       custom_name?: string | null;
     };
+    /**
+     * TitleEnum
+     * @enum {string}
+     */
+    TitleEnum: "Mr" | "Mrs" | "Ms" | "Miss" | "Dr" | "Prof" | "Mx" | "Other";
     /** UniversitiesListResponse */
     UniversitiesListResponse: {
       /** Items */
@@ -1055,6 +1449,88 @@ export interface operations {
       };
     };
   };
+  contacts_list: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ContactResponse"][];
+        };
+      };
+    };
+  };
+  contacts_upsert: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ContactWrite"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ContactResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  contacts_delete: {
+    parameters: {
+      query: {
+        contact_type: components["schemas"]["ContactType"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
   documents_upload: {
     parameters: {
       query?: never;
@@ -1286,6 +1762,107 @@ export interface operations {
       };
     };
   };
+  applications_field_mappings: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        application_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["FieldMappingRead"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  applications_consent: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        application_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ConsentRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApplicationRead"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  applications_supply_challenge: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        application_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ChallengeSupplyRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApplicationRead"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
   applications_retry: {
     parameters: {
       query?: never;
@@ -1303,7 +1880,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["ApplicationRead"];
         };
       };
       /** @description Validation Error */

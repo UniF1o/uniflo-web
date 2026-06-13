@@ -38,7 +38,7 @@ Phase 1 delivered seven feature tasks (auth SDK setup, app shell, auth screens, 
 | `.prettierignore`                      | New — excludes lockfiles, build output, env files, docs, generated types |
 | `.github/workflows/frontend.yml`       | Added `format:check` and `tsc --noEmit` CI steps                       |
 | `package.json`                         | Added `format` and `format:check` npm scripts                          |
-| `README.md`                            | Rewrote from create-next-app boilerplate to Uniflo-specific setup      |
+| `README.md`                            | Rewrote from create-next-app boilerplate to UniFlo-specific setup      |
 | _13 other files_                       | Whitespace-only reformats from the Prettier sweep                      |
 
 ---
@@ -67,7 +67,7 @@ An "Edit" link in the page header routes students back to `/profile/setup` to mo
 - `next=//evil.com/path` — protocol-relative, most browsers follow it to `evil.com`.
 - `next=/\evil.com` — backslash often normalises to forward slash in URL parsers, collapsing to `//evil.com`.
 
-Either shape would let an attacker craft a phishing link that sends a freshly authenticated Uniflo user, already holding a valid session cookie, to an attacker-controlled page.
+Either shape would let an attacker craft a phishing link that sends a freshly authenticated UniFlo user, already holding a valid session cookie, to an attacker-controlled page.
 
 **Fix.** A `safeNextPath()` helper validates with the regex `/^\/[^/\\]/`:
 
@@ -153,7 +153,7 @@ Note: no component-level tests yet — `@testing-library/react` is not a depende
 
 ### README
 
-Rewrote the create-next-app boilerplate with Uniflo-specific content: what the app is, the stack, getting-started steps (including the three required env vars), all five npm scripts, project layout, git workflow summary, and key contributing conventions (Supabase-managed auth, OpenAPI-generated API types, mobile-first, mandatory `gender`/`home_language`, locked `subjects` JSON contract).
+Rewrote the create-next-app boilerplate with UniFlo-specific content: what the app is, the stack, getting-started steps (including the three required env vars), all five npm scripts, project layout, git workflow summary, and key contributing conventions (Supabase-managed auth, OpenAPI-generated API types, mobile-first, mandatory `gender`/`home_language`, locked `subjects` JSON contract).
 
 ---
 
@@ -209,7 +209,7 @@ Once the PR is open the Vercel preview URL should be exercised through the full 
 
 ### Open-redirect regression test
 
-From a signed-out state, visit these URLs. All three must land on `/dashboard` (not on `evil.com`), and the whole URL bar must show the Uniflo origin:
+From a signed-out state, visit these URLs. All three must land on `/dashboard` (not on `evil.com`), and the whole URL bar must show the UniFlo origin:
 
 - `/auth/callback?code=<valid_code>&next=//evil.com`
 - `/auth/callback?code=<valid_code>&next=/\evil.com`
@@ -255,7 +255,7 @@ Eight commits on top of `main`, each scoped to a single concern:
 
 ```
 refactor(profile): consolidate gender and home-language enums
-docs: rewrite README with Uniflo-specific setup and layout
+docs: rewrite README with UniFlo-specific setup and layout
 test: cover cn() utility, drop empty placeholder
 feat(profile): add /profile overview page with read-only summary
 feat(auth): redirect signed-in users away from /login and /signup

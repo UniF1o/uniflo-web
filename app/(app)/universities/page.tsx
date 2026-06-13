@@ -37,7 +37,7 @@ export default async function UniversitiesPage() {
           Universities
         </h1>
         <p className="text-sm text-muted-foreground">
-          Browse universities Uniflo supports and select the ones you want to
+          Browse universities UniFlo supports and select the ones you want to
           apply to.
         </p>
       </div>

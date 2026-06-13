@@ -356,11 +356,11 @@ export function ProfileCompleteness() {
 
   return (
     <div className="space-y-8">
-      {/* How Uniflo works — shown until every section is complete */}
+      {/* How UniFlo works — shown until every section is complete */}
       {!allDone && (
         <div className="space-y-4">
           <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
-            How Uniflo works
+            How UniFlo works
           </h2>
           <div className="grid gap-4 sm:grid-cols-3">
             {HOW_IT_WORKS.map(({ step, title, body }) => (

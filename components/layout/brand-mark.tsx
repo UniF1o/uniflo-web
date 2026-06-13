@@ -1,4 +1,4 @@
-// BrandMark — the "Uniflo" wordmark in the display serif.
+// BrandMark — the "UniFlo" wordmark in the display serif.
 //
 // Single source of truth for the brand treatment (font, tracking, accent
 // sprout) so it looks identical in the navbar, auth layout, and landing.
@@ -14,9 +14,9 @@ export function BrandMark({ href = "/" }: { href?: string }) {
       // The coral sprout doodle is the brand signature — it picks up the
       // theme of growth ("starting your future") without being literal.
       className="group inline-flex items-baseline gap-1.5 font-display text-2xl leading-none tracking-tight text-foreground"
-      aria-label="Uniflo home"
+      aria-label="UniFlo home"
     >
-      <span>Uniflo</span>
+      <span>UniFlo</span>
       <Sprout
         // `origin-bottom` so the sway pivots from the stem rather than the
         // glyph centre, and the hover scale reads as a planted wiggle.

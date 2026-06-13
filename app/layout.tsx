@@ -1,4 +1,4 @@
-// Root layout — wraps the entire Uniflo app.
+// Root layout — wraps the entire UniFlo app.
 //
 // Loads all three project fonts via next/font (downloaded at build time,
 // served from our own origin — no runtime request to fonts.googleapis.com).
@@ -6,7 +6,7 @@
 // wire it up as a utility class (font-body / font-display / font-script).
 //
 // SEO: child routes export their own `metadata.title` as a short string
-// (e.g. "Dashboard") and the template here expands it to "Dashboard — Uniflo".
+// (e.g. "Dashboard") and the template here expands it to "Dashboard — UniFlo".
 import type { Metadata } from "next";
 import { Caveat, Geist, Instrument_Serif } from "next/font/google";
 import "./globals.css";
@@ -41,11 +41,11 @@ const caveat = Caveat({
 
 export const metadata: Metadata = {
   title: {
-    default: "Uniflo — Apply to SA universities, automated",
-    template: "%s — Uniflo",
+    default: "UniFlo — Apply to SA universities, automated",
+    template: "%s — UniFlo",
   },
   description:
-    "Uniflo helps South African students apply to multiple universities in one go. Fill in your details once, review every application, and let us handle the rest.",
+    "UniFlo helps South African students apply to multiple universities in one go. Fill in your details once, review every application, and let us handle the rest.",
 };
 
 export default function RootLayout({

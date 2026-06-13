@@ -12,6 +12,9 @@ export interface SelectionEntry {
   universityId: string;
   universityName: string;
   programme?: string;
+  // Up to two additional programme choices (the backend caps total choices at
+  // 3). `programme` above is always the 1st/primary choice.
+  additionalProgrammes?: string[];
   applicationYear?: number;
 }
 
@@ -21,7 +24,12 @@ type Action =
   | {
       type: "UPDATE";
       universityId: string;
-      patch: Partial<Pick<SelectionEntry, "programme" | "applicationYear">>;
+      patch: Partial<
+        Pick<
+          SelectionEntry,
+          "programme" | "additionalProgrammes" | "applicationYear"
+        >
+      >;
     }
   | { type: "CLEAR" };
 
@@ -49,7 +57,12 @@ interface SelectionContextValue {
   remove: (universityId: string) => void;
   update: (
     universityId: string,
-    patch: Partial<Pick<SelectionEntry, "programme" | "applicationYear">>,
+    patch: Partial<
+      Pick<
+        SelectionEntry,
+        "programme" | "additionalProgrammes" | "applicationYear"
+      >
+    >,
   ) => void;
   clear: () => void;
   isSelected: (universityId: string) => boolean;
@@ -76,7 +89,12 @@ export function SelectionProvider({ children }: { children: React.ReactNode }) {
   const update = useCallback(
     (
       universityId: string,
-      patch: Partial<Pick<SelectionEntry, "programme" | "applicationYear">>,
+      patch: Partial<
+        Pick<
+          SelectionEntry,
+          "programme" | "additionalProgrammes" | "applicationYear"
+        >
+      >,
     ) => dispatch({ type: "UPDATE", universityId, patch }),
     [],
   );

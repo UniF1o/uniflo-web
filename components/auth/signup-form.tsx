@@ -1,4 +1,4 @@
-// SignUpForm — creates a new Uniflo account.
+// SignUpForm — creates a new UniFlo account.
 //
 // Two paths to sign up:
 //   1. Email + password — calls supabase.auth.signUp().

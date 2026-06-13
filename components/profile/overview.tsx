@@ -24,6 +24,34 @@ import type { components } from "@/lib/api/schema";
 
 type ProfileResponse = components["schemas"]["StudentProfileResponse"];
 
+// ─── Row list ─────────────────────────────────────────────────────────────────
+
+// A label/value table. Shared by the core profile rows and the optional
+// "additional details" rows so both render identically.
+function RowList({
+  rows,
+}: {
+  rows: Array<{ label: string; value: string | null }>;
+}) {
+  return (
+    <dl className="divide-y divide-border rounded-lg border border-border">
+      {rows.map((row) => (
+        <div
+          key={row.label}
+          className="flex flex-col gap-1 px-5 py-4 sm:flex-row sm:items-center sm:gap-6"
+        >
+          <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground sm:w-40">
+            {row.label}
+          </dt>
+          <dd className="text-sm text-foreground sm:flex-1">
+            {row.value ?? <span className="text-muted-foreground">—</span>}
+          </dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 // Masks a 13-digit SA ID number to show only the first 6 digits (date of
@@ -158,21 +186,81 @@ export function ProfileOverview() {
     { label: "Ethnicity", value: profile.ethnicity ?? null },
   ];
 
+  // Renders a boolean as Yes/No, or null when the backend hasn't recorded it.
+  const yesNo = (v: boolean | null | undefined): string | null =>
+    v == null ? null : v ? "Yes" : "No";
+
+  const mailingAddress =
+    profile.mailing_same_as_residential === false
+      ? [
+          profile.mailing_street_address,
+          profile.mailing_suburb,
+          profile.mailing_city,
+          profile.mailing_province,
+          profile.mailing_postal_code,
+        ]
+          .filter(Boolean)
+          .join(", ") || null
+      : null;
+
+  const redressCount = profile.redress_factors
+    ? Object.keys(profile.redress_factors).length
+    : 0;
+
+  // Optional Phase-3 fields. Only the populated ones render, so students who
+  // skip this section don't see a wall of em-dashes.
+  const optionalRows: Array<{ label: string; value: string | null }> = [
+    { label: "Title", value: profile.title ?? null },
+    { label: "Middle names", value: profile.middle_names ?? null },
+    { label: "Maiden name", value: profile.maiden_name ?? null },
+    { label: "Preferred name", value: profile.preferred_name ?? null },
+    { label: "SA citizen", value: yesNo(profile.is_sa_citizen) },
+    { label: "Mailing address", value: mailingAddress },
+    { label: "Disability detail", value: profile.disability_detail ?? null },
+    {
+      label: "Assistance required",
+      value: profile.disability_assistance ?? null,
+    },
+    { label: "Current activity", value: profile.current_activity ?? null },
+    { label: "Exam number", value: profile.exam_number ?? null },
+    { label: "Sport", value: profile.sport ?? null },
+    { label: "Wants residence", value: yesNo(profile.wants_residence) },
+    {
+      label: "Preferred residence",
+      value: profile.preferred_residence ?? null,
+    },
+    { label: "Applying for NSFAS", value: yesNo(profile.applying_nsfas) },
+    {
+      label: "Institutional funding",
+      value: yesNo(profile.applying_institutional_funding),
+    },
+    { label: "NBT reference", value: profile.nbt_reference ?? null },
+    {
+      label: "NBT year",
+      value: profile.nbt_year != null ? String(profile.nbt_year) : null,
+    },
+    { label: "NBT date", value: formatDate(profile.nbt_date) },
+    {
+      label: "Redress factors",
+      value: redressCount > 0 ? `${redressCount} recorded` : null,
+    },
+  ].filter((row) => row.value != null);
+
   return (
-    <dl className="divide-y divide-border rounded-lg border border-border">
-      {rows.map((row) => (
-        <div
-          key={row.label}
-          className="flex flex-col gap-1 px-5 py-4 sm:flex-row sm:items-center sm:gap-6"
-        >
-          <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground sm:w-40">
-            {row.label}
-          </dt>
-          <dd className="text-sm text-foreground sm:flex-1">
-            {row.value ?? <span className="text-muted-foreground">—</span>}
-          </dd>
+    <div className="space-y-8">
+      <RowList rows={rows} />
+
+      {/* Additional, optional details — only shown once the student fills in
+       * at least one. These feed the portal automation but don't gate
+       * profile completeness. */}
+      {optionalRows.length > 0 && (
+        <div className="space-y-3">
+          <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+            Additional details
+          </h2>
+          <RowList rows={optionalRows} />
         </div>
-      ))}
-    </dl>
+      )}
+    </div>
   );
 }

@@ -17,7 +17,7 @@ export interface MarketingUniversity {
 
 // Featured universities surfaced on the landing-page marquee. Each carries
 // its actual brand colour so the row reads as six distinct institutions
-// rather than a uniform Uniflo grid. The Uniflo paper context is held by
+// rather than a uniform UniFlo grid. The UniFlo paper context is held by
 // the cream card surface, the editorial serif monogram, and the cream-
 // rather-than-white text inside the disc — those keep the chip on-brand
 // even though the disc fill comes from outside the palette.

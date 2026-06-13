@@ -107,7 +107,7 @@ Full rewrite. Sections, in order:
 5. Testimonials — 3 placeholder quote cards with "Accepted to …" success
    badges. Real quotes go in iteration 2.
 6. FAQ — two-column on `lg`, five items covering fees, deadlines,
-   passwords, what Uniflo does, and data safety.
+   passwords, what UniFlo does, and data safety.
 7. Closing CTA — `feature` card with gradient surface, Caveat lead-in,
    and dual CTAs.
 8. Footer — three-column on `md`+, with `BrandMark` + tagline + social
