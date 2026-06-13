@@ -9,3 +9,11 @@ const url =
 execSync(`npx openapi-typescript ${url} -o lib/api/schema.d.ts`, {
   stdio: "inherit",
 });
+
+// openapi-typescript emits single-line unions and its own indentation, which
+// does not match the repo's Prettier style. schema.d.ts is not in
+// .prettierignore, so an unformatted regen fails the CI format:check. Format it
+// here so `npm run types:api` always leaves the tree CI-clean.
+execSync(`npx prettier --write lib/api/schema.d.ts`, {
+  stdio: "inherit",
+});

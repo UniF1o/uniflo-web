@@ -593,6 +593,11 @@ export interface components {
     };
     /**
      * ContactType
+     * @description One captured contact covers all portals (the automation layer resolves
+     *     roles through fallback chains) — the frontend should ask for ONE
+     *     parent/guardian and offer a separate fee payer only as an opt-in
+     *     ("someone else pays my fees"); never ask for an emergency contact
+     *     (no portal needs a distinct person — Wits copies the next of kin).
      * @enum {string}
      */
     ContactType: "next_of_kin" | "fee_payer" | "guardian" | "emergency";
@@ -796,7 +801,7 @@ export interface components {
      * RecordType
      * @enum {string}
      */
-    RecordType: "grade_11_final" | "grade_12_april";
+    RecordType: "grade_11_final" | "grade_12_april" | "grade_12_june";
     /**
      * ReligionEnum
      * @enum {string}
