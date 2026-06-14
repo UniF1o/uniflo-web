@@ -77,7 +77,7 @@ export function UserMenu({ user, profileName }: UserMenuProps) {
         onClick={() => setIsOpen((o) => !o)}
         aria-haspopup="menu"
         aria-expanded={isOpen}
-        className="flex cursor-pointer items-center gap-2 rounded-full py-1 pl-1 pr-3 text-sm transition-colors hover:bg-muted"
+        className="flex cursor-pointer items-center gap-2 rounded-full py-1 pl-1 pr-3 text-sm transition-colors hover:bg-foreground/5"
       >
         {/* Avatar circle — navy bg + cream initials, matching the brand
          * accent role. The shadow gives it a tiny lift so it reads as a

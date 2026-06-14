@@ -18,6 +18,12 @@
   --color-card: #fffdf6; /* lifted paper — one step brighter than the page
                           * so cards visibly float instead of dissolving
                           * into the cream background */
+  --color-chrome: #efe7cd; /* recessed app chrome (sidebar + top bar) — a step
+                            * deeper than the page so the content canvas reads
+                            * as a brighter inset framed by the rails. Gives the
+                            * shell depth without a wash: chrome < page < card.
+                            * Interactive states on the chrome use cobalt/ink
+                            * tints, not --muted, since muted sits this close. */
   --color-foreground: #14182b; /* charcoal-blue ink, kept clearly distinct
                                 * from the navy accent below (~15:1 on bg) */
   --color-muted: #ede2cd; /* warm sand for muted surfaces */

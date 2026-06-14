@@ -25,14 +25,14 @@ export function Navbar({ user, profileName, onToggleSidebar }: NavbarProps) {
       // bg-background/80 + backdrop-blur gives a frosted-glass depth cue; the
       // `supports-[backdrop-filter]` query keeps the bar opaque on browsers
       // that don't support the blur (otherwise content shows through).
-      className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border/70 bg-background/80 px-4 backdrop-blur-md supports-[backdrop-filter]:bg-background/60 md:h-16 md:px-6"
+      className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border/70 bg-chrome/80 px-4 backdrop-blur-md supports-[backdrop-filter]:bg-chrome/60 md:h-16 md:px-6"
     >
       {/* Hamburger — mobile only (md:hidden). Opens the sidebar drawer. */}
       <button
         type="button"
         onClick={onToggleSidebar}
         aria-label="Open navigation"
-        className="-ml-2 inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-md text-foreground transition-colors hover:bg-muted md:hidden"
+        className="-ml-2 inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-md text-foreground transition-colors hover:bg-foreground/5 md:hidden"
       >
         <Menu size={20} />
       </button>
