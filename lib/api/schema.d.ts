@@ -668,6 +668,8 @@ export interface components {
       type: components["schemas"]["DocumentType"];
       /** Storage Url */
       storage_url: string;
+      /** Original Filename */
+      original_filename?: string | null;
       /**
        * Uploaded At
        * Format: date-time
