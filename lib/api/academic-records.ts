@@ -20,11 +20,12 @@ import type { components } from "@/lib/api/schema";
 export type RecordType = components["schemas"]["RecordType"];
 
 // Display name per record type. Keyed on the full enum so tsc forces an
-// entry here when the backend adds a type (grade_12_june is coming in
-// uniflo-api PR #49 — regenerate types once it's deployed).
+// entry here when the backend adds a type — this is how grade_12_june surfaced
+// after the uniflo-api spec landed it.
 export const RECORD_TYPE_LABELS: Record<RecordType, string> = {
   grade_11_final: "Grade 11 final",
   grade_12_april: "Grade 12 April",
+  grade_12_june: "Grade 12 June",
 };
 
 // POST /academic-records request body. `aggregate` is intentionally absent —

@@ -50,7 +50,7 @@ export function JourneyMini() {
               "h-1.5 flex-1 rounded-full transition-colors",
               stage.state === "complete" && "bg-primary",
               stage.state === "current" && "bg-primary/40",
-              stage.state === "upcoming" && "bg-muted",
+              stage.state === "upcoming" && "bg-foreground/15",
             )}
           />
         ))}

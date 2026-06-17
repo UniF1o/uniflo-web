@@ -137,11 +137,10 @@ function validateCertDate(dateStr: string): string | null {
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-// The backend stores uploads under generated ids and never records the
-// original file name, so we remember it client-side. Best-effort: the name
-// survives revisits on the same device/browser (the common "did I upload the
-// right file?" case) and silently degrades to timestamp-only elsewhere.
-// A cross-device fix needs an original_filename column on uniflo-api.
+// The documents API now persists original_filename, so the upload name shows
+// across devices. localStorage stays as a fallback only for documents uploaded
+// before that column existed (their API value is null), and only on the device
+// that uploaded them. Storage paths use generated ids, never this name.
 const DOC_NAME_STORE_KEY = "uniflo-document-names";
 
 function readStoredNames(): Partial<Record<DocumentType, string>> {
@@ -502,10 +501,10 @@ export function DocumentsUploadForm() {
             if (!(doc.type in next)) continue;
             next[doc.type] = {
               status: "uploaded",
-              // The documents table doesn't keep the original file name —
-              // fall back to the name remembered at upload time on this
-              // device, or timestamp-only when there isn't one.
-              fileName: storedNames[doc.type] ?? null,
+              // Prefer the name the API now persists; fall back to the name
+              // remembered on this device for pre-migration uploads (whose API
+              // value is null), then to timestamp-only.
+              fileName: doc.original_filename ?? storedNames[doc.type] ?? null,
               uploadedAt: doc.uploaded_at,
               progress: 100,
               error: null,

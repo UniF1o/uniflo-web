@@ -103,7 +103,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       <aside
         aria-label="Primary navigation"
         className={cn(
-          "fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-border bg-background transition-transform duration-200 ease-out",
+          "fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-border bg-chrome transition-transform duration-200 ease-out",
           "md:sticky md:top-0 md:min-h-full md:translate-x-0",
           isOpen ? "translate-x-0" : "-translate-x-full",
         )}
@@ -116,7 +116,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             type="button"
             onClick={onClose}
             aria-label="Close navigation"
-            className="-mr-2 inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-md text-foreground transition-colors hover:bg-muted"
+            className="-mr-2 inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-md text-foreground transition-colors hover:bg-foreground/5"
           >
             <X size={20} />
           </button>
@@ -153,7 +153,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                         "group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
                         isActive
                           ? "bg-primary/10 font-medium text-primary"
-                          : "text-foreground hover:bg-muted hover:text-primary",
+                          : "text-foreground hover:bg-primary/5 hover:text-primary",
                       )}
                     >
                       {/* Active indicator — small cobalt bar pinned to the

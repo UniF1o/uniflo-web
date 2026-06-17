@@ -92,7 +92,7 @@ export function UniversityCard({
         <h3 className="font-display text-lg leading-snug tracking-tight text-foreground">
           {university.name}
         </h3>
-        <Badge tone={statusTone} dot={status === "open"}>
+        <Badge tone={statusTone} dot={status === "open"} className="shrink-0">
           {statusLabel}
         </Badge>
       </div>

@@ -10,9 +10,7 @@ export const metadata: Metadata = {
 
 // One section per record type. Grade 11 final is the required baseline — it
 // feeds every university's subject grid. Grade 12 results are added as they
-// arrive during the year.
-// TODO: add grade_12_june here once uniflo-api PR #49's RecordType lands in
-// the deployed spec and types are regenerated.
+// arrive during the year: April first, then June mid-year marks.
 const SECTIONS: { type: RecordType; heading: string; description: string }[] = [
   {
     type: "grade_11_final",
@@ -24,6 +22,12 @@ const SECTIONS: { type: RecordType; heading: string; description: string }[] = [
     heading: "Grade 12 April results",
     description:
       "Add these once you have them. Universities use your most recent marks.",
+  },
+  {
+    type: "grade_12_june",
+    heading: "Grade 12 June results",
+    description:
+      "Add your mid-year marks once you have them. UCT uses these alongside your April results.",
   },
 ];
 
