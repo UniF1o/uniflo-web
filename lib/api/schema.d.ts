@@ -231,6 +231,40 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/universities/{university_id}/programmes": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List University Programmes */
+    get: operations["universities_programmes"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/recommendations": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Recommendations */
+    get: operations["recommendations_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/applications": {
     parameters: {
       query?: never;
@@ -697,6 +731,17 @@ export interface components {
       | "Asian"
       | "White"
       | "Other";
+    /** FacultyGroup */
+    FacultyGroup: {
+      /** Faculty Id */
+      faculty_id: string;
+      /** Faculty Name */
+      faculty_name: string;
+      /** Close Date */
+      close_date: string | null;
+      /** Programmes */
+      programmes: components["schemas"]["ProgrammeCatalogueItem"][];
+    };
     /**
      * FieldMappingEntryRead
      * @description One mapped field for the review screen. `flagged` == low confidence
@@ -777,6 +822,11 @@ export interface components {
      */
     MaritalStatusEnum: "Single" | "Married" | "Divorced" | "Widowed" | "Other";
     /**
+     * MatchStatus
+     * @enum {string}
+     */
+    MatchStatus: "qualifies" | "borderline" | "not_yet";
+    /**
      * PendingChallengeRead
      * @description An unanswered email challenge the run is waiting on — non-null while the
      *     status is `action_required`. The app shows one input per requested field
@@ -798,6 +848,61 @@ export interface components {
        * Format: date-time
        */
       created_at: string;
+    };
+    /** ProgrammeCatalogueItem */
+    ProgrammeCatalogueItem: {
+      /** Id */
+      id: string;
+      /** Name */
+      name: string;
+      /** Qualification Code */
+      qualification_code: string | null;
+      /** Min Aps */
+      min_aps: number | null;
+      /** Notes */
+      notes: string | null;
+    };
+    /** ProgrammeMatch */
+    ProgrammeMatch: {
+      /** Id */
+      id: string;
+      /** Name */
+      name: string;
+      /** Faculty */
+      faculty: string | null;
+      /** Qualification Code */
+      qualification_code: string | null;
+      /** Min Aps */
+      min_aps: number | null;
+      status: components["schemas"]["MatchStatus"];
+      /** Unmet Rules */
+      unmet_rules: components["schemas"]["UnmetRule"][];
+      /** Notes */
+      notes: string | null;
+    };
+    /** ProgrammesCatalogueResponse */
+    ProgrammesCatalogueResponse: {
+      /** University Id */
+      university_id: string;
+      /** Intake Year */
+      intake_year: number;
+      /** Faculties */
+      faculties: components["schemas"]["FacultyGroup"][];
+    };
+    /** RecommendationsResponse */
+    RecommendationsResponse: {
+      /** University Id */
+      university_id: string;
+      /** Intake Year */
+      intake_year: number;
+      /** Record Type Used */
+      record_type_used: string;
+      /** Aps */
+      aps: number;
+      /** Aps Max */
+      aps_max: number;
+      /** Programmes */
+      programmes: components["schemas"]["ProgrammeMatch"][];
     };
     /**
      * RecordType
@@ -1040,6 +1145,15 @@ export interface components {
       close_date?: string | null;
       /** Is Active */
       is_active: boolean;
+    };
+    /** UnmetRule */
+    UnmetRule: {
+      /** Requirement */
+      requirement: string;
+      /** Have */
+      have: string;
+      /** Shortfall */
+      shortfall: string;
     };
     /** UserCreatedPayload */
     UserCreatedPayload: {
@@ -1672,6 +1786,72 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["UniversityRead"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  universities_programmes: {
+    parameters: {
+      query?: {
+        intake_year?: number | null;
+      };
+      header?: never;
+      path: {
+        university_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ProgrammesCatalogueResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  recommendations_get: {
+    parameters: {
+      query: {
+        university_id: string;
+        record_type?: string | null;
+        intake_year?: number | null;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RecommendationsResponse"];
         };
       };
       /** @description Validation Error */
