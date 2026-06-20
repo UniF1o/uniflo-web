@@ -57,15 +57,22 @@ Header reads: `Your APS: 34 / 42` (UP) or `Your FPS: 450 / 600` (UCT), always fr
 
 ## Verification (2026-06-20)
 
-Production build (`npm run build` + `npm run start`), authenticated as jane.doe.test26@gmail.com.
+Full Playwright MCP browser pass on the production build (`npm run start`), authenticated as jane.doe.test26@gmail.com. Jane's academic record updated to `grade_12_june` with APS 35/42 to exercise all three status groups.
 
-- `/courses` loads with UP selected, APS 13 / 42, "Matched on your grade 11 final results"
-- Programmes grouped under NOT YET (APS 13 qualifies for nothing at UP — expected)
-- Cards render name + faculty + qualification type + duration + gap list
-- Sidebar "Courses" active state highlights correctly
-- CI: ESLint (0 errors) + Prettier + `tsc --noEmit` + Vitest 34/34 + build all green
+**Desktop (1280px)**
+- `/dashboard`: "Courses" in sidebar under Applying, "See what you qualify for" CTA card visible
+- `/courses`: UP selected by default, APS 35/42, "Matched on your grade 12 june results"
+- Faculty filter chips visible and horizontally scrollable; "Engineering, Built Environment and IT" chip activates (cobalt) and filters results to QUALIFIES · 12
+- QUALIFIES · 110 and BORDERLINE sections show cards with name, badge, faculty, qual type + duration, gap list, Apply buttons
+- NOT YET · 1 collapsed to a single row by default — expand/collapse toggles correctly
+- Apply CTA on qualifying card → `/applications/new` with programme pre-filled ("Bachelor of Engineering [5-year ENGAGE]") and year "2027" from `intake_year`
+- UCT: FPS 427/600 score label, UCT faculty chips, programmes now seeded (UCT data loaded since initial build)
 
-Playwright MCP was unavailable for UCT empty state, mobile (375px), and Apply CTA walkthrough due to the MCP process disconnecting on server restart. The Vercel preview on this PR is the substitute for those passes.
+**Tablet (768px)**: 2-column card grid, sidebar visible, chips scroll horizontally — no layout overflow
+
+**Mobile (375px)**: hamburger menu, full-width picker, single-column cards, chips horizontally scrollable
+
+**CI**: ESLint (0 errors, 2 pre-existing warnings), Prettier clean, `tsc --noEmit` clean, Vitest 34/34 green
 
 ---
 
