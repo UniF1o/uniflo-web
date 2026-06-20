@@ -20,6 +20,7 @@ import {
   GraduationCap,
   NotebookPen,
   ClipboardList,
+  BookOpen,
   Settings,
   X,
 } from "lucide-react";
@@ -70,6 +71,7 @@ const NAV_GROUPS: readonly NavGroup[] = [
     label: "Applying",
     items: [
       { href: "/universities", label: "Universities", icon: GraduationCap },
+      { href: "/courses", label: "Courses", icon: BookOpen },
       { href: "/applications", label: "Applications", icon: ClipboardList },
     ],
   },
