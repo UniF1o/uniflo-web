@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { BookOpen } from "lucide-react";
+import { BookOpen, ChevronDown, ChevronUp } from "lucide-react";
 import { ApiError } from "@/lib/api/client";
 import {
   getRecommendations,
@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Section } from "@/components/ui/section";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils/cn";
 import type { components } from "@/lib/api/schema";
 
 type University = components["schemas"]["UniversityRead"];
@@ -57,7 +58,6 @@ interface CoursesViewProps {
   universities: University[];
   defaultUniversityId: string;
   initialData: RecommendationsResponse | null;
-  // True when the initial server fetch returned 409 no_academic_record.
   initialNoRecord: boolean;
 }
 
@@ -75,6 +75,8 @@ export function CoursesView({
   const [loading, setLoading] = useState(false);
   const [noRecord, setNoRecord] = useState(initialNoRecord);
   const [error, setError] = useState<string | null>(null);
+  const [selectedFaculty, setSelectedFaculty] = useState<string | null>(null);
+  const [notYetExpanded, setNotYetExpanded] = useState(false);
 
   const selectedUni = universities.find((u) => u.id === selectedUniId);
 
@@ -83,6 +85,8 @@ export function CoursesView({
     setError(null);
     setNoRecord(false);
     setData(null);
+    setSelectedFaculty(null);
+    setNotYetExpanded(false);
     try {
       const result = await getRecommendations(universityId);
       setData(result);
@@ -120,17 +124,29 @@ export function CoursesView({
     router.push("/applications/new");
   }
 
-  // Group programmes by status, preserving backend order within each group.
+  // Unique sorted faculties from all programmes — drives the filter strip.
+  const faculties = data
+    ? [...new Set(data.programmes.map((p) => p.faculty))].sort()
+    : [];
+
+  const visibleProgrammes = data
+    ? data.programmes.filter(
+        (p) => !selectedFaculty || p.faculty === selectedFaculty,
+      )
+    : [];
+
   const groups =
-    data && data.programmes.length > 0
+    visibleProgrammes.length > 0
       ? STATUS_ORDER.map((status) => ({
           status,
-          programmes: data.programmes.filter((p) => p.status === status),
+          programmes: visibleProgrammes.filter((p) => p.status === status),
         })).filter((g) => g.programmes.length > 0)
       : [];
 
+  const hasResults = !loading && groups.length > 0;
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* University picker */}
       <div className="max-w-sm">
         <label
@@ -153,7 +169,7 @@ export function CoursesView({
         </select>
       </div>
 
-      {/* Score summary line — shown when data is available */}
+      {/* Score summary + record type */}
       {data && (
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <p className="text-sm text-foreground">
@@ -169,6 +185,45 @@ export function CoursesView({
           <p className="text-xs text-muted-foreground">
             Matched on your {recordTypeLabel(data.record_type_used)} results
           </p>
+        </div>
+      )}
+
+      {/* Faculty filter chips — only shown when results are available */}
+      {data && faculties.length > 1 && (
+        <div
+          className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          role="group"
+          aria-label="Filter by faculty"
+        >
+          <button
+            type="button"
+            onClick={() => setSelectedFaculty(null)}
+            className={cn(
+              "inline-flex shrink-0 items-center rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors",
+              selectedFaculty === null
+                ? "bg-primary text-background"
+                : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground",
+            )}
+          >
+            All faculties
+          </button>
+          {faculties.map((faculty) => (
+            <button
+              key={faculty}
+              type="button"
+              onClick={() =>
+                setSelectedFaculty(selectedFaculty === faculty ? null : faculty)
+              }
+              className={cn(
+                "inline-flex shrink-0 items-center rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors",
+                selectedFaculty === faculty
+                  ? "bg-primary text-background"
+                  : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground",
+              )}
+            >
+              {faculty}
+            </button>
+          ))}
         </div>
       )}
 
@@ -226,7 +281,7 @@ export function CoursesView({
         </div>
       )}
 
-      {/* No programmes seeded for this university */}
+      {/* No programmes seeded */}
       {!loading &&
         !error &&
         !noRecord &&
@@ -243,31 +298,77 @@ export function CoursesView({
           </Card>
         )}
 
-      {/* Results grouped by status */}
-      {!loading && groups.length > 0 && (
+      {/* No match for current faculty filter */}
+      {!loading &&
+        data &&
+        data.programmes.length > 0 &&
+        visibleProgrammes.length === 0 && (
+          <Card variant="paper" className="px-6 py-8 text-center">
+            <p className="text-sm text-muted-foreground">
+              No programmes in this faculty to show.
+            </p>
+          </Card>
+        )}
+
+      {/* Results */}
+      {hasResults && (
         <div className="space-y-8">
           {groups.map(({ status, programmes }) => {
             const { label } = MATCH_STATUS_BADGE[status];
+            const isNotYet = status === "not_yet";
+
             return (
-              <Section key={status} kicker={label}>
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {programmes.map((p) => (
-                    <CourseCard
-                      key={p.id}
-                      programme={p}
-                      onApply={
-                        p.status === "qualifies" || p.status === "borderline"
-                          ? handleApply
-                          : undefined
-                      }
+              <Section key={status} kicker={`${label} · ${programmes.length}`}>
+                {isNotYet && !notYetExpanded ? (
+                  // Collapsed "Not yet" — a single quiet row instead of a wall of cards.
+                  <button
+                    type="button"
+                    onClick={() => setNotYetExpanded(true)}
+                    className="flex w-full items-center justify-between rounded-xl border border-border bg-card px-5 py-4 text-left transition-colors hover:border-foreground/20"
+                  >
+                    <span className="text-sm text-muted-foreground">
+                      {programmes.length} programme
+                      {programmes.length === 1 ? "" : "s"} you don&apos;t
+                      qualify for yet
+                    </span>
+                    <ChevronDown
+                      size={16}
+                      aria-hidden
+                      className="shrink-0 text-muted-foreground"
                     />
-                  ))}
-                </div>
+                  </button>
+                ) : (
+                  <>
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                      {programmes.map((p) => (
+                        <CourseCard
+                          key={p.id}
+                          programme={p}
+                          onApply={
+                            p.status === "qualifies" ||
+                            p.status === "borderline"
+                              ? handleApply
+                              : undefined
+                          }
+                        />
+                      ))}
+                    </div>
+                    {isNotYet && (
+                      <button
+                        type="button"
+                        onClick={() => setNotYetExpanded(false)}
+                        className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+                      >
+                        <ChevronUp size={14} aria-hidden />
+                        Collapse
+                      </button>
+                    )}
+                  </>
+                )}
               </Section>
             );
           })}
 
-          {/* Disclaimer */}
           <p className="text-xs leading-relaxed text-muted-foreground">
             Matching is based on published programme requirements and your
             current marks. The university makes the final admission decision —
