@@ -327,9 +327,9 @@ export function CoursesView({
                     className="flex w-full items-center justify-between rounded-xl border border-border bg-card px-5 py-4 text-left transition-colors hover:border-foreground/20"
                   >
                     <span className="text-sm text-muted-foreground">
-                      {programmes.length} programme
-                      {programmes.length === 1 ? "" : "s"} you don&apos;t
-                      qualify for yet
+                      {programmes.length}{" "}
+                      {programmes.length === 1 ? "programme" : "programmes"} you
+                      don&apos;t qualify for yet
                     </span>
                     <ChevronDown
                       size={16}
