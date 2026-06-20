@@ -857,6 +857,10 @@ export interface components {
       name: string;
       /** Qualification Code */
       qualification_code: string | null;
+      /** Qualification Type */
+      qualification_type?: string | null;
+      /** Duration Years */
+      duration_years?: number | null;
       /** Min Aps */
       min_aps: number | null;
       /** Notes */
@@ -872,6 +876,10 @@ export interface components {
       faculty: string | null;
       /** Qualification Code */
       qualification_code: string | null;
+      /** Qualification Type */
+      qualification_type?: string | null;
+      /** Duration Years */
+      duration_years?: number | null;
       /** Min Aps */
       min_aps: number | null;
       status: components["schemas"]["MatchStatus"];
@@ -1145,6 +1153,8 @@ export interface components {
       close_date?: string | null;
       /** Is Active */
       is_active: boolean;
+      /** Scoring Method */
+      scoring_method?: string | null;
     };
     /** UnmetRule */
     UnmetRule: {
