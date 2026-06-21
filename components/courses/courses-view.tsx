@@ -215,7 +215,7 @@ export function CoursesView({
           {/* Left fade + arrow */}
           {showLeft && (
             <>
-              <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-gradient-to-r from-background to-transparent" />
+              <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-8 bg-gradient-to-r from-background to-transparent" />
               <button
                 type="button"
                 onClick={() =>
@@ -232,7 +232,7 @@ export function CoursesView({
           <div
             ref={chipsRef}
             onScroll={updateArrows}
-            className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="flex gap-2 overflow-x-auto px-8 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             role="group"
             aria-label="Filter by faculty"
           >
@@ -272,7 +272,7 @@ export function CoursesView({
           {/* Right fade + arrow */}
           {showRight && (
             <>
-              <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-background to-transparent" />
+              <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-gradient-to-l from-background to-transparent" />
               <button
                 type="button"
                 onClick={() =>
