@@ -37,7 +37,7 @@ export function AppShell({ user, profileName, children }: AppShellProps) {
 
   return (
     // Flex column: navbar fixed to top, sidebar + main filling the remaining height.
-    <div className="flex min-h-dvh flex-col">
+    <div className="flex h-dvh flex-col">
       <Navbar
         user={user}
         profileName={profileName}

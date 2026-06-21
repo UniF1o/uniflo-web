@@ -10,6 +10,42 @@
 
 ---
 
+## Contract update (2026-06-20) — read before Task 2
+
+Backend Tasks 1-5 are merged and deployed (`uniflo-api` #53-#59). The contract
+grew and the data landed since Task 1 was generated (#33, 2026-06-18), so the
+deployed spec now differs from our committed `schema.d.ts`. What changed and what
+it means for us:
+
+- **`ProgrammeMatch` and `ProgrammeCatalogueItem` gained two optional fields:**
+  `qualification_type` (`"degree" | "diploma" | "higher_certificate"`, nullable)
+  and `duration_years` (int, nullable). Additive and nullable, so nothing breaks,
+  but our generated `schema.d.ts` predates them — **Task 2 must re-run
+  `npm run types:api`** in its branch to pull them. Extended programmes (e.g. UP
+  ENGAGE) are not a separate type; they are a longer `duration_years` (4-5 vs 3).
+  Surface these on the card (see Task 2).
+- **Multi-university is now real, not a pilot.** UP (120 programmes), UJ (177),
+  and Wits (56) are seeded and live; UCT is active in `/universities` but its
+  catalogue currently returns **zero programmes** (seed pending/not yet run
+  against prod). So the "no programmes yet" empty state is exercised today by UCT,
+  and the page is genuinely multi-university. Default the picker to UP (the
+  most-checked example data); the others are just entries in the picker.
+- **`aps` / `aps_max` are generic, and `aps_max` varies by university.** Never
+  hardcode a denominator: UP's max is ~42, Wits ~56, **UCT uses Faculty Points
+  Score out of 600** (the field is still named `aps`). Always render
+  `{aps} / {aps_max}` from the response.
+- **Open question — the score label.** The response carries no label for the
+  score, so a literal "Your APS" kicker mislabels UCT (which calls it FPS). The
+  page is meant to be university-agnostic. Preferred fix: ask Partner B to add a
+  small `score_label` string to `RecommendationsResponse` (e.g. "APS", "Faculty
+  Points Score") so we render it verbatim. Fallback with no backend change: use
+  neutral wording ("Your score: 34 / 600"). Decide before building the header.
+- **No-impact changes:** #56's "prospectus freshness" pipeline is seed-side only
+  no new response field. `FacultyGroup.close_date` (per-faculty deadline) rides on
+  the catalogue endpoint and is a Phase 5 concern, not Phase 4.
+
+---
+
 ## Orientation for a fresh session (read these first)
 
 Written so an agent starting cold (repo access, no chat history) can execute it.
@@ -50,9 +86,10 @@ open a **Courses** page and see, for a university, every relevant programme tagg
 straight into the existing apply flow with the programme pre-filled.
 
 The backend (`uniflo-api`) owns the data and the matching; the frontend renders the
-result and routes the student onward. We launch on **one university — University of
-Pretoria (UP)** — to match the backend pilot, but the page is built so more
-universities are just data appearing in the picker, not new code.
+result and routes the student onward. UP was the pilot, but the
+backend has since seeded **UP, UJ, and Wits** (UCT is active but not yet seeded),
+which proves the original design intent: more universities are just data appearing
+in the picker, not new code. Default the picker to UP; the rest light up as data.
 
 ### Foundation note — this sets up Phase 5 structured selection
 
@@ -180,7 +217,14 @@ before committing. Drop a per-task write-up in `docs/phase-4/` as
 ---
 
 ## Task 1 — Types + data wiring
-**Branch:** `feature/phase-4-types`
+**Branch:** `feature/phase-4-types` — **DONE (merged PR #33, 2026-06-18).**
+
+> ⚠️ The contract has grown since this merged (`qualification_type`,
+> `duration_years` — see Contract update). `schema.d.ts` is now stale. **Task 2
+> re-runs `npm run types:api` in its own branch** to refresh it; no separate
+> types PR needed. `lib/api/recommendations.ts` (aliases + `MATCH_STATUS_BADGE` +
+> `getRecommendations`/`recommendationsPath`) is unaffected — the new fields flow
+> through the re-export automatically.
 
 Small gating task: get the contract into the codebase before building UI.
 
@@ -215,13 +259,19 @@ The new screen at `/courses` (plain-noun title "Courses", per the design lock).
   `record_type_used` (e.g. caption "Matched on your Grade 12 June results").
 - [ ] `components/courses/course-card.tsx` (presentational): programme `name`,
   `faculty`, the status `Badge`, and — when `unmet_rules` is non-empty — a compact
-  gap list ("Needs Mathematics 65%, you have 58%"). If the programme has a `notes`
-  value (additional requirements, e.g. "Also requires: NBT"), show it as an
+  gap list ("Needs Mathematics 65%, you have 58%"). Add a small meta line from the
+  new fields when present: `qualification_type` ("Degree" / "Diploma" / "Higher
+  certificate") and `duration_years` ("4 years") — these distinguish a diploma
+  from a degree and flag extended programmes (4-5 years). If the programme has a
+  `notes` value (additional requirements, e.g. "Also requires: NBT"), show it as an
   informational line that does **not** affect the badge. Reuse `Card` (paper variant,
   hairline border, hover lift) to match `university-card.tsx`.
 - [ ] Group with `Section` headers: **Qualifies**, **Borderline**, **Not yet**;
-  preserve backend order within each. Show the student's APS in the `PageHeader`
-  description or a `Section` kicker ("Your APS: 34 / 42").
+  preserve backend order within each. Show the student's score in the `PageHeader`
+  description or a `Section` kicker, always as `{aps} / {aps_max}` from the response
+  (never a hardcoded denominator — UCT's max is 600, not 42). Label per the score-
+  label decision in Contract update (prefer a backend `score_label`; fallback to
+  neutral "Your score").
 - [ ] Show a brief **disclaimer** near the results: matching is based on published
   requirements and the student's current marks, and the university's portal makes the
   final decision (requirements change; provisional marks are provisional). Keep it
@@ -230,7 +280,9 @@ The new screen at `/courses` (plain-noun title "Courses", per the design lock).
   - `409 no_academic_record` -> "Add your subjects to see what you qualify for"
     with a link to `/academic-records`.
   - University with no programmes seeded -> "Course matching is not available yet
-    for this university."
+    for this university." This triggers on an empty `programmes` array, not an
+    error — UCT exercises it today (active but unseeded). Confirm with Partner B
+    whether `/recommendations` 200s-empty or 404s for such a university.
   - Error -> retry affordance (same pattern as `university-list.tsx`).
   - Loading on picker/toggle change -> `Skeleton`s shaped like the cards.
 
@@ -346,5 +398,11 @@ None new. The page uses the existing `NEXT_PUBLIC_API_URL` and Supabase config, 
   (empty vs 404) — drives the picker's "not available yet" copy.
 - **Resolve before Task 3:** confirm the `applicationYear` the Apply CTA should
   pre-fill (reuse the same valid-year rule the Phase 2 application form enforces).
-- **Pilot scope:** only UP has data at launch; make the single-university reality
-  read as intentional ("More universities coming"), not broken.
+- **Resolve before Task 2 (score label):** the response has no label for `aps` /
+  `aps_max`, so "Your APS" mislabels UCT (Faculty Points Score, out of 600).
+  Prefer a small backend `score_label` string on `RecommendationsResponse`;
+  fallback is neutral "Your score" wording. See Contract update.
+- **Coverage (updated 2026-06-20):** UP/UJ/Wits are seeded and live; UCT is active
+  but returns zero programmes (seed pending). No longer a single-university pilot:
+  the picker is genuinely multi-university, and the "not available yet" empty state
+  is live for UCT. Keep that state reading as intentional, not broken.

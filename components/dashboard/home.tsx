@@ -19,6 +19,7 @@ import Link from "next/link";
 import {
   ArrowRight,
   BellRing,
+  BookOpen,
   CalendarClock,
   CheckCircle2,
   CircleHelp,
@@ -470,6 +471,39 @@ function DeadlinesSection({
   );
 }
 
+// ─── Courses CTA ─────────────────────────────────────────────────────────────
+
+function CoursesCta() {
+  return (
+    <Card
+      variant="paper"
+      className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between"
+    >
+      <div className="flex items-start gap-3">
+        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
+          <BookOpen size={17} aria-hidden />
+        </span>
+        <div className="space-y-0.5">
+          <p className="text-sm font-medium text-foreground">
+            See what you qualify for
+          </p>
+          <p className="text-xs leading-relaxed text-muted-foreground">
+            Browse every programme you are eligible for based on your current
+            marks.
+          </p>
+        </div>
+      </div>
+      <Link
+        href="/courses"
+        className="inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80"
+      >
+        View courses
+        <ArrowRight size={14} aria-hidden />
+      </Link>
+    </Card>
+  );
+}
+
 // ─── DashboardHome ───────────────────────────────────────────────────────────
 
 export function DashboardHome() {
@@ -533,6 +567,7 @@ export function DashboardHome() {
       {setupDone ? (
         <>
           <ActivityNudge />
+          <CoursesCta />
           <ApplicationsOverview universityNames={universityNames} />
           <DeadlinesSection universities={universities} />
         </>

@@ -857,10 +857,28 @@ export interface components {
       name: string;
       /** Qualification Code */
       qualification_code: string | null;
+      /** Qualification Type */
+      qualification_type?: string | null;
+      /** Duration Years */
+      duration_years?: number | null;
       /** Min Aps */
       min_aps: number | null;
       /** Notes */
       notes: string | null;
+      combination?: components["schemas"]["ProgrammeCombination"] | null;
+    };
+    /** ProgrammeCombination */
+    ProgrammeCombination: {
+      /** Majors Min */
+      majors_min?: number | null;
+      /** Majors Max */
+      majors_max?: number | null;
+      /** Co Majors */
+      co_majors?: string[] | null;
+      /** Excludes */
+      excludes?: string[] | null;
+      /** Rule */
+      rule?: string | null;
     };
     /** ProgrammeMatch */
     ProgrammeMatch: {
@@ -872,6 +890,10 @@ export interface components {
       faculty: string | null;
       /** Qualification Code */
       qualification_code: string | null;
+      /** Qualification Type */
+      qualification_type?: string | null;
+      /** Duration Years */
+      duration_years?: number | null;
       /** Min Aps */
       min_aps: number | null;
       status: components["schemas"]["MatchStatus"];
@@ -879,6 +901,7 @@ export interface components {
       unmet_rules: components["schemas"]["UnmetRule"][];
       /** Notes */
       notes: string | null;
+      combination?: components["schemas"]["ProgrammeCombination"] | null;
     };
     /** ProgrammesCatalogueResponse */
     ProgrammesCatalogueResponse: {
@@ -1145,6 +1168,8 @@ export interface components {
       close_date?: string | null;
       /** Is Active */
       is_active: boolean;
+      /** Scoring Method */
+      scoring_method?: string | null;
     };
     /** UnmetRule */
     UnmetRule: {
