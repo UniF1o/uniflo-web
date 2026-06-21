@@ -865,6 +865,20 @@ export interface components {
       min_aps: number | null;
       /** Notes */
       notes: string | null;
+      combination?: components["schemas"]["ProgrammeCombination"] | null;
+    };
+    /** ProgrammeCombination */
+    ProgrammeCombination: {
+      /** Majors Min */
+      majors_min?: number | null;
+      /** Majors Max */
+      majors_max?: number | null;
+      /** Co Majors */
+      co_majors?: string[] | null;
+      /** Excludes */
+      excludes?: string[] | null;
+      /** Rule */
+      rule?: string | null;
     };
     /** ProgrammeMatch */
     ProgrammeMatch: {
@@ -887,6 +901,7 @@ export interface components {
       unmet_rules: components["schemas"]["UnmetRule"][];
       /** Notes */
       notes: string | null;
+      combination?: components["schemas"]["ProgrammeCombination"] | null;
     };
     /** ProgrammesCatalogueResponse */
     ProgrammesCatalogueResponse: {
