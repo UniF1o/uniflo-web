@@ -211,30 +211,38 @@ export function CoursesView({
 
       {/* Faculty filter chips — only shown when results are available */}
       {data && faculties.length > 1 && (
-        <div className="relative">
-          {/* Left fade + arrow */}
-          {showLeft && (
-            <>
-              <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-8 bg-gradient-to-r from-background to-transparent" />
-              <button
-                type="button"
-                onClick={() =>
-                  chipsRef.current?.scrollBy({ left: -180, behavior: "smooth" })
-                }
-                aria-label="Scroll faculties left"
-                className="absolute left-0 top-1/2 z-20 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-sm hover:bg-muted"
-              >
-                <ChevronLeft size={12} aria-hidden />
-              </button>
-            </>
-          )}
+        <div className="flex items-center gap-2">
+          {/* Left arrow — always occupies its space; invisible + inert when not needed */}
+          <button
+            type="button"
+            onClick={() =>
+              chipsRef.current?.scrollBy({ left: -180, behavior: "smooth" })
+            }
+            aria-label="Scroll faculties left"
+            className={cn(
+              "flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-sm transition-opacity hover:bg-muted",
+              !showLeft && "pointer-events-none opacity-0",
+            )}
+          >
+            <ChevronLeft size={12} aria-hidden />
+          </button>
 
           <div
             ref={chipsRef}
             onScroll={updateArrows}
-            className="flex gap-2 overflow-x-auto px-8 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="flex min-w-0 flex-1 gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             role="group"
             aria-label="Filter by faculty"
+            style={{
+              maskImage:
+                showLeft && showRight
+                  ? "linear-gradient(to right, transparent 0, black 24px, black calc(100% - 24px), transparent 100%)"
+                  : showLeft
+                    ? "linear-gradient(to right, transparent 0, black 24px)"
+                    : showRight
+                      ? "linear-gradient(to right, black calc(100% - 24px), transparent 100%)"
+                      : undefined,
+            }}
           >
             <button
               type="button"
@@ -269,22 +277,20 @@ export function CoursesView({
             ))}
           </div>
 
-          {/* Right fade + arrow */}
-          {showRight && (
-            <>
-              <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-gradient-to-l from-background to-transparent" />
-              <button
-                type="button"
-                onClick={() =>
-                  chipsRef.current?.scrollBy({ left: 180, behavior: "smooth" })
-                }
-                aria-label="Scroll faculties right"
-                className="absolute right-0 top-1/2 z-20 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-sm hover:bg-muted"
-              >
-                <ChevronRight size={12} aria-hidden />
-              </button>
-            </>
-          )}
+          {/* Right arrow */}
+          <button
+            type="button"
+            onClick={() =>
+              chipsRef.current?.scrollBy({ left: 180, behavior: "smooth" })
+            }
+            aria-label="Scroll faculties right"
+            className={cn(
+              "flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-sm transition-opacity hover:bg-muted",
+              !showRight && "pointer-events-none opacity-0",
+            )}
+          >
+            <ChevronRight size={12} aria-hidden />
+          </button>
         </div>
       )}
 
