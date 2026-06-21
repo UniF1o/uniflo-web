@@ -1,9 +1,15 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { BookOpen, ChevronDown, ChevronUp } from "lucide-react";
+import {
+  BookOpen,
+  ChevronDown,
+  ChevronUp,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { ApiError } from "@/lib/api/client";
 import {
   getRecommendations,
@@ -77,6 +83,21 @@ export function CoursesView({
   const [error, setError] = useState<string | null>(null);
   const [selectedFaculty, setSelectedFaculty] = useState<string | null>(null);
   const [notYetExpanded, setNotYetExpanded] = useState(false);
+
+  const chipsRef = useRef<HTMLDivElement>(null);
+  const [showLeft, setShowLeft] = useState(false);
+  const [showRight, setShowRight] = useState(false);
+
+  const updateArrows = useCallback(() => {
+    const el = chipsRef.current;
+    if (!el) return;
+    setShowLeft(el.scrollLeft > 0);
+    setShowRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 1);
+  }, []);
+
+  useEffect(() => {
+    updateArrows();
+  }, [data, updateArrows]);
 
   const selectedUni = universities.find((u) => u.id === selectedUniId);
 
@@ -190,40 +211,80 @@ export function CoursesView({
 
       {/* Faculty filter chips — only shown when results are available */}
       {data && faculties.length > 1 && (
-        <div
-          className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-          role="group"
-          aria-label="Filter by faculty"
-        >
-          <button
-            type="button"
-            onClick={() => setSelectedFaculty(null)}
-            className={cn(
-              "inline-flex shrink-0 items-center rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors",
-              selectedFaculty === null
-                ? "bg-primary text-background"
-                : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground",
-            )}
+        <div className="relative">
+          {/* Left fade + arrow */}
+          {showLeft && (
+            <>
+              <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-gradient-to-r from-background to-transparent" />
+              <button
+                type="button"
+                onClick={() =>
+                  chipsRef.current?.scrollBy({ left: -180, behavior: "smooth" })
+                }
+                aria-label="Scroll faculties left"
+                className="absolute left-0 top-1/2 z-20 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-sm hover:bg-muted"
+              >
+                <ChevronLeft size={12} aria-hidden />
+              </button>
+            </>
+          )}
+
+          <div
+            ref={chipsRef}
+            onScroll={updateArrows}
+            className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            role="group"
+            aria-label="Filter by faculty"
           >
-            All faculties
-          </button>
-          {faculties.map((faculty) => (
             <button
-              key={faculty}
               type="button"
-              onClick={() =>
-                setSelectedFaculty(selectedFaculty === faculty ? null : faculty)
-              }
+              onClick={() => setSelectedFaculty(null)}
               className={cn(
                 "inline-flex shrink-0 items-center rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors",
-                selectedFaculty === faculty
+                selectedFaculty === null
                   ? "bg-primary text-background"
                   : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground",
               )}
             >
-              {faculty}
+              All faculties
             </button>
-          ))}
+            {faculties.map((faculty) => (
+              <button
+                key={faculty}
+                type="button"
+                onClick={() =>
+                  setSelectedFaculty(
+                    selectedFaculty === faculty ? null : faculty,
+                  )
+                }
+                className={cn(
+                  "inline-flex shrink-0 items-center rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors",
+                  selectedFaculty === faculty
+                    ? "bg-primary text-background"
+                    : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground",
+                )}
+              >
+                {faculty}
+              </button>
+            ))}
+          </div>
+
+          {/* Right fade + arrow */}
+          {showRight && (
+            <>
+              <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-background to-transparent" />
+              <button
+                type="button"
+                onClick={() =>
+                  chipsRef.current?.scrollBy({ left: 180, behavior: "smooth" })
+                }
+                aria-label="Scroll faculties right"
+                className="absolute right-0 top-1/2 z-20 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-sm hover:bg-muted"
+              >
+                <ChevronRight size={12} aria-hidden />
+              </button>
+            </>
+          )}
         </div>
       )}
 
