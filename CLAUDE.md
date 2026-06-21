@@ -10,7 +10,7 @@ For full detail on architecture decisions, schema, and the build plan, refer to 
 - `docs/build-action-plan.md` — phased build plan, partner split, phase status, MVP scope
 - `docs/git-github-workflow.md` — branching strategy, PR process, commit conventions
 
-Per-task write-ups live in `docs/phase-1/` (all complete) and `docs/phase-2/` (in progress). `docs/phase-1/phase-0-1-review.md` is the cross-phase audit that closed out Phase 1. `docs/phase-2/task-1-openapi-types.md` covers the Task 1 type generation work. `docs/phase-2/task-2-universities-browse.md` covers the Task 2 university browse and search page. `docs/phase-2/task-3-university-selection.md` covers the Task 3 selection state and selection bar. `docs/phase-2/task-4-application-form.md` covers the Task 4 programme/year form. `docs/phase-2/task-5-application-review.md` covers the Task 5 review and submit flow. `docs/phase-2/task-6-applications-dashboard.md` covers the Task 6 application status dashboard.
+Per-task write-ups live under `docs/phase-1/` through `docs/phase-5/`, one file per task or feature, following the pattern set in `docs/phase-1/`. `docs/phase-1/phase-0-1-review.md` is the cross-phase audit that closed out Phase 1; later phases carry their own `phase-<N>-review.md` and task docs. The per-phase plan for each phase is `docs/phase-<N>/partner-a-phase-<N>-plan.md`, with the backend sibling at `uniflo-api/docs/phase-<N>/partner-b-phase-<N>-plan.md`.
 
 ---
 
@@ -24,9 +24,18 @@ This repo is owned by **Partner A (Frontend)**. The backend lives in a separate 
 
 ## Current Phase
 
-**Phase 0 and Phase 1 are complete on the frontend side.** A student can sign up (email/password or Google OAuth), complete the multi-step profile setup, add academic records, upload documents, and see a dashboard with completeness plus a read-only `/profile` overview.
+> **Note:** the executed phase track diverged from `docs/build-action-plan.md`'s
+> original numbering (which called Phase 4 "beta hardening"). See that file's "Phase
+> numbering note" for the reconciliation. The summary below follows the executed track.
 
-**Phase 2 is in progress.** Tasks 1–6 are complete. Task 1 (`feature/openapi-types`) — `openapi-typescript` is wired, `lib/api/schema.d.ts` covers the full contract, `lib/api/client.ts` is the shared fetch wrapper. Task 2 (`feature/universities-browse`) — `/universities` page with server-side initial fetch, debounced search, skeleton loading, and status pills. Task 3 (`feature/university-selection`) — `lib/state/selection.tsx` context with add/remove/update/clear, sticky `SelectionBar`, card toggle UI, and `SelectionGuard` for the deep-link guard on `/applications/new`. Task 4 (`feature/application-form`) — `ApplicationFieldset` per selected university with programme/year validation, reactive Review button, and context write-back. Task 5 (`feature/application-review`) — `ReviewScreen` at `/applications/review` with profile/records/documents completeness checks, consent checkbox, sequential POST to `/applications`, and redirect to dashboard on success. Task 6 (`feature/applications-dashboard`) — `/applications` list with `StatusBadge`, Refresh button, relative timestamps, and `/applications/[id]` detail with retry. Task 7 (`feature/phase-2-polish`) — consolidate `formatDate`/`REQUIRED_DOC_TYPES` into shared utils/constants, a11y fixes, dynamic metadata on detail page, Phase 2 review doc. Phase 2 is complete. Phase 3 is next. See `docs/phase-2/partner-a-phase-2-plan.md` for the full task breakdown.
+**Phases 0–4 are complete on the frontend side.**
+
+- **Phase 0–1** — sign up (email/password or Google OAuth), multi-step profile setup, academic records, document upload, a dashboard with completeness, and a read-only `/profile` overview.
+- **Phase 2** — `/universities` browse + search, selection state (`lib/state/selection.tsx`), the per-university application form, `/applications/review`, and the `/applications` status dashboard. The apply flow runs end to end against the real API.
+- **Phase 3** — the confidence-scoring / field-mapping review UI, the submission-proof screen, and the failure/retry + email-challenge handling that sit on top of the backend's real Playwright automation.
+- **Phase 4** — the `/courses` page: per-university qualification matching (Qualifies / Borderline / Not yet) from `GET /recommendations`, with an Apply handoff into the existing flow.
+
+**Phase 5 is planned (next up):** structured programme selection (a uni → faculty → course picker carrying `programme_id`, replacing the free-text programme box) and applicant-type inclusivity (`grade_12_final` records plus relaxing the "currently in Grade 12" apply gate). Full breakdown in `docs/phase-5/partner-a-phase-5-plan.md`; the backend sibling is `uniflo-api/docs/phase-5/partner-b-phase-5-plan.md`.
 
 ---
 

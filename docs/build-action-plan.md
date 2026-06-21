@@ -5,15 +5,31 @@ UniFlo is a South African university application automation platform. Students f
 
 ## Phase Status At a Glance
 
-| Phase | Status |
-|-------|--------|
-| Phase 0 — Foundation | ✅ Complete |
-| Phase 1 — Auth, profiles, documents | ✅ Frontend complete (backend tracked separately in `uniflo-api`) |
-| Phase 2 — Universities & application flow | ⏳ Next up |
-| Phase 3 — Automation layer | ⏳ Not started |
-| Phase 4 — Beta hardening & launch | ⏳ Not started |
+> **Phase numbering note (read this).** The executed build diverged from this plan's
+> original numbering. Phases 0–3 ran as planned. An unplanned **Phase 4 — Courses &
+> qualification matching** (the `/recommendations` engine + `/courses` page) was then
+> built, and the structured-selection + applicant-type-inclusivity work became
+> **Phase 5**. The original "Phase 4 — Beta hardening & launch" was **deferred** and now
+> sits *after* Phase 5 (its detailed section is kept below, under its original heading,
+> with a deferred banner). The detailed phase sections further down still use the
+> original numbering and estimates; the table here is the source of truth for *what ran
+> and in what order*, and the per-phase plan docs
+> (`docs/phase-<N>/partner-*-phase-<N>-plan.md` and task write-ups) are authoritative
+> for per-task status.
 
-Per-task Phase 1 write-ups (design decisions, what changed during implementation) live in `docs/phase-1/`. The cross-phase audit is `docs/phase-1/phase-0-1-review.md`.
+| Phase | Focus | Status |
+|-------|-------|--------|
+| Phase 0 — Foundation | Tooling, CI/CD, deploy pipeline | ✅ Complete |
+| Phase 1 — Auth, profiles, documents | Sign-up, profile, academic records, uploads | ✅ Complete |
+| Phase 2 — Universities & application flow | Browse, select, review, submit (fake automation) | ✅ Complete |
+| Phase 3 — Automation layer | Real Playwright adapters (UJ, UP, Wits, UCT) + Claude field mapping | ✅ Complete |
+| Phase 4 — Courses & qualification matching | `/recommendations` engine + `/courses` page | ✅ Complete |
+| Phase 5 — Structured selection & applicant-type inclusivity | `programme_id` picker + `grade_12_final` applicants | ⏳ Planned (next up) — see `docs/phase-5/` |
+| Beta hardening & launch | POPIA, security audit, load test, paid tiers (the original "Phase 4") | ⏳ Deferred |
+
+Per-task write-ups live under `docs/phase-1/` through `docs/phase-5/`. The cross-phase
+audit that closed out Phase 1 is `docs/phase-1/phase-0-1-review.md`; later phases carry
+their own `phase-<N>-review.md` / task docs.
 
 ---
 
@@ -172,6 +188,7 @@ A student can sign up, complete their profile, and upload their documents. Data 
 **Duration:** Weeks 6–8
 **Goal:** Students can select universities and trigger applications. The full user flow works end to end, even though automation is not real yet.
 **Reference tag: `[PHASE-2]`**
+**Status: ✅ Complete.** The unchecked boxes below predate completion; `docs/phase-2/` task write-ups are the authoritative record.
 
 ### Database Schema Extension — Both Partners
 ```
@@ -217,6 +234,7 @@ Full user flow works: signup → profile → select universities → select prog
 **Duration:** Weeks 9–14
 **Goal:** Real Playwright adapters for 3–5 universities. Actual form submission happening. This is the MVP.
 **Reference tag: `[PHASE-3]`**
+**Status: ✅ Complete.** Adapters for UJ, UP, Wits, UCT live in `uniflo-api/app/automation/`. The unchecked boxes below predate completion; the `uniflo-api` Phase 3 docs and portal research are authoritative.
 
 ### Preparation — Both Partners
 Before writing any Playwright or AI code:
@@ -265,6 +283,12 @@ A real student can apply to at least 3 SA universities through UniFlo. Real brow
 **Goal:** The product is stable, secure, and ready for real students.
 **Reference tag: `[PHASE-4]`**
 
+> ⚠️ **Deferred + renumbered.** This section is the *original* Phase 4. In the executed
+> track the `[PHASE-4]` slot was taken by Courses & qualification matching, and beta
+> hardening was pushed out to **after Phase 5**. The work below is still required before
+> a real-student launch; treat it as the next major effort once Phase 5 ships. It no
+> longer holds the `[PHASE-4]` tag in practice.
+
 ### Infrastructure Upgrades Before Beta
 - [ ] Upgrade Vercel Hobby → Vercel Pro ($20/month) — required for commercial use
 - [ ] Upgrade Supabase free → Supabase Pro ($25/month) — required for guaranteed uptime
@@ -295,9 +319,14 @@ Real matric students are using UniFlo. Applications are being submitted. Feedbac
 ---
 
 ## Post-MVP Roadmap
-These phases follow after a successful beta. Order may shift based on user feedback.
+These follow after a successful beta. Order may shift based on user feedback.
 
-| Phase | Focus |
+> The numbers below are a **priority-ordered backlog**, not executed phase numbers. The
+> executed track has already used "Phase 4" (Courses) and "Phase 5" (structured
+> selection + inclusivity) for product work that was originally unplanned, so read this
+> column as backlog rank, not a phase tag.
+
+| Backlog # | Focus |
 |-------|-------|
 | 5 | Payments — PayFast once-off + recurring subscription |
 | 6 | Subscription features — deadline tracking, notification centre, Supabase Realtime |
@@ -313,13 +342,19 @@ These phases follow after a successful beta. Order may shift based on user feedb
 
 ## Timeline Summary
 
+> Durations below are the original estimates. Rows 4–5 reflect the **executed** track
+> (Courses, then structured selection + inclusivity), which were not in the original
+> timeline; beta hardening moved to after Phase 5.
+
 | Phase | Focus | Duration |
 |-------|-------|----------|
 | 0 `[PHASE-0]` | Foundation & setup | Weeks 1–2 |
 | 1 `[PHASE-1]` | Auth, profiles, documents | Weeks 3–5 |
 | 2 `[PHASE-2]` | University data & application flow | Weeks 6–8 |
 | 3 `[PHASE-3]` | Automation layer + AI | Weeks 9–14 |
-| 4 `[PHASE-4]` | Beta hardening & launch | Weeks 15–18 |
+| 4 `[PHASE-4]` | Courses & qualification matching | Executed (not in original timeline) |
+| 5 `[PHASE-5]` | Structured selection & applicant-type inclusivity | Planned |
+| — | Beta hardening & launch (the original Phase 4) | Deferred to after Phase 5 |
 
 ---
 
