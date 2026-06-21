@@ -33,8 +33,12 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env
 
-# Claude Code session data
-.claude/
+# Claude Code session data (local only — skills are shared via the exception below)
+.claude/*
+!.claude/skills/
+!.claude/skills/**
+.claude/skills/**/__pycache__/
+.claude/skills/**/*.pyc
 
 # Playwright MCP verification artefacts (screenshots + snapshots)
 .playwright-mcp/
