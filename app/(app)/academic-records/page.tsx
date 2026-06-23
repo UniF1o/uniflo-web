@@ -10,7 +10,8 @@ export const metadata: Metadata = {
 
 // One section per record type. Grade 11 final is the required baseline — it
 // feeds every university's subject grid. Grade 12 results are added as they
-// arrive during the year: April first, then June mid-year marks.
+// arrive. grade_12_final is for students who have already completed matric
+// (gap-year, prior-year school-leaver).
 const SECTIONS: { type: RecordType; heading: string; description: string }[] = [
   {
     type: "grade_11_final",
@@ -28,6 +29,12 @@ const SECTIONS: { type: RecordType; heading: string; description: string }[] = [
     heading: "Grade 12 June results",
     description:
       "Add your mid-year marks once you have them. UCT uses these alongside your April results.",
+  },
+  {
+    type: "grade_12_final",
+    heading: "Grade 12 final results",
+    description:
+      "Already completed matric? Enter your certified NSC results here. These are used instead of April or June marks.",
   },
 ];
 

@@ -70,6 +70,21 @@ export function recommendationsPath(
   return `/recommendations?${params.toString()}`;
 }
 
+// Builds the `/universities/{id}/programmes` path. The catalogue endpoint is
+// public — no JWT needed, fetched like the universities list.
+export function programmeCataloguePath(universityId: string): string {
+  return `/universities/${universityId}/programmes`;
+}
+
+// Client-side fetch for the programme catalogue (no auth required).
+export function getProgrammeCatalogue(
+  universityId: string,
+): Promise<ProgrammesCatalogueResponse> {
+  return apiClient.get<ProgrammesCatalogueResponse>(
+    programmeCataloguePath(universityId),
+  );
+}
+
 // Client-side fetch (attaches the Supabase JWT via `apiClient`). Used for
 // picker / record-toggle re-fetches; the first paint is server-fetched.
 export function getRecommendations(

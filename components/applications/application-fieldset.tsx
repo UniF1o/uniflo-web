@@ -1,7 +1,10 @@
 import { Plus, Trash2 } from "lucide-react";
-import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import {
+  ProgrammePicker,
+  type PickerValue,
+} from "@/components/applications/programme-picker";
 import type { SelectionEntry } from "@/lib/state/selection";
 
 const CURRENT_YEAR = new Date().getFullYear();
@@ -27,17 +30,16 @@ const ADD_BUTTON_LABELS = [
 
 interface ApplicationFieldsetProps {
   entry: SelectionEntry;
-  programme: string;
-  additionalProgrammes: string[];
+  programme: PickerValue;
+  additionalProgrammes: PickerValue[];
   year: string;
   errors: {
     programme?: string;
     year?: string;
-    // Parallel to additionalProgrammes — errors[i] is the error for slot i.
     additionalProgrammes?: (string | undefined)[];
   };
-  onProgrammeChange: (value: string) => void;
-  onAdditionalChange: (index: number, value: string) => void;
+  onProgrammeChange: (value: PickerValue) => void;
+  onAdditionalChange: (index: number, value: PickerValue) => void;
   onAddProgramme: () => void;
   onRemoveProgramme: (index: number) => void;
   onYearChange: (value: string) => void;
@@ -63,32 +65,26 @@ export function ApplicationFieldset({
         {entry.universityName}
       </h3>
 
-      <Input
+      <ProgrammePicker
         id={`programme-${entry.universityId}`}
         label="Programme (1st choice)"
-        type="text"
-        placeholder="e.g. BSc Computer Science"
+        universityId={entry.universityId}
         value={programme}
-        onChange={(e) => onProgrammeChange(e.target.value)}
+        onChange={onProgrammeChange}
         error={errors.programme}
       />
 
       {/* Additional programme choices — each removable. The portal automation
        * applies for these in order if the primary choice isn't offered. */}
       {additionalProgrammes.map((value, i) => (
-        <div
-          key={i}
-          className="flex items-end gap-2"
-          // Align the trash button baseline with the input (label adds height).
-        >
+        <div key={i} className="flex items-end gap-2">
           <div className="flex-1">
-            <Input
+            <ProgrammePicker
               id={`programme-${entry.universityId}-additional-${i}`}
               label={ADDITIONAL_LABELS[i]}
-              type="text"
-              placeholder="e.g. BCom Accounting"
+              universityId={entry.universityId}
               value={value}
-              onChange={(e) => onAdditionalChange(i, e.target.value)}
+              onChange={(v) => onAdditionalChange(i, v)}
               error={errors.additionalProgrammes?.[i]}
             />
           </div>

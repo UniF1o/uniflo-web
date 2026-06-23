@@ -146,9 +146,21 @@ export function ReviewScreen({
         await apiClient.post("/applications", {
           university_id: entry.universityId,
           programme: entry.programme!,
+          // Send programme_id when the student picked from the catalogue;
+          // omit it for the free-text fallback (id stays null).
+          ...(entry.programmeId ? { programme_id: entry.programmeId } : {}),
           // Only send additional choices when the student added any.
           ...(entry.additionalProgrammes?.length
-            ? { additional_programmes: entry.additionalProgrammes }
+            ? {
+                additional_programmes: entry.additionalProgrammes,
+                // Parallel additional ids — only non-null ids are sent.
+                ...(entry.additionalProgrammeIds?.some(Boolean)
+                  ? {
+                      additional_programme_ids:
+                        entry.additionalProgrammeIds.map((id) => id ?? null),
+                    }
+                  : {}),
+              }
             : {}),
           application_year: entry.applicationYear!,
         });
@@ -343,18 +355,17 @@ export function ReviewScreen({
       {automationBlocked && (
         <Alert
           tone="warning"
-          title="Automated applications aren't available for your situation yet"
+          title="Automated applications are not available for your situation yet"
         >
-          UniFlo currently only submits on behalf of students in Grade 12, and
-          your profile says you&apos;re &ldquo;{profile?.current_activity}
-          &rdquo;. Please apply directly on each university&apos;s portal, or{" "}
+          UniFlo cannot submit on behalf of students currently at university or
+          transferring. Please apply directly on each portal, or{" "}
           <Link
             href="/profile/edit"
             className="font-medium underline underline-offset-2"
           >
             update your profile
           </Link>{" "}
-          if this has changed.
+          if your situation has changed.
         </Alert>
       )}
 

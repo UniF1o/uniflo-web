@@ -19,10 +19,9 @@ export default async function NewApplicationPage() {
   } = await supabase.auth.getSession();
   const token = session?.access_token ?? null;
 
-  // The automation only supports students currently in Grade 12 — running it
-  // for anyone else fails server-side ("form_submit_failed"), so blocked
-  // students are stopped here rather than after a doomed submission. A failed
-  // profile fetch falls open: the review screen re-checks before posting.
+  // Block applicants the automation cannot handle (at-university, upgrading).
+  // Gap-year and employed applicants are supported from Phase 5 onwards.
+  // A failed profile fetch falls open — the review screen re-checks before posting.
   const profileResult = await serverApiGet<StudentProfileResponse>(
     "/profile",
     token,
@@ -40,12 +39,11 @@ export default async function NewApplicationPage() {
         <Alert
           tone="warning"
           role="status"
-          title="Automated applications aren't available for your situation yet"
+          title="Automated applications are not available for your situation yet"
         >
-          UniFlo currently only submits on behalf of students in Grade 12, and
-          your profile says you&apos;re &ldquo;{activity}&rdquo;. Please apply
-          directly on each university&apos;s portal. You&apos;ll find the portal
-          links on the{" "}
+          UniFlo cannot submit on behalf of students currently at university or
+          transferring. Please apply directly on each portal. You&apos;ll find
+          portal links on the{" "}
           <Link
             href="/universities"
             className="font-medium underline underline-offset-2"
