@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { ArrowRight, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -10,6 +13,8 @@ export interface CareerCardProps {
 }
 
 export function CareerCard({ career, onViewProgrammes }: CareerCardProps) {
+  const [expanded, setExpanded] = useState(false);
+
   return (
     <Card
       variant="paper"
@@ -37,10 +42,24 @@ export function CareerCard({ career, onViewProgrammes }: CareerCardProps) {
         </span>
       </div>
 
-      {/* Description */}
-      <p className="line-clamp-3 text-xs leading-relaxed text-muted-foreground">
-        {career.description}
-      </p>
+      {/* Description with see more */}
+      <div>
+        <p
+          className={cn(
+            "text-xs leading-relaxed text-muted-foreground",
+            !expanded && "line-clamp-3",
+          )}
+        >
+          {career.description}
+        </p>
+        <button
+          type="button"
+          onClick={() => setExpanded((v) => !v)}
+          className="mt-0.5 text-[0.65rem] font-medium text-primary hover:text-primary/80"
+        >
+          {expanded ? "See less" : "See more"}
+        </button>
+      </div>
 
       {/* Compensation */}
       <p className="text-xs font-medium text-foreground">
@@ -53,14 +72,13 @@ export function CareerCard({ career, onViewProgrammes }: CareerCardProps) {
         {career.employability.outlook}
       </p>
 
-      {/* Recommended subjects */}
-      {career.recommended_subjects &&
-        career.recommended_subjects.length > 0 && (
-          <p className="text-xs text-muted-foreground">
-            <span className="font-medium text-foreground">Recommended: </span>
-            {career.recommended_subjects.join(", ")}
-          </p>
-        )}
+      {/* Required subjects */}
+      {career.required_subjects && career.required_subjects.length > 0 && (
+        <p className="text-xs text-muted-foreground">
+          <span className="font-medium text-foreground">Requires: </span>
+          {career.required_subjects.join(", ")}
+        </p>
+      )}
 
       {/* Programmes CTA */}
       <Button

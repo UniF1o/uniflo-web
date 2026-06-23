@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { serverApiGet } from "@/lib/api/server";
 import { careersPath } from "@/lib/api/careers";
 import { PageHeader } from "@/components/layout/page-header";
+import { Alert } from "@/components/ui/alert";
 import { CareersView } from "@/components/careers/careers-view";
 import type { components } from "@/lib/api/schema";
 
@@ -21,6 +22,7 @@ export default async function CareersPage() {
 
   let initialData: CareersListResponse | null = null;
   let initialNoRecord = false;
+  let initialError: string | null = null;
 
   if (token) {
     const result = await serverApiGet<CareersListResponse>(
@@ -31,6 +33,8 @@ export default async function CareersPage() {
       initialData = result.data;
     } else if (result.status === 409) {
       initialNoRecord = true;
+    } else {
+      initialError = "Couldn't load careers. Please try again.";
     }
   }
 
@@ -42,6 +46,7 @@ export default async function CareersPage() {
         description="Explore careers matched to the subjects you already take, then see which university programmes lead there."
       />
 
+      {initialError && <Alert tone="destructive">{initialError}</Alert>}
       <CareersView
         initialData={initialData}
         initialNoRecord={initialNoRecord}

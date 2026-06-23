@@ -650,8 +650,11 @@ export interface components {
       description: string;
       compensation: components["schemas"]["CompensationOut"];
       employability: components["schemas"]["EmployabilityOut"];
-      /** Recommended Subjects */
-      recommended_subjects?: string[] | null;
+      /**
+       * Required Subjects
+       * @default []
+       */
+      required_subjects: string[];
     };
     /** CareerUniversityGroup */
     CareerUniversityGroup: {
