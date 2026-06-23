@@ -33,14 +33,12 @@ export const CURRENT_ACTIVITY_OPTIONS: EnumOption[] = [
   { value: "Other", label: "Other" },
 ];
 
-// Activities the portal automation refuses to run for — the portal forms
-// would misreport these students, so the backend fails the run with
-// "form_submit_failed". The apply flow blocks them up front instead.
-// (Unset and "Other" are allowed; "Currently in Grade 12" is the happy path.)
+// Activities the portal automation cannot handle. The backend blocks these
+// with "at-university" or "upgrader" errors. Gap-year and employed applicants
+// are now supported (completed-matric branch, Phase 5).
+// Must match the server's _guard_applicant_type permit set exactly.
 export const AUTOMATION_BLOCKED_ACTIVITIES: readonly string[] = [
   "Upgrading matric",
-  "Gap year",
-  "Employed",
   "At university",
 ];
 

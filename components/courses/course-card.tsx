@@ -12,7 +12,7 @@ const QUALIFICATION_LABELS: Record<string, string> = {
   higher_certificate: "Higher Certificate",
 };
 
-interface CourseCardProps {
+export interface CourseCardProps {
   programme: ProgrammeMatch;
   onApply?: (programme: ProgrammeMatch) => void;
 }

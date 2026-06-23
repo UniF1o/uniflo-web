@@ -458,6 +458,8 @@ export interface components {
       choice_number: number;
       /** Programme */
       programme: string;
+      /** Programme Id */
+      programme_id?: string | null;
       /** Eligible */
       eligible?: boolean | null;
     };
@@ -470,8 +472,12 @@ export interface components {
       university_id: string;
       /** Programme */
       programme: string;
+      /** Programme Id */
+      programme_id?: string | null;
       /** Additional Programmes */
       additional_programmes?: string[] | null;
+      /** Additional Programme Ids */
+      additional_programme_ids?: string[] | null;
       /** Application Year */
       application_year: number;
     };
@@ -516,6 +522,8 @@ export interface components {
       university_id: string;
       /** Programme */
       programme: string;
+      /** Programme Id */
+      programme_id?: string | null;
       /** Application Year */
       application_year: number;
       status: components["schemas"]["ApplicationStatus"] | null;
@@ -931,7 +939,11 @@ export interface components {
      * RecordType
      * @enum {string}
      */
-    RecordType: "grade_11_final" | "grade_12_april" | "grade_12_june";
+    RecordType:
+      | "grade_11_final"
+      | "grade_12_april"
+      | "grade_12_june"
+      | "grade_12_final";
     /**
      * ReligionEnum
      * @enum {string}

@@ -540,9 +540,12 @@ export function AcademicRecordsForm({
         return;
       }
 
-      // First-time Grade 11 save (onboarding): advance to document upload.
-      // Updates and other types: stay and show success.
-      if (recordType === "grade_11_final" && !hadExisting) {
+      // First-time Grade 11 or Grade 12 final save (onboarding): advance to
+      // document upload. Updates and all other types: stay and show success.
+      if (
+        (recordType === "grade_11_final" || recordType === "grade_12_final") &&
+        !hadExisting
+      ) {
         router.push("/documents");
       } else {
         setHadExisting(true);

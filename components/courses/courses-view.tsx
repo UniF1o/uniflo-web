@@ -132,6 +132,7 @@ export function CoursesView({
     if (isSelected(selectedUniId)) {
       update(selectedUniId, {
         programme: programme.name,
+        programmeId: programme.id,
         applicationYear: year,
       });
     } else {
@@ -139,6 +140,7 @@ export function CoursesView({
         universityId: selectedUniId,
         universityName: selectedUni?.name ?? "",
         programme: programme.name,
+        programmeId: programme.id,
         applicationYear: year,
       });
     }

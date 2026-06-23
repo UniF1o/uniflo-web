@@ -12,9 +12,14 @@ export interface SelectionEntry {
   universityId: string;
   universityName: string;
   programme?: string;
+  // Catalogue FK — set when the student picks from the structured picker;
+  // null/undefined for the free-text fallback path.
+  programmeId?: string | null;
   // Up to two additional programme choices (the backend caps total choices at
   // 3). `programme` above is always the 1st/primary choice.
   additionalProgrammes?: string[];
+  // Parallel to additionalProgrammes — ids ride alongside names, index-aligned.
+  additionalProgrammeIds?: (string | null)[];
   applicationYear?: number;
 }
 
@@ -27,7 +32,11 @@ type Action =
       patch: Partial<
         Pick<
           SelectionEntry,
-          "programme" | "additionalProgrammes" | "applicationYear"
+          | "programme"
+          | "programmeId"
+          | "additionalProgrammes"
+          | "additionalProgrammeIds"
+          | "applicationYear"
         >
       >;
     }
@@ -60,7 +69,11 @@ interface SelectionContextValue {
     patch: Partial<
       Pick<
         SelectionEntry,
-        "programme" | "additionalProgrammes" | "applicationYear"
+        | "programme"
+        | "programmeId"
+        | "additionalProgrammes"
+        | "additionalProgrammeIds"
+        | "applicationYear"
       >
     >,
   ) => void;
@@ -92,7 +105,11 @@ export function SelectionProvider({ children }: { children: React.ReactNode }) {
       patch: Partial<
         Pick<
           SelectionEntry,
-          "programme" | "additionalProgrammes" | "applicationYear"
+          | "programme"
+          | "programmeId"
+          | "additionalProgrammes"
+          | "additionalProgrammeIds"
+          | "applicationYear"
         >
       >,
     ) => dispatch({ type: "UPDATE", universityId, patch }),
