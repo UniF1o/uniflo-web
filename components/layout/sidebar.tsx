@@ -21,6 +21,7 @@ import {
   NotebookPen,
   ClipboardList,
   BookOpen,
+  Compass,
   Settings,
   X,
 } from "lucide-react";
@@ -66,6 +67,10 @@ const NAV_GROUPS: readonly NavGroup[] = [
       { href: "/documents", label: "Documents", icon: FileText },
       { href: "/contacts", label: "Contacts", icon: Users },
     ],
+  },
+  {
+    label: "Discover",
+    items: [{ href: "/careers", label: "Careers", icon: Compass }],
   },
   {
     label: "Applying",

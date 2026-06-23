@@ -265,6 +265,40 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/careers": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Careers */
+    get: operations["careers_list"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/careers/{career_id}/programmes": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Career Programmes */
+    get: operations["careers_programmes_list"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/applications": {
     parameters: {
       query?: never;
@@ -564,6 +598,81 @@ export interface components {
       file: string;
       document_type: components["schemas"]["DocumentType"];
     };
+    /** CareerProgrammeMatch */
+    CareerProgrammeMatch: {
+      /** Id */
+      id: string;
+      /** Name */
+      name: string;
+      /** Faculty */
+      faculty?: string | null;
+      /** Qualification Type */
+      qualification_type?: string | null;
+      /** Duration Years */
+      duration_years?: number | null;
+      /** Min Aps */
+      min_aps?: number | null;
+      /** Status */
+      status: string;
+      /**
+       * Unmet Rules
+       * @default []
+       */
+      unmet_rules: unknown[];
+      /** Notes */
+      notes?: string | null;
+    };
+    /** CareerProgrammesResponse */
+    CareerProgrammesResponse: {
+      /** Career Id */
+      career_id: string;
+      /** Career Title */
+      career_title: string;
+      /** Universities */
+      universities: components["schemas"]["CareerUniversityGroup"][];
+      /**
+       * Tvet Only
+       * @default false
+       */
+      tvet_only: boolean;
+    };
+    /** CareerRead */
+    CareerRead: {
+      /** Id */
+      id: string;
+      /** Slug */
+      slug: string;
+      /** Title */
+      title: string;
+      /** Industry */
+      industry: string;
+      /** Description */
+      description: string;
+      compensation: components["schemas"]["CompensationOut"];
+      employability: components["schemas"]["EmployabilityOut"];
+      /** Recommended Subjects */
+      recommended_subjects?: string[] | null;
+    };
+    /** CareerUniversityGroup */
+    CareerUniversityGroup: {
+      /** University Id */
+      university_id: string;
+      /** University Name */
+      university_name: string;
+      /** Scoring Method */
+      scoring_method?: string | null;
+      /** Aps */
+      aps: number;
+      /** Aps Max */
+      aps_max: number;
+      /** Programmes */
+      programmes: components["schemas"]["CareerProgrammeMatch"][];
+    };
+    /** CareersListResponse */
+    CareersListResponse: {
+      /** Careers */
+      careers: components["schemas"]["CareerRead"][];
+    };
     /**
      * ChallengeSupplyRequest
      * @description The student's answer to a pending challenge: one value per requested
@@ -574,6 +683,21 @@ export interface components {
       values: {
         [key: string]: string;
       };
+    };
+    /** CompensationOut */
+    CompensationOut: {
+      /** Entry */
+      entry: number;
+      /** Mid */
+      mid: number;
+      /** Senior */
+      senior: number;
+      /** Currency */
+      currency: string;
+      /** Period */
+      period: string;
+      /** Display */
+      display: string;
     };
     /**
      * ConsentRequest
@@ -728,6 +852,17 @@ export interface components {
       | "TRANSCRIPT"
       | "GRADE12_APRIL"
       | "GRADE11_RESULTS";
+    /** EmployabilityOut */
+    EmployabilityOut: {
+      /** Demand */
+      demand: string;
+      /** Outlook */
+      outlook: string;
+      /** Pathways */
+      pathways: string[];
+      /** Employment Note */
+      employment_note?: string | null;
+    };
     /**
      * EthnicityEnum
      * @enum {string}
@@ -1889,6 +2024,70 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["RecommendationsResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  careers_list: {
+    parameters: {
+      query?: {
+        intake_year?: number | null;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CareersListResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  careers_programmes_list: {
+    parameters: {
+      query?: {
+        intake_year?: number | null;
+      };
+      header?: never;
+      path: {
+        career_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CareerProgrammesResponse"];
         };
       };
       /** @description Validation Error */
