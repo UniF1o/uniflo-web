@@ -8,7 +8,12 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { LogOut, User as UserIcon, ChevronDown } from "lucide-react";
+import {
+  LogOut,
+  User as UserIcon,
+  ChevronDown,
+  LayoutDashboard,
+} from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils/cn";
@@ -16,9 +21,10 @@ import { cn } from "@/lib/utils/cn";
 interface UserMenuProps {
   user: User;
   profileName?: string;
+  isAdmin?: boolean;
 }
 
-export function UserMenu({ user, profileName }: UserMenuProps) {
+export function UserMenu({ user, profileName, isAdmin }: UserMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -125,6 +131,17 @@ export function UserMenu({ user, profileName }: UserMenuProps) {
             <UserIcon size={14} aria-hidden />
             Profile
           </Link>
+          {isAdmin && (
+            <Link
+              href="/admin"
+              role="menuitem"
+              className="flex items-center gap-2.5 px-4 py-2 text-sm text-foreground transition-colors hover:bg-muted hover:text-primary"
+              onClick={() => setIsOpen(false)}
+            >
+              <LayoutDashboard size={14} aria-hidden />
+              Admin dashboard
+            </Link>
+          )}
           <button
             type="button"
             role="menuitem"
