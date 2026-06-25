@@ -5,7 +5,9 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { Alert } from "@/components/ui/alert";
 import { formatDate } from "@/lib/utils/format";
-import type { AdminStudentsResponse } from "@/lib/api/admin-types";
+import type { components } from "@/lib/api/schema";
+
+type AdminStudentsResponse = components["schemas"]["AdminStudentsResponse"];
 
 export const metadata: Metadata = { title: "Students — Admin" };
 

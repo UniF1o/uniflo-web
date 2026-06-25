@@ -8,7 +8,9 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils/cn";
 import type { components } from "@/lib/api/schema";
-import type { UniversityCreate, UniversityUpdate } from "@/lib/api/admin-types";
+
+type UniversityCreate = components["schemas"]["UniversityCreate"];
+type UniversityUpdate = components["schemas"]["UniversityUpdate"];
 
 type University = components["schemas"]["UniversityRead"];
 

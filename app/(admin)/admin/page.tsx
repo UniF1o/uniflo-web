@@ -4,7 +4,9 @@ import { serverApiGet } from "@/lib/api/server";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { Alert } from "@/components/ui/alert";
-import type { AdminStatsResponse } from "@/lib/api/admin-types";
+import type { components } from "@/lib/api/schema";
+
+type AdminStatsResponse = components["schemas"]["AdminStatsResponse"];
 
 export const metadata: Metadata = { title: "Admin" };
 

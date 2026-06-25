@@ -6,7 +6,10 @@ import { Card } from "@/components/ui/card";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils/format";
-import type { AdminApplicationsResponse } from "@/lib/api/admin-types";
+import type { components } from "@/lib/api/schema";
+
+type AdminApplicationsResponse =
+  components["schemas"]["AdminApplicationsResponse"];
 
 export const metadata: Metadata = { title: "Applications — Admin" };
 

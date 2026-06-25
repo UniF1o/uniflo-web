@@ -26,6 +26,7 @@ export const RECORD_TYPE_LABELS: Record<RecordType, string> = {
   grade_11_final: "Grade 11 final",
   grade_12_april: "Grade 12 April",
   grade_12_june: "Grade 12 June",
+  grade_12_final: "Grade 12 final",
 };
 
 // POST /academic-records request body. `aggregate` is intentionally absent —

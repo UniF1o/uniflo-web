@@ -72,6 +72,92 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/admin/stats": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Stats */
+    get: operations["admin_stats"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/students": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Students */
+    get: operations["admin_students"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/applications": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Applications */
+    get: operations["admin_applications"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/universities": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Universities */
+    get: operations["admin_universities_list"];
+    put?: never;
+    /** Create University */
+    post: operations["admin_universities_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/universities/{university_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Update University */
+    patch: operations["admin_universities_update"];
+    trace?: never;
+  };
   "/account": {
     parameters: {
       query?: never;
@@ -257,6 +343,40 @@ export interface paths {
     };
     /** Get Recommendations */
     get: operations["recommendations_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/careers": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Careers */
+    get: operations["careers_list"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/careers/{career_id}/programmes": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Career Programmes */
+    get: operations["careers_programmes_list"];
     put?: never;
     post?: never;
     delete?: never;
@@ -452,12 +572,91 @@ export interface components {
       /** Aggregate */
       aggregate?: number | null;
     };
+    /** AdminApplicationRow */
+    AdminApplicationRow: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Student Email */
+      student_email: string;
+      /** Student Name */
+      student_name: string | null;
+      /** University Name */
+      university_name: string;
+      /** Programme */
+      programme: string;
+      /** Status */
+      status: string | null;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+    };
+    /** AdminApplicationsResponse */
+    AdminApplicationsResponse: {
+      /** Items */
+      items: components["schemas"]["AdminApplicationRow"][];
+      /** Total */
+      total: number;
+      /** Page */
+      page: number;
+      /** Per Page */
+      per_page: number;
+    };
+    /** AdminStatsResponse */
+    AdminStatsResponse: {
+      /** Total Students */
+      total_students: number;
+      /** Active Universities */
+      active_universities: number;
+      /** Applications By Status */
+      applications_by_status: components["schemas"]["ApplicationStatusCount"][];
+    };
+    /** AdminStudentRow */
+    AdminStudentRow: {
+      /**
+       * User Id
+       * Format: uuid
+       */
+      user_id: string;
+      /** Email */
+      email: string;
+      /** First Name */
+      first_name: string | null;
+      /** Last Name */
+      last_name: string | null;
+      /** Profile Complete */
+      profile_complete: boolean;
+      /** Application Count */
+      application_count: number;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+    };
+    /** AdminStudentsResponse */
+    AdminStudentsResponse: {
+      /** Items */
+      items: components["schemas"]["AdminStudentRow"][];
+      /** Total */
+      total: number;
+      /** Page */
+      page: number;
+      /** Per Page */
+      per_page: number;
+    };
     /** ApplicationChoiceRead */
     ApplicationChoiceRead: {
       /** Choice Number */
       choice_number: number;
       /** Programme */
       programme: string;
+      /** Programme Id */
+      programme_id?: string | null;
       /** Eligible */
       eligible?: boolean | null;
     };
@@ -470,8 +669,12 @@ export interface components {
       university_id: string;
       /** Programme */
       programme: string;
+      /** Programme Id */
+      programme_id?: string | null;
       /** Additional Programmes */
       additional_programmes?: string[] | null;
+      /** Additional Programme Ids */
+      additional_programme_ids?: string[] | null;
       /** Application Year */
       application_year: number;
     };
@@ -516,6 +719,8 @@ export interface components {
       university_id: string;
       /** Programme */
       programme: string;
+      /** Programme Id */
+      programme_id?: string | null;
       /** Application Year */
       application_year: number;
       status: components["schemas"]["ApplicationStatus"] | null;
@@ -550,11 +755,96 @@ export interface components {
       | "action_required"
       | "submitted"
       | "failed";
+    /** ApplicationStatusCount */
+    ApplicationStatusCount: {
+      /** Status */
+      status: string;
+      /** Count */
+      count: number;
+    };
     /** Body_documents_upload */
     Body_documents_upload: {
       /** File */
       file: string;
       document_type: components["schemas"]["DocumentType"];
+    };
+    /** CareerProgrammeMatch */
+    CareerProgrammeMatch: {
+      /** Id */
+      id: string;
+      /** Name */
+      name: string;
+      /** Faculty */
+      faculty?: string | null;
+      /** Qualification Type */
+      qualification_type?: string | null;
+      /** Duration Years */
+      duration_years?: number | null;
+      /** Min Aps */
+      min_aps?: number | null;
+      /** Status */
+      status: string;
+      /**
+       * Unmet Rules
+       * @default []
+       */
+      unmet_rules: unknown[];
+      /** Notes */
+      notes?: string | null;
+    };
+    /** CareerProgrammesResponse */
+    CareerProgrammesResponse: {
+      /** Career Id */
+      career_id: string;
+      /** Career Title */
+      career_title: string;
+      /** Universities */
+      universities: components["schemas"]["CareerUniversityGroup"][];
+      /**
+       * Tvet Only
+       * @default false
+       */
+      tvet_only: boolean;
+    };
+    /** CareerRead */
+    CareerRead: {
+      /** Id */
+      id: string;
+      /** Slug */
+      slug: string;
+      /** Title */
+      title: string;
+      /** Industry */
+      industry: string;
+      /** Description */
+      description: string;
+      compensation: components["schemas"]["CompensationOut"];
+      employability: components["schemas"]["EmployabilityOut"];
+      /**
+       * Required Subjects
+       * @default []
+       */
+      required_subjects: string[];
+    };
+    /** CareerUniversityGroup */
+    CareerUniversityGroup: {
+      /** University Id */
+      university_id: string;
+      /** University Name */
+      university_name: string;
+      /** Scoring Method */
+      scoring_method?: string | null;
+      /** Aps */
+      aps: number;
+      /** Aps Max */
+      aps_max: number;
+      /** Programmes */
+      programmes: components["schemas"]["CareerProgrammeMatch"][];
+    };
+    /** CareersListResponse */
+    CareersListResponse: {
+      /** Careers */
+      careers: components["schemas"]["CareerRead"][];
     };
     /**
      * ChallengeSupplyRequest
@@ -566,6 +856,21 @@ export interface components {
       values: {
         [key: string]: string;
       };
+    };
+    /** CompensationOut */
+    CompensationOut: {
+      /** Entry */
+      entry: number;
+      /** Mid */
+      mid: number;
+      /** Senior */
+      senior: number;
+      /** Currency */
+      currency: string;
+      /** Period */
+      period: string;
+      /** Display */
+      display: string;
     };
     /**
      * ConsentRequest
@@ -720,6 +1025,17 @@ export interface components {
       | "TRANSCRIPT"
       | "GRADE12_APRIL"
       | "GRADE11_RESULTS";
+    /** EmployabilityOut */
+    EmployabilityOut: {
+      /** Demand */
+      demand: string;
+      /** Outlook */
+      outlook: string;
+      /** Pathways */
+      pathways: string[];
+      /** Employment Note */
+      employment_note?: string | null;
+    };
     /**
      * EthnicityEnum
      * @enum {string}
@@ -931,7 +1247,11 @@ export interface components {
      * RecordType
      * @enum {string}
      */
-    RecordType: "grade_11_final" | "grade_12_april" | "grade_12_june";
+    RecordType:
+      | "grade_11_final"
+      | "grade_12_april"
+      | "grade_12_june"
+      | "grade_12_final";
     /**
      * ReligionEnum
      * @enum {string}
@@ -1149,6 +1469,26 @@ export interface components {
       /** Items */
       items: components["schemas"]["UniversityRead"][];
     };
+    /** UniversityCreate */
+    UniversityCreate: {
+      /** Name */
+      name: string;
+      /** Website */
+      website: string;
+      /** Portal Url */
+      portal_url: string;
+      /** Open Date */
+      open_date?: string | null;
+      /** Close Date */
+      close_date?: string | null;
+      /**
+       * Is Active
+       * @default false
+       */
+      is_active: boolean;
+      /** Scoring Method */
+      scoring_method?: string | null;
+    };
     /** UniversityRead */
     UniversityRead: {
       /**
@@ -1168,6 +1508,23 @@ export interface components {
       close_date?: string | null;
       /** Is Active */
       is_active: boolean;
+      /** Scoring Method */
+      scoring_method?: string | null;
+    };
+    /** UniversityUpdate */
+    UniversityUpdate: {
+      /** Name */
+      name?: string | null;
+      /** Website */
+      website?: string | null;
+      /** Portal Url */
+      portal_url?: string | null;
+      /** Open Date */
+      open_date?: string | null;
+      /** Close Date */
+      close_date?: string | null;
+      /** Is Active */
+      is_active?: boolean | null;
       /** Scoring Method */
       scoring_method?: string | null;
     };
@@ -1384,6 +1741,178 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["UserResponse"];
+        };
+      };
+    };
+  };
+  admin_stats: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminStatsResponse"];
+        };
+      };
+    };
+  };
+  admin_students: {
+    parameters: {
+      query?: {
+        page?: number;
+        per_page?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminStudentsResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  admin_applications: {
+    parameters: {
+      query?: {
+        page?: number;
+        per_page?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminApplicationsResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  admin_universities_list: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["UniversitiesListResponse"];
+        };
+      };
+    };
+  };
+  admin_universities_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UniversityCreate"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["UniversityRead"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  admin_universities_update: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        university_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UniversityUpdate"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["UniversityRead"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
         };
       };
     };
@@ -1877,6 +2406,70 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["RecommendationsResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  careers_list: {
+    parameters: {
+      query?: {
+        intake_year?: number | null;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CareersListResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  careers_programmes_list: {
+    parameters: {
+      query?: {
+        intake_year?: number | null;
+      };
+      header?: never;
+      path: {
+        career_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CareerProgrammesResponse"];
         };
       };
       /** @description Validation Error */
