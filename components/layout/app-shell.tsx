@@ -15,10 +15,16 @@ import { Sidebar } from "./sidebar";
 interface AppShellProps {
   user: User;
   profileName?: string;
+  isAdmin?: boolean;
   children: React.ReactNode;
 }
 
-export function AppShell({ user, profileName, children }: AppShellProps) {
+export function AppShell({
+  user,
+  profileName,
+  isAdmin,
+  children,
+}: AppShellProps) {
   // Controls the mobile sidebar drawer. On md+ the sidebar is always visible
   // so this value is ignored at those breakpoints.
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -41,6 +47,7 @@ export function AppShell({ user, profileName, children }: AppShellProps) {
       <Navbar
         user={user}
         profileName={profileName}
+        isAdmin={isAdmin}
         onToggleSidebar={() => setIsSidebarOpen((open) => !open)}
       />
 

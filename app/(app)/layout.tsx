@@ -36,7 +36,9 @@ export default async function ProtectedLayout({
   // Fetch the student's name from the backend profile so the UserMenu always
   // reflects the latest saved name rather than the Supabase auth metadata
   // (which is only set at OAuth sign-in and never updated on profile edits).
+  // Also fetch /auth/me for the role so admins get the admin link in the menu.
   let profileName: string | undefined;
+  let isAdmin = false;
   try {
     const {
       data: { session },
@@ -44,18 +46,28 @@ export default async function ProtectedLayout({
     const token = session?.access_token;
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
     if (token && apiUrl) {
-      const res = await fetch(`${apiUrl}/profile`, {
-        headers: { Authorization: `Bearer ${token}` },
-        // next.revalidate: 0 ensures this fetch is not cached between requests,
-        // so router.refresh() from the edit form picks up the updated name.
-        next: { revalidate: 0 },
-      });
-      if (res.ok) {
-        const data = (await res.json()) as ProfileResponse;
+      const [profileRes, meRes] = await Promise.all([
+        fetch(`${apiUrl}/profile`, {
+          headers: { Authorization: `Bearer ${token}` },
+          // next.revalidate: 0 ensures this fetch is not cached between requests,
+          // so router.refresh() from the edit form picks up the updated name.
+          next: { revalidate: 0 },
+        }),
+        fetch(`${apiUrl}/auth/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+          next: { revalidate: 0 },
+        }),
+      ]);
+      if (profileRes.ok) {
+        const data = (await profileRes.json()) as ProfileResponse;
         const name = [data.first_name, data.last_name]
           .filter(Boolean)
           .join(" ");
         if (name) profileName = name;
+      }
+      if (meRes.ok) {
+        const me = (await meRes.json()) as { role: string };
+        isAdmin = me.role === "admin";
       }
     }
   } catch {
@@ -65,7 +77,7 @@ export default async function ProtectedLayout({
   return (
     <SelectionProvider>
       <JourneyProvider>
-        <AppShell user={user} profileName={profileName}>
+        <AppShell user={user} profileName={profileName} isAdmin={isAdmin}>
           {children}
         </AppShell>
         <SelectionBar />
