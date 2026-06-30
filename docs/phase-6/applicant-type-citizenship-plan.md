@@ -15,10 +15,12 @@ entirely (it exists only in `edit-form.tsx`); the ID input is hardcoded "South A
 with no passport alternative. There is also no `passport_number` / permit field in the schema yet
 (added by the backend half).
 
-**Goal:** the setup flow isolates the fields shown to each applicant by **current status**
-(still-in-G12 / completed-matric / gap-year / employed / **upgrading**) and swaps the
-**ID-vs-passport** input by **citizenship** (SA Citizen / Permanent Resident / Refugee / Asylum
-Seeker / International), capturing exactly what each situation needs.
+**Goal:** **applicant type is the first question**, and it drives the whole wizard — the academic
+info and documents requested are isolated to what that type needs (Grade 10 / Grade 11 / in matric
+/ completed matric / upgrading / gap year / employed / at university). Setup is also **time-aware**:
+depending on the month of setup, a current matric learner can add whatever interim results they
+have (April, June/July, September prelims). Citizenship is the secondary axis, swapping the
+**ID-vs-passport** input (SA Citizen / Permanent Resident / Refugee / Asylum Seeker / International).
 
 ### Decisions (locked)
 - **Full residency taxonomy** drives the citizenship block: `citizenship_status` +
@@ -41,9 +43,49 @@ Reuse the existing conditional-block precedents (`disability !== "None"`,
 `mailingSameAsResidential`, `wantsResidence`) and the field primitives in `components/ui/`
 (`Input`, `Select`, `Checkbox`, `DateInput`, `FormSection`).
 
-**D1. Promote status + citizenship earlier.** Move `current_activity` (status) and add a
-citizenship block (`citizenship_status` / `is_sa_citizen`) into an early step so later fields can
-gate on them.
+### Applicant type is the entry point (Step 1)
+The **first question** is "What best describes you right now?" — a single selector whose answer
+drives the whole wizard: which academic-info fields, which document uploads, and which downstream
+steps appear. Citizenship is the **secondary** axis (drives only the ID-vs-passport swap).
+
+| Status | Apply-eligible? | Academic info | Documents |
+|--------|-----------------|---------------|-----------|
+| In Grade 10 | No (profile-only) | optional Grade 10 results | ID/passport |
+| In Grade 11 | No (profile-only) | Grade 11 results | ID/passport, Grade 11 results |
+| In Grade 12 (matric) | Yes — current learner | Grade 11 final (+ interim, see D1c) | ID/passport, Grade 11 results |
+| Completed matric (prior year) | Yes — completed | Grade 12 final | ID/passport, matric certificate/results |
+| Repeating / upgrading matric | Yes — upgrading | Grade 12 final + upgrade subjects | ID/passport, matric results |
+| Gap year | Yes — completed | Grade 12 final | ID/passport, matric certificate/results |
+| Employed | Yes — completed | Grade 12 final | ID/passport, matric results (CV note for Wits) |
+| At university (transfer) | No (profile-only, out of scope) | — | ID/passport |
+
+Profile-only statuses (Grade 10/11, at-university) save a full profile, but the Apply step shows a
+clear "not eligible to apply yet — profile saved" message (no adapter run). **Assumption flagged
+for confirmation:** Grade 10/11 are selectable but profile-only; flip easily if they should be
+hidden entirely.
+
+**D1. Make applicant type the entry point.** Promote the status selector (today's
+`current_activity`, currently the optional last step) to **Step 1**, expand its options to the
+taxonomy above, and gate every later step on it. Place the citizenship block
+(`citizenship_status` / `is_sa_citizen`) immediately after so the ID-vs-passport swap keys off it.
+
+**D1b. Status-driven info + documents.** Surface academic-info fields and document-upload prompts
+per the matrix above. Reuse the per-record-type academic forms (the academic-records page already
+splits `grade_12_final`) and the existing document types
+(`ID_COPY`/`MATRIC_RESULTS`/`GRADE11_RESULTS`/…). The matrix is the single source of truth shared
+with the apply gate.
+
+**D1c. Time-aware interim results (month of setup).** For a current matric (Grade 12) learner, use
+the **current date** to offer the interim result sets plausibly available by then, so students add
+their latest marks as the year progresses:
+- ~Apr onward → April/term-1 (`grade_12_april`)
+- ~Jun/Jul onward → mid-year / June (`grade_12_june`)
+- ~Sep onward → September prelims (`grade_12_september` — new record type)
+- ~Nov/Dec onward → final NSC (`grade_12_final`)
+Each is **optional** ("add it if you have it"), additive to the Grade 11 final base, labelled by
+month. Completed/gap/employed go straight to `grade_12_final`. Drive the cutoffs off a small
+`interimResultsAvailable(today)` helper (data-driven, not hard-coded per render). Add
+`grade_12_september` to `RECORD_TYPE_LABELS` (`lib/api/academic-records.ts`).
 
 **D2. ID-vs-passport swap (citizenship-gated).**
 - SA Citizen / Permanent Resident → SA-ID input; run `validateSAID` (`lib/utils/sa-id.ts`).
@@ -53,17 +95,19 @@ gate on them.
   has `is_sa_citizen`), and mirror the new passport/permit fields into `edit-form.tsx` so the two
   forms don't drift further. Prefer a shared citizenship field-group component.
 
-**D3. Status-gated guidance.** Use `current_activity` to drive which academic-record path is
-surfaced downstream (the academic-records page already splits `grade_12_final`). Remove
-`"Upgrading matric"` from `AUTOMATION_BLOCKED_ACTIVITIES` in `lib/constants/profile-enums.ts` (now
-supported); keep `"At university"`. The apply gate at `app/(app)/applications/new/page.tsx` uses
-`isAutomationBlocked()` and needs no change beyond the constant.
+**D3. Status-gated guidance + apply gate.** Use `current_activity` to drive which academic-record
+path is surfaced downstream. In `AUTOMATION_BLOCKED_ACTIVITIES` (`lib/constants/profile-enums.ts`):
+remove `"Upgrading matric"` (now supported); keep `"At university"`; **add `"In Grade 10"` and
+`"In Grade 11"`** (profile-only — can't apply yet). The apply gate at
+`app/(app)/applications/new/page.tsx` uses `isAutomationBlocked()` and needs no change beyond the
+constant, but its message should read "not eligible to apply yet" for these statuses.
 
-**D4. Enums + types.** Add `CITIZENSHIP_STATUS_OPTIONS` and `STUDY_PERMIT_OPTIONS` to
-`lib/constants/profile-enums.ts`. Replace the stale hand-written `ProfilePayload` in
-`setup-form.tsx` with the generated `StudentProfileWrite`; regenerate `lib/api/schema.d.ts` after
-the backend schema lands. (Opportunistic cleanup, flagged not required: migrate the two raw
-`fetch('/profile')` calls onto `apiClient`.)
+**D4. Enums + types.** Expand `CURRENT_ACTIVITY_OPTIONS` to the Step-1 taxonomy (add "In Grade 10"
+and "In Grade 11"). Add `CITIZENSHIP_STATUS_OPTIONS` and `STUDY_PERMIT_OPTIONS`. Add
+`grade_12_september` to `RECORD_TYPE_LABELS` (`lib/api/academic-records.ts`). Replace the stale
+hand-written `ProfilePayload` in `setup-form.tsx` with the generated `StudentProfileWrite`;
+regenerate `lib/api/schema.d.ts` after the backend schema lands. (Opportunistic cleanup, flagged
+not required: migrate the two raw `fetch('/profile')` calls onto `apiClient`.)
 
 **D5. Design lock.** Conform to `docs/phase-3/app-redesign.md`.
 
