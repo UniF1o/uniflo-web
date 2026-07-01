@@ -63,6 +63,27 @@ export function collectsSubjects(activity: string | null | undefined): boolean {
   return !!activity && !GRADE_8_9.includes(activity);
 }
 
+// Interim Grade 12 result sets a current matric learner can plausibly have by a
+// given month, so setup offers the latest marks as the year progresses. Final
+// NSC results (grade_12_final) are handled separately (available to completed
+// applicants year-round). Driven off the month so it is data-driven, not
+// hard-coded per render.
+export type InterimRecordType =
+  | "grade_12_april"
+  | "grade_12_june"
+  | "grade_12_september";
+
+export function interimResultsAvailable(
+  today: Date = new Date(),
+): InterimRecordType[] {
+  const month = today.getMonth(); // 0 = January
+  const available: InterimRecordType[] = [];
+  if (month >= 3) available.push("grade_12_april"); // ~April onward
+  if (month >= 5) available.push("grade_12_june"); // ~June/July onward
+  if (month >= 8) available.push("grade_12_september"); // ~September onward
+  return available;
+}
+
 // SA ID is issued from age 16; younger learners have only a birth certificate.
 // Apply-eligible students always provide an ID (or a passport). Younger
 // profile-only learners are asked only once they reach ID age.

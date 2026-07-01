@@ -5,6 +5,7 @@ import {
   collectsIdNumber,
   collectsSubjects,
   deriveStage,
+  interimResultsAvailable,
   isMinor,
   needsGuardianConsent,
 } from "@/lib/eligibility";
@@ -78,5 +79,33 @@ describe("collectsIdNumber", () => {
   it("asks younger learners only once they reach ID age (16)", () => {
     expect(collectsIdNumber("In Grade 9", dobAged(14))).toBe(false);
     expect(collectsIdNumber("In Grade 11", dobAged(16))).toBe(true);
+  });
+});
+
+describe("interimResultsAvailable", () => {
+  // Month index is 0-based: 1 = Feb, 3 = Apr, 6 = Jul, 8 = Sep.
+  it("offers nothing before April", () => {
+    expect(interimResultsAvailable(new Date(2026, 1, 15))).toEqual([]);
+  });
+
+  it("adds April term marks from April", () => {
+    expect(interimResultsAvailable(new Date(2026, 3, 10))).toEqual([
+      "grade_12_april",
+    ]);
+  });
+
+  it("adds June marks mid-year", () => {
+    expect(interimResultsAvailable(new Date(2026, 6, 1))).toEqual([
+      "grade_12_april",
+      "grade_12_june",
+    ]);
+  });
+
+  it("adds September prelims in spring", () => {
+    expect(interimResultsAvailable(new Date(2026, 8, 20))).toEqual([
+      "grade_12_april",
+      "grade_12_june",
+      "grade_12_september",
+    ]);
   });
 });
