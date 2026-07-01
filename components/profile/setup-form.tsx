@@ -38,6 +38,7 @@ import { cn } from "@/lib/utils/cn";
 import { validateSAID } from "@/lib/utils/sa-id";
 import { DateInput } from "@/components/ui/date-input";
 import {
+  CITIZENSHIP_STATUS_OPTIONS,
   DISABILITY_OPTIONS,
   ETHNICITY_OPTIONS,
   GENDER_OPTIONS,
@@ -47,6 +48,8 @@ import {
   NATIONALITY_OPTIONS,
   RELIGION_OPTIONS,
   SA_PROVINCE_OPTIONS,
+  STUDY_PERMIT_OPTIONS,
+  usesPassport,
 } from "@/lib/constants/profile-enums";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -70,7 +73,11 @@ const STEPS = [
 interface ProfilePayload {
   first_name?: string;
   last_name?: string;
-  id_number?: string;
+  citizenship_status?: string | null;
+  is_sa_citizen?: boolean;
+  id_number?: string | null;
+  passport_number?: string | null;
+  study_permit_type?: string | null;
   date_of_birth?: string; // ISO 8601 — "YYYY-MM-DD"
   phone?: string;
   street_address?: string;
@@ -104,13 +111,22 @@ function validateStep1(fields: {
   firstName: string;
   lastName: string;
   dateOfBirth: string;
+  citizenshipStatus: string;
   idNumber: string;
+  passportNumber: string;
 }) {
   const errors: Record<string, string> = {};
   if (!fields.firstName.trim()) errors.firstName = "First name is required.";
   if (!fields.lastName.trim()) errors.lastName = "Last name is required.";
   if (!fields.dateOfBirth) errors.dateOfBirth = "Date of birth is required.";
-  if (!fields.idNumber) {
+  if (!fields.citizenshipStatus) {
+    errors.citizenshipStatus = "Please select your citizenship status.";
+  } else if (usesPassport(fields.citizenshipStatus)) {
+    // Non-SA-citizen branch: a passport replaces the SA ID; the SA-ID checksum
+    // must not run against it.
+    if (!fields.passportNumber.trim())
+      errors.passportNumber = "Passport number is required.";
+  } else if (!fields.idNumber) {
     errors.idNumber = "ID number is required.";
   } else {
     const idResult = validateSAID(
@@ -250,7 +266,13 @@ export function ProfileSetupForm() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
+  const [citizenshipStatus, setCitizenshipStatus] = useState("");
   const [idNumber, setIdNumber] = useState("");
+  const [passportNumber, setPassportNumber] = useState("");
+  const [studyPermitType, setStudyPermitType] = useState("");
+
+  // Non-SA citizens (and PR/refugee/asylum) supply a passport, not an SA ID.
+  const isPassportApplicant = usesPassport(citizenshipStatus);
 
   // Step 2: contact details
   const [phone, setPhone] = useState("");
@@ -359,7 +381,14 @@ export function ProfileSetupForm() {
     // optional, so it has no validator.
     const errors =
       step === 1
-        ? validateStep1({ firstName, lastName, dateOfBirth, idNumber })
+        ? validateStep1({
+            firstName,
+            lastName,
+            dateOfBirth,
+            citizenshipStatus,
+            idNumber,
+            passportNumber,
+          })
         : step === 2
           ? validateStep2({
               phone,
@@ -395,8 +424,15 @@ export function ProfileSetupForm() {
     const payload: ProfilePayload = {
       first_name: firstName,
       last_name: lastName,
-      id_number: idNumber,
       date_of_birth: dateOfBirth,
+      citizenship_status: citizenshipStatus || null,
+      is_sa_citizen: citizenshipStatus === "SA Citizen",
+      // Send whichever identifier applies; the other goes up null so switching
+      // citizenship after a prior save clears the stale value.
+      id_number: isPassportApplicant ? null : idNumber,
+      passport_number: isPassportApplicant ? passportNumber : null,
+      study_permit_type:
+        isPassportApplicant && studyPermitType ? studyPermitType : null,
       ...(step >= 2 && {
         phone,
         street_address: streetAddress,
@@ -519,27 +555,75 @@ export function ProfileSetupForm() {
             error={fieldErrors.dateOfBirth}
           />
 
-          <div className="space-y-1">
-            <Input
-              id="idNumber"
-              label="South African ID number"
-              type="text"
-              inputMode="numeric"
-              maxLength={13}
-              placeholder="0001010000000"
-              value={idNumber}
-              onChange={(e) => {
-                // Strip non-digit characters on every keystroke so the field
-                // only ever holds numbers. maxLength={13} caps further input.
-                setIdNumber(e.target.value.replace(/\D/g, ""));
-                clearError("idNumber");
-              }}
-              error={fieldErrors.idNumber}
-            />
-            <p className="text-xs text-muted-foreground">
-              13-digit number on the front of your green ID book or smart card.
-            </p>
-          </div>
+          <Select
+            id="citizenshipStatus"
+            label="Citizenship status"
+            placeholder="Select status"
+            options={CITIZENSHIP_STATUS_OPTIONS}
+            value={citizenshipStatus}
+            onChange={(e) => {
+              setCitizenshipStatus(e.target.value);
+              clearError("citizenshipStatus");
+              // Clear the identifier errors when switching branches.
+              clearError("idNumber");
+              clearError("passportNumber");
+            }}
+            error={fieldErrors.citizenshipStatus}
+          />
+
+          {isPassportApplicant ? (
+            <>
+              <div className="space-y-1">
+                <Input
+                  id="passportNumber"
+                  label="Passport number"
+                  type="text"
+                  placeholder="A01234567"
+                  value={passportNumber}
+                  onChange={(e) => {
+                    setPassportNumber(e.target.value);
+                    clearError("passportNumber");
+                  }}
+                  error={fieldErrors.passportNumber}
+                />
+                <p className="text-xs text-muted-foreground">
+                  As shown in your passport. We do not run the SA ID check on
+                  this.
+                </p>
+              </div>
+              <Select
+                id="studyPermitType"
+                label="Study permit / visa type (optional)"
+                placeholder="Select permit type"
+                options={STUDY_PERMIT_OPTIONS}
+                value={studyPermitType}
+                onChange={(e) => setStudyPermitType(e.target.value)}
+              />
+            </>
+          ) : (
+            <div className="space-y-1">
+              <Input
+                id="idNumber"
+                label="South African ID number"
+                type="text"
+                inputMode="numeric"
+                maxLength={13}
+                placeholder="0001010000000"
+                value={idNumber}
+                onChange={(e) => {
+                  // Strip non-digit characters on every keystroke so the field
+                  // only ever holds numbers. maxLength={13} caps further input.
+                  setIdNumber(e.target.value.replace(/\D/g, ""));
+                  clearError("idNumber");
+                }}
+                error={fieldErrors.idNumber}
+              />
+              <p className="text-xs text-muted-foreground">
+                13-digit number on the front of your green ID book or smart
+                card.
+              </p>
+            </div>
+          )}
         </form>
       )}
 
