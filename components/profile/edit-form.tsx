@@ -14,6 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { validateSAID } from "@/lib/utils/sa-id";
 import { DateInput } from "@/components/ui/date-input";
 import {
+  CITIZENSHIP_STATUS_OPTIONS,
   CURRENT_ACTIVITY_OPTIONS,
   DISABILITY_OPTIONS,
   ETHNICITY_OPTIONS,
@@ -23,7 +24,9 @@ import {
   NATIONALITY_OPTIONS,
   RELIGION_OPTIONS,
   SA_PROVINCE_OPTIONS,
+  STUDY_PERMIT_OPTIONS,
   TITLE_OPTIONS,
+  usesPassport,
 } from "@/lib/constants/profile-enums";
 import type { components } from "@/lib/api/schema";
 
@@ -68,7 +71,13 @@ export function ProfileEditForm() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
+  const [citizenshipStatus, setCitizenshipStatus] = useState("");
   const [idNumber, setIdNumber] = useState("");
+  const [passportNumber, setPassportNumber] = useState("");
+  const [studyPermitType, setStudyPermitType] = useState("");
+  // Non-SA citizens (PR / refugee / asylum / international) carry a passport
+  // and permit, not an SA ID. Derived so the two forms stay in sync.
+  const isPassportApplicant = usesPassport(citizenshipStatus);
 
   // Contact
   const [phone, setPhone] = useState("");
@@ -96,7 +105,6 @@ export function ProfileEditForm() {
   const [middleNames, setMiddleNames] = useState("");
   const [maidenName, setMaidenName] = useState("");
   const [preferredName, setPreferredName] = useState("");
-  const [isSaCitizen, setIsSaCitizen] = useState(false);
 
   // Mailing address (used when it differs from the residential address)
   const [mailingSameAsResidential, setMailingSameAsResidential] =
@@ -163,6 +171,13 @@ export function ProfileEditForm() {
         setLastName(data.last_name ?? "");
         setDateOfBirth(data.date_of_birth ?? "");
         setIdNumber(data.id_number ?? "");
+        // Prefer the new citizenship_status; fall back to the legacy
+        // is_sa_citizen boolean for profiles saved before this field existed.
+        setCitizenshipStatus(
+          data.citizenship_status ?? (data.is_sa_citizen ? "SA Citizen" : ""),
+        );
+        setPassportNumber(data.passport_number ?? "");
+        setStudyPermitType(data.study_permit_type ?? "");
         setPhone(data.phone ?? "");
         setStreetAddress(data.street_address ?? "");
         setSuburb(data.suburb ?? "");
@@ -184,7 +199,6 @@ export function ProfileEditForm() {
         setMiddleNames(data.middle_names ?? "");
         setMaidenName(data.maiden_name ?? "");
         setPreferredName(data.preferred_name ?? "");
-        setIsSaCitizen(data.is_sa_citizen ?? false);
         // Default to "same as residential" when the backend hasn't recorded a
         // preference yet (null) — most students share one address.
         setMailingSameAsResidential(data.mailing_same_as_residential ?? true);
@@ -240,7 +254,13 @@ export function ProfileEditForm() {
     if (!lastName.trim()) errors.lastName = "Last name is required.";
     if (!dateOfBirth) errors.dateOfBirth = "Date of birth is required.";
 
-    if (!idNumber) {
+    if (!citizenshipStatus) {
+      errors.citizenshipStatus = "Please select your citizenship status.";
+    } else if (isPassportApplicant) {
+      // Passport branch: no SA-ID checksum on a passport number.
+      if (!passportNumber.trim())
+        errors.passportNumber = "Passport number is required.";
+    } else if (!idNumber) {
       errors.idNumber = "ID number is required.";
     } else {
       const idResult = validateSAID(idNumber, dateOfBirth || undefined);
@@ -332,7 +352,13 @@ export function ProfileEditForm() {
         body: JSON.stringify({
           first_name: firstName,
           last_name: lastName,
-          id_number: idNumber,
+          citizenship_status: citizenshipStatus || null,
+          // Send whichever identifier applies; null the other so switching
+          // citizenship clears the stale value.
+          id_number: isPassportApplicant ? null : idNumber,
+          passport_number: isPassportApplicant ? passportNumber : null,
+          study_permit_type:
+            isPassportApplicant && studyPermitType ? studyPermitType : null,
           date_of_birth: dateOfBirth,
           phone,
           street_address: streetAddress,
@@ -352,7 +378,7 @@ export function ProfileEditForm() {
           middle_names: clean(middleNames),
           maiden_name: clean(maidenName),
           preferred_name: clean(preferredName),
-          is_sa_citizen: isSaCitizen,
+          is_sa_citizen: citizenshipStatus === "SA Citizen",
           mailing_same_as_residential: mailingSameAsResidential,
           // When the mailing address matches the residential one, don't persist
           // stale mailing values — send null so the backend mirrors residential.
@@ -489,24 +515,68 @@ export function ProfileEditForm() {
           }}
           error={fieldErrors.dateOfBirth}
         />
-        <div className="space-y-1">
-          <Input
-            id="idNumber"
-            label="South African ID number"
-            type="text"
-            inputMode="numeric"
-            maxLength={13}
-            value={idNumber}
-            onChange={(e) => {
-              setIdNumber(e.target.value.replace(/\D/g, ""));
-              clearError("idNumber");
-            }}
-            error={fieldErrors.idNumber}
-          />
-          <p className="text-xs text-muted-foreground">
-            13-digit number on the front of your green ID book or smart card.
-          </p>
-        </div>
+        <Select
+          id="citizenshipStatus"
+          label="Citizenship status"
+          placeholder="Select status"
+          options={CITIZENSHIP_STATUS_OPTIONS}
+          value={citizenshipStatus}
+          onChange={(e) => {
+            setCitizenshipStatus(e.target.value);
+            clearError("citizenshipStatus");
+            clearError("idNumber");
+            clearError("passportNumber");
+          }}
+          error={fieldErrors.citizenshipStatus}
+        />
+        {isPassportApplicant ? (
+          <>
+            <div className="space-y-1">
+              <Input
+                id="passportNumber"
+                label="Passport number"
+                type="text"
+                value={passportNumber}
+                onChange={(e) => {
+                  setPassportNumber(e.target.value);
+                  clearError("passportNumber");
+                }}
+                error={fieldErrors.passportNumber}
+              />
+              <p className="text-xs text-muted-foreground">
+                As shown in your passport. We do not run the SA ID check on
+                this.
+              </p>
+            </div>
+            <Select
+              id="studyPermitType"
+              label="Study permit / visa type (optional)"
+              placeholder="Select permit type"
+              options={STUDY_PERMIT_OPTIONS}
+              value={studyPermitType}
+              onChange={(e) => setStudyPermitType(e.target.value)}
+            />
+          </>
+        ) : (
+          <div className="space-y-1">
+            <Input
+              id="idNumber"
+              label="South African ID number"
+              type="text"
+              inputMode="numeric"
+              maxLength={13}
+              value={idNumber}
+              onChange={(e) => {
+                setIdNumber(e.target.value.replace(/\D/g, ""));
+                clearError("idNumber");
+              }}
+              error={fieldErrors.idNumber}
+            />
+            <p className="text-xs text-muted-foreground">
+              13-digit number on the front of your green ID book or smart card.
+            </p>
+          </div>
+        )}
       </div>
 
       {/* ── Additional names ──────────────────────────────────────────────── */}
@@ -644,12 +714,6 @@ export function ProfileEditForm() {
             clearError("nationality");
           }}
           error={fieldErrors.nationality}
-        />
-        <Checkbox
-          id="isSaCitizen"
-          label="I am a South African citizen"
-          checked={isSaCitizen}
-          onChange={(e) => setIsSaCitizen(e.target.checked)}
         />
       </div>
 
