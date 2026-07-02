@@ -23,22 +23,29 @@ export const TITLE_OPTIONS: EnumOption[] = [
   { value: "Other", label: "Other" },
 ];
 
-// What the student is currently doing — backend CurrentActivityEnum.
+// What the student is currently doing — backend CurrentActivityEnum. Grade 8-11
+// are profile-only (can build a profile and explore careers, but can't apply).
 export const CURRENT_ACTIVITY_OPTIONS: EnumOption[] = [
+  { value: "In Grade 8", label: "In Grade 8" },
+  { value: "In Grade 9", label: "In Grade 9" },
+  { value: "In Grade 10", label: "In Grade 10" },
+  { value: "In Grade 11", label: "In Grade 11" },
   { value: "Currently in Grade 12", label: "Currently in Grade 12" },
-  { value: "Upgrading matric", label: "Upgrading matric" },
+  { value: "Upgrading matric", label: "Upgrading / repeating matric" },
   { value: "Gap year", label: "Gap year" },
   { value: "Employed", label: "Employed" },
   { value: "At university", label: "At university" },
   { value: "Other", label: "Other" },
 ];
 
-// Activities the portal automation cannot handle. The backend blocks these
-// with "at-university" or "upgrader" errors. Gap-year and employed applicants
-// are now supported (completed-matric branch, Phase 5).
-// Must match the server's _guard_applicant_type permit set exactly.
+// Activities that cannot apply to university yet, so the portal automation is
+// blocked for them. Grade 8-11 and at-university are profile-only; upgrading is
+// now supported. Must match the server's _guard_applicant_type set exactly.
 export const AUTOMATION_BLOCKED_ACTIVITIES: readonly string[] = [
-  "Upgrading matric",
+  "In Grade 8",
+  "In Grade 9",
+  "In Grade 10",
+  "In Grade 11",
   "At university",
 ];
 
@@ -47,6 +54,54 @@ export function isAutomationBlocked(
 ): boolean {
   return !!activity && AUTOMATION_BLOCKED_ACTIVITIES.includes(activity);
 }
+
+// Citizenship / residency status — backend CitizenshipStatusEnum. Drives the
+// SA-ID vs passport input swap in profile setup.
+export const CITIZENSHIP_STATUS_OPTIONS: EnumOption[] = [
+  { value: "SA Citizen", label: "South African citizen" },
+  { value: "Permanent Resident", label: "SA permanent resident" },
+  { value: "Refugee", label: "Refugee" },
+  { value: "Asylum Seeker", label: "Asylum seeker" },
+  { value: "International", label: "International (non-SA citizen)" },
+];
+
+// Citizenship statuses that use a passport + permit instead of an SA ID.
+export const PASSPORT_CITIZENSHIP_STATUSES: readonly string[] = [
+  "Permanent Resident",
+  "Refugee",
+  "Asylum Seeker",
+  "International",
+];
+
+export function usesPassport(
+  citizenshipStatus: string | null | undefined,
+): boolean {
+  return (
+    !!citizenshipStatus &&
+    PASSPORT_CITIZENSHIP_STATUSES.includes(citizenshipStatus)
+  );
+}
+
+// Study permit / visa type — backend StudyPermitTypeEnum (UJ's 17-option LOV).
+export const STUDY_PERMIT_OPTIONS: EnumOption[] = [
+  { value: "Study Visa", label: "Study Visa" },
+  { value: "Permanent Residence Status", label: "Permanent Residence Status" },
+  { value: "Asylum Seeker Permit", label: "Asylum Seeker Permit" },
+  { value: "Refugees Permit", label: "Refugees Permit" },
+  { value: "Critical Skills Visa", label: "Critical Skills Visa" },
+  { value: "Business Visa With Endorsement", label: "Business Visa" },
+  { value: "Quota Work Visa With Endorsement", label: "Quota Work Visa" },
+  { value: "Work Visa With Endorsement", label: "Work Visa" },
+  { value: "Relatives Visa With Endorsement", label: "Relatives Visa" },
+  { value: "Diplomatic Permit", label: "Diplomatic Permit" },
+  { value: "Exchange Student", label: "Exchange Student" },
+  { value: "Experiential Learning", label: "Experiential Learning" },
+  { value: "Extra Curricular", label: "Extra Curricular" },
+  { value: "Limited Contact Sessions", label: "Limited Contact Sessions" },
+  { value: "Online Programme - Not Applicable", label: "Online Programme" },
+  { value: "Visitor's Visa", label: "Visitor's Visa" },
+  { value: "Other", label: "Other" },
+];
 
 // Gender options accepted by the backend GenderEnum.
 export const GENDER_OPTIONS: EnumOption[] = [

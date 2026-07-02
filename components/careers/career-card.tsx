@@ -72,13 +72,35 @@ export function CareerCard({ career, onViewProgrammes }: CareerCardProps) {
         {career.employability.outlook}
       </p>
 
-      {/* Required subjects */}
-      {career.required_subjects && career.required_subjects.length > 0 && (
-        <p className="text-xs text-muted-foreground">
-          <span className="font-medium text-foreground">Requires: </span>
-          {career.required_subjects.join(", ")}
-        </p>
-      )}
+      {/* Subject combination to aim for (from Grade 10). Shown so younger
+          learners can plan their choices, not just apply-ready matriculants. */}
+      {career.required_subjects?.length ||
+      career.any_of_subjects?.length ||
+      career.recommended_subjects?.length ? (
+        <div className="space-y-0.5 text-xs text-muted-foreground">
+          {career.required_subjects && career.required_subjects.length > 0 && (
+            <p>
+              <span className="font-medium text-foreground">Take: </span>
+              {career.required_subjects.join(", ")}
+            </p>
+          )}
+          {career.any_of_subjects && career.any_of_subjects.length > 0 && (
+            <p>
+              <span className="font-medium text-foreground">One of: </span>
+              {career.any_of_subjects.join(" or ")}
+            </p>
+          )}
+          {career.recommended_subjects &&
+            career.recommended_subjects.length > 0 && (
+              <p>
+                <span className="font-medium text-foreground">
+                  Recommended:{" "}
+                </span>
+                {career.recommended_subjects.join(", ")}
+              </p>
+            )}
+        </div>
+      ) : null}
 
       {/* Programmes CTA */}
       <Button

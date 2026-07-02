@@ -180,14 +180,17 @@ export function CareersView({
         </div>
       )}
 
-      {/* Match count summary */}
+      {/* Match count summary — explore mode (no subjects yet) browses all SA
+          careers; otherwise the list is matched to the learner's subjects. */}
       {data && (
         <p className="text-sm text-muted-foreground">
           <span className="font-medium text-foreground">
             {visibleCareers.length}
           </span>{" "}
-          {visibleCareers.length === 1 ? "career" : "careers"} match your
-          subjects
+          {visibleCareers.length === 1 ? "career" : "careers"}{" "}
+          {data.explore
+            ? "to explore — each shows the subjects to choose from Grade 10"
+            : "match your subjects"}
           {selectedIndustry ? ` in ${selectedIndustry}` : ""}
         </p>
       )}

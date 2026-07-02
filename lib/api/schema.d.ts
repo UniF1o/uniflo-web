@@ -789,6 +789,11 @@ export interface components {
        * @default []
        */
       unmet_rules: unknown[];
+      /**
+       * Subject Requirements
+       * @default []
+       */
+      subject_requirements: string[];
       /** Notes */
       notes?: string | null;
     };
@@ -825,6 +830,16 @@ export interface components {
        * @default []
        */
       required_subjects: string[];
+      /**
+       * Any Of Subjects
+       * @default []
+       */
+      any_of_subjects: string[];
+      /**
+       * Recommended Subjects
+       * @default []
+       */
+      recommended_subjects: string[];
     };
     /** CareerUniversityGroup */
     CareerUniversityGroup: {
@@ -845,6 +860,11 @@ export interface components {
     CareersListResponse: {
       /** Careers */
       careers: components["schemas"]["CareerRead"][];
+      /**
+       * Explore
+       * @default false
+       */
+      explore: boolean;
     };
     /**
      * ChallengeSupplyRequest
@@ -857,6 +877,16 @@ export interface components {
         [key: string]: string;
       };
     };
+    /**
+     * CitizenshipStatusEnum
+     * @enum {string}
+     */
+    CitizenshipStatusEnum:
+      | "SA Citizen"
+      | "Permanent Resident"
+      | "Refugee"
+      | "Asylum Seeker"
+      | "International";
     /** CompensationOut */
     CompensationOut: {
       /** Entry */
@@ -973,6 +1003,10 @@ export interface components {
      * @enum {string}
      */
     CurrentActivityEnum:
+      | "In Grade 8"
+      | "In Grade 9"
+      | "In Grade 10"
+      | "In Grade 11"
       | "Currently in Grade 12"
       | "Upgrading matric"
       | "Gap year"
@@ -1251,6 +1285,7 @@ export interface components {
       | "grade_11_final"
       | "grade_12_april"
       | "grade_12_june"
+      | "grade_12_september"
       | "grade_12_final";
     /**
      * ReligionEnum
@@ -1320,6 +1355,12 @@ export interface components {
       nationality?: string | null;
       /** Is Sa Citizen */
       is_sa_citizen?: boolean | null;
+      citizenship_status?:
+        | components["schemas"]["CitizenshipStatusEnum"]
+        | null;
+      /** Passport Number */
+      passport_number?: string | null;
+      study_permit_type?: components["schemas"]["StudyPermitTypeEnum"] | null;
       gender?: components["schemas"]["GenderEnum"] | null;
       home_language?: components["schemas"]["HomeLanguageEnum"] | null;
       religion?: components["schemas"]["ReligionEnum"] | null;
@@ -1331,6 +1372,8 @@ export interface components {
       marital_status?: components["schemas"]["MaritalStatusEnum"] | null;
       ethnicity?: components["schemas"]["EthnicityEnum"] | null;
       current_activity?: components["schemas"]["CurrentActivityEnum"] | null;
+      /** Subject Choices */
+      subject_choices?: string[] | null;
       /** Exam Number */
       exam_number?: string | null;
       /** Sport */
@@ -1353,6 +1396,12 @@ export interface components {
       redress_factors?: {
         [key: string]: unknown;
       } | null;
+      /** Guardian Consent At */
+      guardian_consent_at?: string | null;
+      /** Guardian Consent By */
+      guardian_consent_by?: string | null;
+      /** Guardian Relationship */
+      guardian_relationship?: string | null;
       /** Updated At */
       updated_at?: string | null;
       /** Is Complete */
@@ -1403,6 +1452,12 @@ export interface components {
       nationality?: string | null;
       /** Is Sa Citizen */
       is_sa_citizen?: boolean | null;
+      citizenship_status?:
+        | components["schemas"]["CitizenshipStatusEnum"]
+        | null;
+      /** Passport Number */
+      passport_number?: string | null;
+      study_permit_type?: components["schemas"]["StudyPermitTypeEnum"] | null;
       gender?: components["schemas"]["GenderEnum"] | null;
       home_language?: components["schemas"]["HomeLanguageEnum"] | null;
       religion?: components["schemas"]["ReligionEnum"] | null;
@@ -1414,6 +1469,8 @@ export interface components {
       marital_status?: components["schemas"]["MaritalStatusEnum"] | null;
       ethnicity?: components["schemas"]["EthnicityEnum"] | null;
       current_activity?: components["schemas"]["CurrentActivityEnum"] | null;
+      /** Subject Choices */
+      subject_choices?: string[] | null;
       /** Exam Number */
       exam_number?: string | null;
       /** Sport */
@@ -1436,7 +1493,35 @@ export interface components {
       redress_factors?: {
         [key: string]: unknown;
       } | null;
+      /** Guardian Consent At */
+      guardian_consent_at?: string | null;
+      /** Guardian Consent By */
+      guardian_consent_by?: string | null;
+      /** Guardian Relationship */
+      guardian_relationship?: string | null;
     };
+    /**
+     * StudyPermitTypeEnum
+     * @enum {string}
+     */
+    StudyPermitTypeEnum:
+      | "Asylum Seeker Permit"
+      | "Business Visa With Endorsement"
+      | "Critical Skills Visa"
+      | "Diplomatic Permit"
+      | "Exchange Student"
+      | "Experiential Learning"
+      | "Extra Curricular"
+      | "Limited Contact Sessions"
+      | "Online Programme - Not Applicable"
+      | "Other"
+      | "Permanent Residence Status"
+      | "Quota Work Visa With Endorsement"
+      | "Refugees Permit"
+      | "Relatives Visa With Endorsement"
+      | "Study Visa"
+      | "Visitor's Visa"
+      | "Work Visa With Endorsement";
     /** SubjectIn */
     SubjectIn: {
       /** Name */

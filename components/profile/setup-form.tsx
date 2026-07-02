@@ -1,11 +1,17 @@
 // ProfileSetupForm — five-step wizard that collects a student's full profile.
 //
+// Applicant type is the entry point (Step 1) and drives the wizard: it decides
+// whether an SA ID is asked for, whether the learner can apply, and (for
+// under-18s) surfaces the guardian-consent block. Citizenship is the secondary
+// axis, swapping the ID input for a passport + permit.
+//
 // Steps:
-//   1. Personal details  — first name, last name, date of birth, SA ID number
+//   1. About you         — applicant type, name, date of birth, guardian
+//                          consent (minors), citizenship + ID/passport
 //   2. Contact details   — phone number, residential address, nationality
 //   3. Demographics      — gender, home language
 //   4. Background        — religion, disability, marital status, ethnicity
-//   5. Studies & funding — optional (skippable): current activity, residence
+//   5. Studies & funding — optional: subject choices (Grade 10/11), residence
 //                          and funding intentions
 //
 // API saves:
@@ -37,7 +43,15 @@ import { Select } from "@/components/ui/select";
 import { cn } from "@/lib/utils/cn";
 import { validateSAID } from "@/lib/utils/sa-id";
 import { DateInput } from "@/components/ui/date-input";
+import { Textarea } from "@/components/ui/textarea";
 import {
+  canApply,
+  collectsIdNumber,
+  deriveStage,
+  needsGuardianConsent,
+} from "@/lib/eligibility";
+import {
+  CITIZENSHIP_STATUS_OPTIONS,
   DISABILITY_OPTIONS,
   ETHNICITY_OPTIONS,
   GENDER_OPTIONS,
@@ -47,12 +61,14 @@ import {
   NATIONALITY_OPTIONS,
   RELIGION_OPTIONS,
   SA_PROVINCE_OPTIONS,
+  STUDY_PERMIT_OPTIONS,
+  usesPassport,
 } from "@/lib/constants/profile-enums";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 const STEPS = [
-  "Personal details",
+  "About you",
   "Contact details",
   "Demographics",
   "Background",
@@ -70,7 +86,21 @@ const STEPS = [
 interface ProfilePayload {
   first_name?: string;
   last_name?: string;
-  id_number?: string;
+  // Applicant type drives the whole wizard (Step 1). Profile-only statuses
+  // (Grade 8-11, at-university) save a profile but cannot apply yet.
+  current_activity?: string | null;
+  citizenship_status?: string | null;
+  is_sa_citizen?: boolean;
+  id_number?: string | null;
+  passport_number?: string | null;
+  study_permit_type?: string | null;
+  // Chosen FET subjects (no marks) for Grade 10/11 learners who have picked
+  // subjects but have no results to record yet.
+  subject_choices?: string[] | null;
+  // POPIA: a minor's profile needs recorded guardian consent.
+  guardian_consent_at?: string | null;
+  guardian_consent_by?: string | null;
+  guardian_relationship?: string | null;
   date_of_birth?: string; // ISO 8601 — "YYYY-MM-DD"
   phone?: string;
   street_address?: string;
@@ -85,9 +115,7 @@ interface ProfilePayload {
   disability?: string;
   marital_status?: string;
   ethnicity?: string;
-  // Step 5 — all optional, but they feed the automation (current_activity
-  // gates whether automated submission is allowed at all).
-  current_activity?: string | null;
+  // Studies & funding — all optional automation hints.
   wants_residence?: boolean;
   preferred_residence?: string | null;
   applying_nsfas?: boolean;
@@ -101,23 +129,54 @@ interface ProfilePayload {
 // beneath each field rather than in a single top-level banner.
 
 function validateStep1(fields: {
+  currentActivity: string;
   firstName: string;
   lastName: string;
   dateOfBirth: string;
+  guardianName: string;
+  guardianRelationship: string;
+  guardianConsent: boolean;
+  citizenshipStatus: string;
   idNumber: string;
+  passportNumber: string;
 }) {
   const errors: Record<string, string> = {};
+  if (!fields.currentActivity)
+    errors.currentActivity = "Please tell us what best describes you.";
   if (!fields.firstName.trim()) errors.firstName = "First name is required.";
   if (!fields.lastName.trim()) errors.lastName = "Last name is required.";
   if (!fields.dateOfBirth) errors.dateOfBirth = "Date of birth is required.";
-  if (!fields.idNumber) {
-    errors.idNumber = "ID number is required.";
-  } else {
-    const idResult = validateSAID(
-      fields.idNumber,
-      fields.dateOfBirth || undefined,
-    );
-    if (!idResult.valid) errors.idNumber = idResult.reason;
+
+  // POPIA: an under-18 profile needs a guardian's recorded consent.
+  if (fields.dateOfBirth && needsGuardianConsent(fields.dateOfBirth)) {
+    if (!fields.guardianName.trim())
+      errors.guardianName = "A parent or guardian's name is required.";
+    if (!fields.guardianRelationship)
+      errors.guardianRelationship = "Please select their relationship to you.";
+    if (!fields.guardianConsent)
+      errors.guardianConsent =
+        "A parent or guardian must consent for under-18s.";
+  }
+
+  if (!fields.citizenshipStatus) {
+    errors.citizenshipStatus = "Please select your citizenship status.";
+  } else if (usesPassport(fields.citizenshipStatus)) {
+    // Non-SA-citizen branch: a passport replaces the SA ID; the SA-ID checksum
+    // must not run against it.
+    if (!fields.passportNumber.trim())
+      errors.passportNumber = "Passport number is required.";
+  } else if (collectsIdNumber(fields.currentActivity, fields.dateOfBirth)) {
+    // SA-ID is only required once the learner is old enough to have one (16+)
+    // or is apply-eligible. Younger profile-only explorers skip it.
+    if (!fields.idNumber) {
+      errors.idNumber = "ID number is required.";
+    } else {
+      const idResult = validateSAID(
+        fields.idNumber,
+        fields.dateOfBirth || undefined,
+      );
+      if (!idResult.valid) errors.idNumber = idResult.reason;
+    }
   }
   return errors;
 }
@@ -246,11 +305,30 @@ export function ProfileSetupForm() {
   // fieldErrors maps field keys to inline error messages beneath each input.
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
-  // Step 1: personal details
+  // Step 1: about you (applicant type is the entry point, then identity)
+  const [currentActivity, setCurrentActivity] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
+  const [guardianName, setGuardianName] = useState("");
+  const [guardianRelationship, setGuardianRelationship] = useState("");
+  const [guardianConsent, setGuardianConsent] = useState(false);
+  const [citizenshipStatus, setCitizenshipStatus] = useState("");
   const [idNumber, setIdNumber] = useState("");
+  const [passportNumber, setPassportNumber] = useState("");
+  const [studyPermitType, setStudyPermitType] = useState("");
+  // Grade 10/11 "choosers" record chosen FET subjects (no marks yet).
+  const [subjectChoices, setSubjectChoices] = useState("");
+
+  // Non-SA citizens (and PR/refugee/asylum) supply a passport, not an SA ID.
+  const isPassportApplicant = usesPassport(citizenshipStatus);
+  // Applicant type drives the wizard: who must consent, who can apply, and
+  // whether an SA ID is asked for. Recomputed at render — nothing persisted.
+  const isMinor = needsGuardianConsent(dateOfBirth);
+  const stage = deriveStage(currentActivity);
+  const showIdField =
+    !isPassportApplicant && collectsIdNumber(currentActivity, dateOfBirth);
+  const applyBlocked = !!currentActivity && !canApply(currentActivity);
 
   // Step 2: contact details
   const [phone, setPhone] = useState("");
@@ -272,7 +350,6 @@ export function ProfileSetupForm() {
   const [ethnicity, setEthnicity] = useState("");
 
   // Step 5: studies & funding — every field optional, so no validator.
-  const [currentActivity, setCurrentActivity] = useState("");
   const [wantsResidence, setWantsResidence] = useState(false);
   const [preferredResidence, setPreferredResidence] = useState("");
   const [applyingNsfas, setApplyingNsfas] = useState(false);
@@ -359,7 +436,18 @@ export function ProfileSetupForm() {
     // optional, so it has no validator.
     const errors =
       step === 1
-        ? validateStep1({ firstName, lastName, dateOfBirth, idNumber })
+        ? validateStep1({
+            currentActivity,
+            firstName,
+            lastName,
+            dateOfBirth,
+            guardianName,
+            guardianRelationship,
+            guardianConsent,
+            citizenshipStatus,
+            idNumber,
+            passportNumber,
+          })
         : step === 2
           ? validateStep2({
               phone,
@@ -392,11 +480,38 @@ export function ProfileSetupForm() {
     // step 2 spreads contact details on top; step 3 adds identity fields.
     // `...(condition && { key: value })` spreads the object when condition is
     // truthy and spreads nothing (false is ignored) when it isn't.
+    // Chosen FET subjects, one per line, kept only for Grade 10/11 choosers.
+    const parsedSubjectChoices = subjectChoices
+      .split("\n")
+      .map((s) => s.trim())
+      .filter(Boolean);
+
     const payload: ProfilePayload = {
+      // Applicant type is the entry point and is sent from step 1 on.
+      current_activity: currentActivity || null,
       first_name: firstName,
       last_name: lastName,
-      id_number: idNumber,
       date_of_birth: dateOfBirth,
+      // POPIA guardian consent for under-18s. guardian_consent_at is stamped
+      // now (the consent checkbox was ticked this session); it clears back to
+      // null once the learner is no longer a minor.
+      guardian_consent_at:
+        isMinor && guardianConsent ? new Date().toISOString() : null,
+      guardian_consent_by: isMinor && guardianName ? guardianName : null,
+      guardian_relationship:
+        isMinor && guardianRelationship ? guardianRelationship : null,
+      subject_choices:
+        stage === "chooser" && parsedSubjectChoices.length > 0
+          ? parsedSubjectChoices
+          : null,
+      citizenship_status: citizenshipStatus || null,
+      is_sa_citizen: citizenshipStatus === "SA Citizen",
+      // Send whichever identifier applies; the other goes up null so switching
+      // citizenship after a prior save clears the stale value.
+      id_number: isPassportApplicant || !showIdField ? null : idNumber,
+      passport_number: isPassportApplicant ? passportNumber : null,
+      study_permit_type:
+        isPassportApplicant && studyPermitType ? studyPermitType : null,
       ...(step >= 2 && {
         phone,
         street_address: streetAddress,
@@ -416,7 +531,6 @@ export function ProfileSetupForm() {
       // Blank optional strings go up as null — backend field validators
       // reject empty strings.
       ...(step >= 5 && {
-        current_activity: currentActivity || null,
         wants_residence: wantsResidence,
         preferred_residence:
           wantsResidence && preferredResidence.trim()
@@ -479,6 +593,35 @@ export function ProfileSetupForm() {
           noValidate
           className="space-y-4 rounded-xl border border-border bg-card p-5 shadow-[var(--shadow-paper)] sm:p-6"
         >
+          <div className="space-y-1">
+            <Select
+              id="currentActivity"
+              label="What best describes you right now?"
+              placeholder="Select an option"
+              options={CURRENT_ACTIVITY_OPTIONS}
+              value={currentActivity}
+              onChange={(e) => {
+                setCurrentActivity(e.target.value);
+                clearError("currentActivity");
+                // The ID requirement can change with the applicant type.
+                clearError("idNumber");
+              }}
+              error={fieldErrors.currentActivity}
+            />
+            <p className="text-xs text-muted-foreground">
+              This decides what we ask for next and whether you can apply yet.
+            </p>
+          </div>
+
+          {applyBlocked && (
+            <Alert tone="info">
+              You can build your profile and explore careers now.
+              {stage === "explorer" || stage === "chooser"
+                ? " Applications open once you reach Grade 12."
+                : " Applying is not available for this status yet."}
+            </Alert>
+          )}
+
           <div className="grid gap-4 sm:grid-cols-2">
             <Input
               id="firstName"
@@ -519,27 +662,137 @@ export function ProfileSetupForm() {
             error={fieldErrors.dateOfBirth}
           />
 
-          <div className="space-y-1">
-            <Input
-              id="idNumber"
-              label="South African ID number"
-              type="text"
-              inputMode="numeric"
-              maxLength={13}
-              placeholder="0001010000000"
-              value={idNumber}
-              onChange={(e) => {
-                // Strip non-digit characters on every keystroke so the field
-                // only ever holds numbers. maxLength={13} caps further input.
-                setIdNumber(e.target.value.replace(/\D/g, ""));
-                clearError("idNumber");
-              }}
-              error={fieldErrors.idNumber}
-            />
-            <p className="text-xs text-muted-foreground">
-              13-digit number on the front of your green ID book or smart card.
+          {/* POPIA: under-18s need a parent or guardian to consent. The block
+           * appears the moment a minor's date of birth is entered. */}
+          {dateOfBirth && isMinor && (
+            <div className="space-y-3 rounded-lg border border-border bg-muted/30 p-4">
+              <p className="text-sm font-medium text-foreground">
+                Parent or guardian consent
+              </p>
+              <p className="text-xs text-muted-foreground">
+                You are under 18, so a parent or guardian needs to consent to us
+                handling your information.
+              </p>
+              <Input
+                id="guardianName"
+                label="Parent or guardian full name"
+                type="text"
+                placeholder="Nomsa Dlamini"
+                value={guardianName}
+                onChange={(e) => {
+                  setGuardianName(e.target.value);
+                  clearError("guardianName");
+                }}
+                error={fieldErrors.guardianName}
+              />
+              <Select
+                id="guardianRelationship"
+                label="Their relationship to you"
+                placeholder="Select relationship"
+                options={[
+                  { value: "Parent", label: "Parent" },
+                  { value: "Legal guardian", label: "Legal guardian" },
+                  { value: "Grandparent", label: "Grandparent" },
+                  { value: "Other", label: "Other" },
+                ]}
+                value={guardianRelationship}
+                onChange={(e) => {
+                  setGuardianRelationship(e.target.value);
+                  clearError("guardianRelationship");
+                }}
+                error={fieldErrors.guardianRelationship}
+              />
+              <Checkbox
+                id="guardianConsent"
+                label="My parent or guardian consents to UniFlo handling my information."
+                checked={guardianConsent}
+                onChange={(e) => {
+                  setGuardianConsent(e.target.checked);
+                  clearError("guardianConsent");
+                }}
+              />
+              {fieldErrors.guardianConsent && (
+                <p className="text-xs text-destructive">
+                  {fieldErrors.guardianConsent}
+                </p>
+              )}
+            </div>
+          )}
+
+          <Select
+            id="citizenshipStatus"
+            label="Citizenship status"
+            placeholder="Select status"
+            options={CITIZENSHIP_STATUS_OPTIONS}
+            value={citizenshipStatus}
+            onChange={(e) => {
+              setCitizenshipStatus(e.target.value);
+              clearError("citizenshipStatus");
+              // Clear the identifier errors when switching branches.
+              clearError("idNumber");
+              clearError("passportNumber");
+            }}
+            error={fieldErrors.citizenshipStatus}
+          />
+
+          {isPassportApplicant ? (
+            <>
+              <div className="space-y-1">
+                <Input
+                  id="passportNumber"
+                  label="Passport number"
+                  type="text"
+                  placeholder="A01234567"
+                  value={passportNumber}
+                  onChange={(e) => {
+                    setPassportNumber(e.target.value);
+                    clearError("passportNumber");
+                  }}
+                  error={fieldErrors.passportNumber}
+                />
+                <p className="text-xs text-muted-foreground">
+                  As shown in your passport. We do not run the SA ID check on
+                  this.
+                </p>
+              </div>
+              <Select
+                id="studyPermitType"
+                label="Study permit / visa type (optional)"
+                placeholder="Select permit type"
+                options={STUDY_PERMIT_OPTIONS}
+                value={studyPermitType}
+                onChange={(e) => setStudyPermitType(e.target.value)}
+              />
+            </>
+          ) : showIdField ? (
+            <div className="space-y-1">
+              <Input
+                id="idNumber"
+                label="South African ID number"
+                type="text"
+                inputMode="numeric"
+                maxLength={13}
+                placeholder="0001010000000"
+                value={idNumber}
+                onChange={(e) => {
+                  // Strip non-digit characters on every keystroke so the field
+                  // only ever holds numbers. maxLength={13} caps further input.
+                  setIdNumber(e.target.value.replace(/\D/g, ""));
+                  clearError("idNumber");
+                }}
+                error={fieldErrors.idNumber}
+              />
+              <p className="text-xs text-muted-foreground">
+                13-digit number on the front of your green ID book or smart
+                card.
+              </p>
+            </div>
+          ) : (
+            <p className="rounded-lg border border-border bg-muted/30 p-3 text-xs text-muted-foreground">
+              We will ask for your ID number once you turn 16. For now your date
+              of birth is enough.
             </p>
-          </div>
+          )}
         </form>
       )}
 
@@ -768,20 +1021,24 @@ export function ProfileSetupForm() {
             each university&rsquo;s forms for you.
           </p>
 
-          <div className="space-y-1">
-            <Select
-              id="currentActivity"
-              label="What are you currently doing?"
-              placeholder="Select option"
-              options={CURRENT_ACTIVITY_OPTIONS}
-              value={currentActivity}
-              onChange={(e) => setCurrentActivity(e.target.value)}
-            />
-            <p className="text-xs text-muted-foreground">
-              If you&rsquo;re in Grade 12 now, we can submit applications
-              automatically on your behalf.
-            </p>
-          </div>
+          {stage === "chooser" && (
+            <div className="space-y-1">
+              <Textarea
+                id="subjectChoices"
+                label="Which subjects are you taking? (optional)"
+                placeholder={
+                  "Mathematics\nPhysical Sciences\nEnglish Home Language"
+                }
+                value={subjectChoices}
+                onChange={(e) => setSubjectChoices(e.target.value)}
+                rows={5}
+              />
+              <p className="text-xs text-muted-foreground">
+                One subject per line. We use these to guide your career and
+                programme suggestions. You will add marks later.
+              </p>
+            </div>
+          )}
 
           <div className="space-y-2 pt-1">
             <Checkbox
